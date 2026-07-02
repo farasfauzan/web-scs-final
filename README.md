@@ -16,8 +16,3 @@ WEB-SCS-final-
 - **Tim Frontend:** Silakan masuk ke dalam folder `frontend/`, baca panduan `README.md` di dalamnya, dan lakukan instalasi *framework* pilihan kalian di sana.
 - **Tim Backend:** Silakan masuk ke dalam folder `backend/`, baca panduan `README.md` di dalamnya, dan lakukan instalasi *framework* serta *database* kalian di sana.
 
-## 📌 Penting untuk AI Assistant
-Setiap folder (`frontend` dan `backend`) memiliki file `README.md` tersendiri dengan instruksi spesifik. 
-AI harus mematuhi konteks masing-masing folder tanpa menggabungkan logika antara keduanya.
-
-Selamat Bekerja!
