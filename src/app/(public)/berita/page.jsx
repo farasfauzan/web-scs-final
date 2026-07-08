@@ -1,64 +1,56 @@
 import Pagination from "@/components/shared/Pagination";
+import NewsList from "@/components/views/berita/NewsList";
 
 export const metadata = {
-  title: "Berita & Pembaruan",
-  description: "Berita terkini seputar proyek dan pencapaian PT Sinar Cerah Sempurna.",
+  title: "Berita & Pembaruan | PT Sinar Cerah Sempurna",
 };
 
 export default async function BeritaPage({ searchParams }) {
-  await new Promise(resolve => setTimeout(resolve, 2000));
-  
-  const news = Array(6).fill(null).map((_, i) => ({
+  const news = Array(9).fill(null).map((_, i) => ({
     id: i,
     title: "Peresmian Kantor Baru PT Sinar Cerah Sempurna",
     desc: "Peresmian kantor baru ini tidak hanya menandai bertambahnya fasilitas operasional perusahaan, tetapi juga...",
-    image: "[https://placehold.co/379x213](https://placehold.co/379x213)"
+    image: "/hero-bg.svg" 
   }));
 
-  const totalPages = 3;
-
   return (
-    <div className="w-full bg-zinc-100 min-h-screen pb-20">
-      <div className="w-full h-[50vh] bg-sky-950 relative flex items-center justify-center rounded-bl-[64px] rounded-br-[64px] overflow-hidden pt-20">
-        <div className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-overlay" style={{ backgroundImage: `url('[https://placehold.co/1440x500](https://placehold.co/1440x500)')` }} />
-        <div className="relative z-10 text-center max-w-3xl px-6 flex flex-col gap-4">
-          <h1 className="text-white text-4xl md:text-5xl font-extrabold font-sans">Kilas Balik & Berita Terkini</h1>
-          <p className="text-zinc-200 text-base md:text-lg font-sans">
-            Simak perjalanan dan perkembangan terbaru dari proyek-proyek strategis kami.
+    <main className="w-full bg-[#F1F1F1] min-h-screen pb-24">
+      
+      {/* HERO SECTION - Menggunakan h-screen agar sama persis dengan Landing Page */}
+      <section className="relative w-full h-screen flex flex-col items-center justify-center rounded-b-[64px] overflow-hidden bg-[#004282]">
+        <div className="absolute inset-0 z-0">
+          <img src="/hero-bg.svg" alt="Background Berita" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-[#004282]/85"></div>
+        </div>
+
+        <div className="relative z-10 text-center max-w-4xl px-6 flex flex-col gap-5">
+          <h1 className="text-white text-4xl md:text-5xl font-extrabold font-['Plus_Jakarta_Sans'] leading-tight">
+            Kilas Balik & Berita Terkini
+          </h1>
+          <p className="text-white/90 text-[17px] font-normal font-['Plus_Jakarta_Sans'] leading-relaxed max-w-[800px] mx-auto">
+            Simak perjalanan dan perkembangan terbaru dari proyek-proyek strategis kami. Informasi seputar kemajuan, kolaborasi, dan dedikasi kami dalam menghadirkan solusi konstruksi berkualitas di Indonesia.
           </p>
         </div>
-      </div>
+      </section>
 
-      <div className="max-w-7xl mx-auto px-6 mt-[-24px] relative z-20 flex flex-col gap-12">
-        {/* Search Bar Berita */}
-        <div className="bg-white rounded-full shadow-lg p-2 flex mx-auto w-full max-w-2xl relative">
+      {/* KONTEN UTAMA */}
+      <section className="relative z-20 -mt-8 px-6">
+        <div className="bg-white rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.08)] p-2 mx-auto w-full max-w-[800px] border border-neutral-100">
             <input 
               type="text" 
               placeholder="Cari Berita..." 
-              className="bg-transparent rounded-full pl-6 pr-12 py-3 w-full text-base font-sans focus:outline-none"
+              className="bg-transparent pl-6 pr-6 py-2.5 w-full text-base font-['Plus_Jakarta_Sans'] text-neutral-600 focus:outline-none placeholder:text-neutral-400"
             />
-            <button className="absolute right-3 top-2.5 w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center text-sky-950 hover:bg-yellow-500 transition-colors">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-            </button>
         </div>
+      </section>
 
-        {/* Grid Berita */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {news.map((item) => (
-            <div key={item.id} className="bg-white rounded-2xl border border-neutral-300 overflow-hidden flex flex-col shadow-sm hover:shadow-md transition-all">
-              <div className="w-full h-52 bg-neutral-200 relative">
-                <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('${item.image}')` }} />
-              </div>
-              <div className="p-6 flex flex-col gap-3">
-                <h3 className="text-stone-900 text-xl font-semibold font-sans leading-snug">{item.title}</h3>
-                <p className="text-stone-600 text-sm font-normal font-sans line-clamp-3">{item.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
+      <section className="w-full pt-16 px-6">
+         <div className="max-w-[1152px] mx-auto flex flex-col gap-8">
+            <NewsList newsData={news} />
+            <Pagination totalPages={3} basePath="/berita" />
+         </div>
+      </section>
 
-        <Pagination totalPages={totalPages} basePath="/berita" />
-      </div>
-    </div>
+    </main>
   );
 }

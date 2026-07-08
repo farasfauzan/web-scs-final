@@ -1,66 +1,112 @@
 export const metadata = {
-  title: "Tentang Kami",
+  title: "Tentang Kami | PT Sinar Cerah Sempurna",
 };
 
 export default function TentangKamiPage() {
-  const values = [
-    { icon: "M12 2L2 22h20L12 2z", title: "Integritas", desc: "Kami menjalankan bisnis dengan kejujuran, transparansi, dan tanggung jawab penuh." },
-    { icon: "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z", title: "Kualitas", desc: "Kami berkomitmen pada standar kualitas tertinggi dalam setiap proyek." },
-    { icon: "M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z", title: "Inovasi", desc: "Mengeksplorasi teknologi dan metode baru untuk solusi efisien." },
-    { icon: "M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z", title: "Kerja Sama Tim", desc: "Kolaborasi kuat antar tim adalah kunci keberhasilan setiap proyek." }
-  ];
-
   return (
-    <div className="w-full bg-zinc-100 min-h-screen pb-20">
-      <div className="w-full h-[60vh] bg-sky-950 relative flex items-center justify-center rounded-bl-[64px] rounded-br-[64px] overflow-hidden pt-20">
-        <div className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-overlay" style={{ backgroundImage: `url('[https://placehold.co/1440x600](https://placehold.co/1440x600)')` }} />
-        <div className="relative z-10 text-center max-w-4xl px-6 flex flex-col gap-6">
-          <h1 className="text-white text-4xl md:text-5xl font-extrabold font-sans leading-tight">
-            Membangun dengan Kepercayaan,<br/>Berkarya dengan Kualitas.
+    <main className="w-full bg-[#F1F1F1] min-h-screen pb-24">
+      
+      {/* HERO SECTION - Menggunakan h-screen agar sama persis dengan Landing Page */}
+      <section className="relative w-full h-screen flex flex-col items-center justify-center rounded-b-[64px] overflow-hidden bg-[#004282]">
+        <div className="absolute inset-0 z-0">
+          <img src="/hero-bg.svg" alt="Background Tentang Kami" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-[#004282]/85"></div>
+        </div>
+
+        <div className="relative z-10 text-center max-w-4xl px-6 flex flex-col items-center gap-6">
+          <h1 className="text-white text-4xl md:text-5xl font-extrabold font-['Plus_Jakarta_Sans'] leading-tight">
+            Membangun dengan Kepercayaan,<br />Berkarya dengan Kualitas.
           </h1>
-          <p className="text-zinc-200 text-base md:text-lg font-sans">
-            Berpegang teguh pada motto &aposMemberi Kepuasan Kepada Relasi&apos, kami terus membangun kepercayaan dalam industri konstruksi melalui dedikasi tinggi.
+          <p className="text-white/90 text-[15px] font-normal font-['Plus_Jakarta_Sans'] leading-relaxed max-w-[850px]">
+            Berpegang teguh pada motto &quot;Memberi Kepuasan Kepada Relasi&quot;, kami terus membangun kepercayaan dalam industri konstruksi melalui dedikasi tinggi. Komitmen ini kami wujudkan dengan konsisten meningkatkan kompetensi Sumber Daya Manusia agar selalu terampil dan profesional, demi memberikan hasil kerja terbaik yang memenuhi standar kepuasan setiap relasi kami.
           </p>
         </div>
-      </div>
+      </section>
 
-      <div className="max-w-5xl mx-auto px-6 mt-16 flex flex-col gap-16">
-        <div className="text-center flex flex-col gap-4">
-          <h2 className="text-3xl font-extrabold text-stone-900 font-sans">Tentang PT Sinar Cerah Sempurna</h2>
-          <p className="text-stone-600 max-w-2xl mx-auto font-sans">
-            Perusahaan konstruksi dan infrastruktur yang berpengalaman dalam pembangunan gedung, jalan, jembatan, dan berbagai proyek infrastruktur lainnya di Indonesia.
-          </p>
-        </div>
+      {/* KONTEN TENTANG KAMI */}
+      <section className="flex flex-col items-center justify-start pt-20 px-6 gap-20">
+         
+         <div className="max-w-[1152px] w-full text-center flex flex-col gap-4">
+            <h2 className="text-[#1E1E1E] text-3xl font-extrabold font-['Plus_Jakarta_Sans']">
+              Tentang PT Sinar Cerah Sempurna
+            </h2>
+            <p className="text-[#757575] text-[15px] font-normal font-['Plus_Jakarta_Sans'] max-w-3xl mx-auto leading-relaxed">
+              PT Sinar Cerah Sempurna adalah perusahaan konstruksi dan infrastruktur yang berpengalaman dalam pembangunan gedung, jalan, jembatan, dan berbagai proyek infrastruktur lainnya di Indonesia.
+            </p>
+         </div>
 
-        <div className="bg-white rounded-3xl border border-neutral-200 p-8 md:p-12 shadow-sm text-center">
-          <h3 className="text-2xl font-extrabold text-stone-900 mb-4 font-sans">Visi</h3>
-          <p className="text-stone-600 mb-10 font-sans">Menjadi perusahaan konstruksi dan infrastruktur terdepan serta terpercaya di Indonesia.</p>
-          
-          <h3 className="text-2xl font-extrabold text-stone-900 mb-4 font-sans">Misi</h3>
-          <ul className="text-stone-600 text-left list-disc list-inside flex flex-col gap-3 font-sans max-w-3xl mx-auto">
-            <li>Memberikan layanan konstruksi berkualitas tinggi yang melampaui ekspektasi klien.</li>
-            <li>Menerapkan praktik terbaik dalam pengelolaan kesehatan, keselamatan kerja, dan lingkungan.</li>
-            <li>Mendorong inovasi melalui adopsi teknologi dan metodologi konstruksi mutakhir.</li>
-          </ul>
-        </div>
+         <div className="max-w-[1000px] w-full bg-white rounded-[32px] p-10 md:p-14 shadow-sm border border-neutral-200">
+            <div className="flex flex-col gap-10">
+              <div className="text-center flex flex-col gap-4">
+                <h3 className="text-2xl font-bold font-['Plus_Jakarta_Sans'] text-[#1E1E1E]">Visi</h3>
+                <p className="text-[15px] text-[#424242] font-['Plus_Jakarta_Sans'] leading-relaxed">
+                  Menjadi perusahaan konstruksi dan infrastruktur terdepan serta terpercaya di Indonesia, yang diakui karena keunggulan dalam kualitas, keselamatan, dan pembangunan berkelanjutan.
+                </p>
+              </div>
+              
+              <div className="flex flex-col gap-4">
+                <h3 className="text-2xl font-bold font-['Plus_Jakarta_Sans'] text-[#1E1E1E] text-center mb-2">Misi</h3>
+                <ul className="list-disc pl-5 space-y-3 text-[15px] text-[#424242] font-['Plus_Jakarta_Sans'] leading-relaxed marker:text-neutral-400">
+                  <li>Memberikan layanan konstruksi berkualitas tinggi yang melampaui ekspektasi klien dan memenuhi standar internasional.</li>
+                  <li>Menerapkan praktik terbaik dalam pengelolaan kesehatan, keselamatan kerja, dan lingkungan pada setiap proyek.</li>
+                  <li>Mendorong inovasi melalui adopsi teknologi dan metodologi konstruksi mutakhir.</li>
+                  <li>Membangun hubungan jangka panjang dengan klien, mitra, dan pemangku kepentingan berdasarkan kepercayaan dan transparansi.</li>
+                  <li>Mengembangkan kapabilitas profesional tim kami melalui pelatihan berkelanjutan dan pengembangan karir.</li>
+                  <li>Berkontribusi pada pembangunan berkelanjutan infrastruktur dan lingkungan binaan Indonesia.</li>
+                </ul>
+              </div>
+            </div>
+         </div>
 
-        <div>
-          <h2 className="text-3xl font-extrabold text-stone-900 font-sans text-center mb-10">Fondasi Utama Keunggulan Kami</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {values.map((val, idx) => (
-              <div key={idx} className="flex gap-4">
-                <div className="w-12 h-12 shrink-0 border-2 border-neutral-300 rounded-xl flex items-center justify-center text-neutral-600">
-                  <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d={val.icon}/></svg>
+         <div className="max-w-[1152px] w-full flex flex-col items-center gap-12">
+            <div className="text-center flex flex-col gap-4">
+              <h2 className="text-[#1E1E1E] text-3xl font-extrabold font-['Plus_Jakarta_Sans']">Fondasi Utama Keunggulan Kami</h2>
+              <p className="text-[#757575] text-[15px] font-normal font-['Plus_Jakarta_Sans'] max-w-2xl mx-auto leading-relaxed">
+                Nilai-nilai ini adalah inti dari setiap keputusan, desain, dan struktur yang kami bangun. Ini adalah prinsip yang memandu langkah kami untuk selalu memberikan yang terbaik.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-[900px]">
+              <div className="flex gap-5">
+                <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-neutral-200 flex items-center justify-center shrink-0">
+                  <span className="text-xl">🛡️</span>
                 </div>
-                <div>
-                  <h4 className="text-lg font-bold text-stone-900 font-sans">{val.title}</h4>
-                  <p className="text-sm text-stone-600 font-sans mt-1">{val.desc}</p>
+                <div className="flex flex-col gap-2">
+                  <h4 className="text-lg font-bold text-[#1E1E1E] font-['Plus_Jakarta_Sans']">Integritas</h4>
+                  <p className="text-sm text-[#757575] font-['Plus_Jakarta_Sans'] leading-relaxed">Kami menjalankan bisnis dengan kejujuran, transparansi, dan tanggung jawab penuh dalam setiap aspek operasional kami.</p>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
+              <div className="flex gap-5">
+                <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-neutral-200 flex items-center justify-center shrink-0">
+                  <span className="text-xl">💎</span>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <h4 className="text-lg font-bold text-[#1E1E1E] font-['Plus_Jakarta_Sans']">Kualitas</h4>
+                  <p className="text-sm text-[#757575] font-['Plus_Jakarta_Sans'] leading-relaxed">Kami berkomitmen pada standar kualitas tertinggi dalam setiap proyek, memastikan hasil yang melampaui ekspektasi klien.</p>
+                </div>
+              </div>
+              <div className="flex gap-5">
+                <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-neutral-200 flex items-center justify-center shrink-0">
+                  <span className="text-xl">💡</span>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <h4 className="text-lg font-bold text-[#1E1E1E] font-['Plus_Jakarta_Sans']">Inovasi</h4>
+                  <p className="text-sm text-[#757575] font-['Plus_Jakarta_Sans'] leading-relaxed">Kami terus mengeksplorasi teknologi dan metode konstruksi terbaru untuk memberikan solusi yang lebih efisien dan berkelanjutan.</p>
+                </div>
+              </div>
+              <div className="flex gap-5">
+                <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-neutral-200 flex items-center justify-center shrink-0">
+                  <span className="text-xl">🤝</span>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <h4 className="text-lg font-bold text-[#1E1E1E] font-['Plus_Jakarta_Sans']">Kerja Sama Tim</h4>
+                  <p className="text-sm text-[#757575] font-['Plus_Jakarta_Sans'] leading-relaxed">Kami percaya bahwa kolaborasi yang kuat antar tim adalah kunci keberhasilan setiap proyek yang kami kerjakan.</p>
+                </div>
+              </div>
+            </div>
+         </div>
+
+      </section>
+    </main>
   );
 }

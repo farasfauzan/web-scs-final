@@ -3,7 +3,9 @@ import FadeUp from "@/components/ui/FadeUp";
 
 export default function HeroSection() {
   return (
-    <section className="relative w-full h-screen bg-[#004282] overflow-hidden flex items-center">
+    // Lengkungan ditambahkan di sini: rounded-b-[64px]
+    <section className="relative w-full h-screen bg-[#004282] overflow-hidden flex items-center rounded-b-[64px]">
+      
       {/* Background & Overlay Biru Transparan */}
       <div className="absolute inset-0 z-0">
         <img src="/hero-bg.svg" alt="Background" className="w-full h-full object-cover" />
@@ -15,7 +17,6 @@ export default function HeroSection() {
         {/* Kolom Kiri: Teks */}
         <div className="flex flex-col gap-4">
           <FadeUp delay={0.1}>
-            {/* Teks sudah dikecilkan menjadi text-xs md:text-sm */}
             <span className="text-white text-xs md:text-sm font-semibold tracking-widest uppercase">
               PT SINAR CERAH SEMPURNA
             </span>

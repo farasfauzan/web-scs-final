@@ -1,77 +1,94 @@
 export const metadata = {
-  title: "Hubungi Kami",
+  title: "Hubungi Kami | PT Sinar Cerah Sempurna",
 };
 
 export default function HubungiKamiPage() {
   return (
-    <div className="w-full bg-sky-950 min-h-screen relative flex items-center justify-center pt-24 pb-20 overflow-hidden">
-      <div className="absolute inset-0 bg-cover bg-center opacity-10 mix-blend-overlay" style={{ backgroundImage: `url('[https://placehold.co/1440x900](https://placehold.co/1440x900)')` }} />
+    // Background biasa, bukan fixed. Padding atas ditambah (pt-28) agar tidak nabrak navbar.
+    <main className="relative w-full min-h-screen flex flex-col items-center justify-center bg-[#004282] pt-28 pb-16 px-6">
       
-      <div className="max-w-6xl mx-auto px-6 w-full relative z-10 flex flex-col gap-12 mt-10">
+      {/* Gambar Background tanpa kelas fixed */}
+      <div className="absolute inset-0 z-0">
+        <img src="/hero-bg.svg" alt="Background Hubungi Kami" className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-[#004282]/85"></div>
+      </div>
+
+      {/* KONTEN UTAMA */}
+      <div className="relative z-10 w-full max-w-[950px] flex flex-col items-center gap-8">
+        
         <div className="text-center flex flex-col gap-2">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-white font-sans">Hubungi Kami</h1>
-          <p className="text-zinc-300 font-sans">Mari diskusikan proyek masa depan Anda bersama tim ahli kami.</p>
+          <h1 className="text-white text-4xl font-extrabold font-['Plus_Jakarta_Sans']">
+            Hubungi Kami
+          </h1>
+          <p className="text-white/90 text-sm md:text-[15px] font-normal font-['Plus_Jakarta_Sans']">
+            Mari diskusikan proyek masa depan Anda bersama tim ahli kami.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Form Kirim Pesan */}
-          <div className="border border-white/20 rounded-3xl p-8 backdrop-blur-md bg-sky-950/40">
-            <h2 className="text-2xl font-bold text-white mb-6 font-sans">Kirimkan Pesan</h2>
+        {/* Kontainer Form */}
+        <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          {/* Form Pesan */}
+          <div className="bg-white/5 border border-white/20 rounded-2xl p-6 backdrop-blur-md shadow-xl">
+            <h2 className="text-white text-xl font-bold font-['Plus_Jakarta_Sans'] mb-5">Kirimkan Pesan</h2>
             <form className="flex flex-col gap-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex flex-col gap-2">
-                  <label className="text-white text-sm font-sans">Nama Lengkap <span className="text-red-400">*</span></label>
-                  <input type="text" className="bg-transparent border border-white/30 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-yellow-400 transition-colors" />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-white text-[13px] font-['Plus_Jakarta_Sans']">Nama Lengkap <span className="text-yellow-400">*</span></label>
+                  <input type="text" className="bg-transparent border border-white/30 rounded-lg p-2.5 text-white text-sm focus:outline-none focus:border-white transition-colors" />
                 </div>
-                <div className="flex flex-col gap-2">
-                  <label className="text-white text-sm font-sans">Alamat Email <span className="text-red-400">*</span></label>
-                  <input type="email" className="bg-transparent border border-white/30 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-yellow-400 transition-colors" />
-                </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex flex-col gap-2">
-                  <label className="text-white text-sm font-sans">Nomor Telepon</label>
-                  <input type="tel" className="bg-transparent border border-white/30 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-yellow-400 transition-colors" />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <label className="text-white text-sm font-sans">Subjek</label>
-                  <input type="text" className="bg-transparent border border-white/30 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-yellow-400 transition-colors" />
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-white text-[13px] font-['Plus_Jakarta_Sans']">Alamat Email <span className="text-yellow-400">*</span></label>
+                  <input type="email" className="bg-transparent border border-white/30 rounded-lg p-2.5 text-white text-sm focus:outline-none focus:border-white transition-colors" />
                 </div>
               </div>
-              <div className="flex flex-col gap-2">
-                <label className="text-white text-sm font-sans">Pesan</label>
-                <textarea rows={5} className="bg-transparent border border-white/30 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-yellow-400 transition-colors resize-none"></textarea>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-white text-[13px] font-['Plus_Jakarta_Sans']">Nomor Telepon</label>
+                  <input type="tel" className="bg-transparent border border-white/30 rounded-lg p-2.5 text-white text-sm focus:outline-none focus:border-white transition-colors" />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-white text-[13px] font-['Plus_Jakarta_Sans']">Subjek</label>
+                  <input type="text" className="bg-transparent border border-white/30 rounded-lg p-2.5 text-white text-sm focus:outline-none focus:border-white transition-colors" />
+                </div>
               </div>
-              <button type="button" className="w-full bg-yellow-400 hover:bg-yellow-500 text-sky-950 font-bold py-4 rounded-xl mt-4 transition-colors">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-white text-[13px] font-['Plus_Jakarta_Sans']">Pesan</label>
+                <textarea rows="3" className="bg-transparent border border-white/30 rounded-lg p-2.5 text-white text-sm focus:outline-none focus:border-white transition-colors resize-none"></textarea>
+              </div>
+              <button type="submit" className="w-full bg-[#FFD700] hover:bg-[#F6CA00] text-[#004282] text-sm font-bold font-['Plus_Jakarta_Sans'] py-3 rounded-lg transition-colors mt-2">
                 Kirim Pesan
               </button>
             </form>
           </div>
 
           {/* Informasi Kontak */}
-          <div className="border border-white/20 rounded-3xl p-8 backdrop-blur-md bg-sky-950/40">
-            <h2 className="text-2xl font-bold text-white mb-8 font-sans">Informasi Kontak</h2>
-            <div className="flex flex-col gap-8">
-              <div>
-                <h4 className="text-white font-bold font-sans mb-1">Alamat</h4>
-                <p className="text-zinc-300 text-sm font-sans leading-relaxed">Jl Karangrejo Barat No 9. Tinjomoyo, KOTA SEMARANG</p>
-              </div>
-              <div>
-                <h4 className="text-white font-bold font-sans mb-1">Telepon</h4>
-                <a href="tel:0248502010" className="text-zinc-300 hover:text-yellow-400 text-sm font-sans underline underline-offset-4 transition-colors">024 8502010</a>
-              </div>
-              <div>
-                <h4 className="text-white font-bold font-sans mb-1">Email</h4>
-                <a href="mailto:info@ptsinarcerahsempurna.com" className="text-zinc-300 hover:text-yellow-400 text-sm font-sans underline underline-offset-4 transition-colors">info@ptsinarcerahsempurna.com</a>
-              </div>
-              <div>
-                <h4 className="text-white font-bold font-sans mb-1">Jam Operasional</h4>
-                <p className="text-zinc-300 text-sm font-sans leading-relaxed">Senin - Jumat: 08.00 - 17.00 WIB<br/>Sabtu: 08.00 - 12.00 WIB</p>
-              </div>
+          <div className="bg-white/5 border border-white/20 rounded-2xl p-6 backdrop-blur-md flex flex-col justify-center gap-6 shadow-xl">
+            <h2 className="text-white text-xl font-bold font-['Plus_Jakarta_Sans']">Informasi Kontak</h2>
+            
+            <div className="flex flex-col gap-1">
+              <h3 className="text-white text-[14px] font-bold font-['Plus_Jakarta_Sans']">Alamat</h3>
+              <p className="text-white/80 text-[14px] font-['Plus_Jakarta_Sans'] leading-relaxed">Jl Karangrejo Barat No 9. Tinjomoyo, KOTA SEMARANG</p>
+            </div>
+            
+            <div className="flex flex-col gap-1">
+              <h3 className="text-white text-[14px] font-bold font-['Plus_Jakarta_Sans']">Telepon</h3>
+              <a href="tel:0248502010" className="text-white/80 text-[14px] font-['Plus_Jakarta_Sans'] underline hover:text-white transition-colors">024 8502010</a>
+            </div>
+            
+            <div className="flex flex-col gap-1">
+              <h3 className="text-white text-[14px] font-bold font-['Plus_Jakarta_Sans']">Email</h3>
+              <a href="mailto:info@ptsinarcerahsempurna.com" className="text-white/80 text-[14px] font-['Plus_Jakarta_Sans'] underline hover:text-white transition-colors">info@ptsinarcerahsempurna.com</a>
+            </div>
+            
+            <div className="flex flex-col gap-1">
+              <h3 className="text-white text-[14px] font-bold font-['Plus_Jakarta_Sans']">Jam Operasional</h3>
+              <p className="text-white/80 text-[14px] font-['Plus_Jakarta_Sans']">Senin - Jumat: 08.00 - 17.00 WIB<br/>Sabtu: 08.00 - 12.00 WIB</p>
             </div>
           </div>
+
         </div>
       </div>
-    </div>
+    </main>
   );
 }
