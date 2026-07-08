@@ -1,8 +1,32 @@
-export const metadata = {
-  title: "Hubungi Kami | PT Sinar Cerah Sempurna",
-};
+"use client";
+import { useState, useEffect } from "react";
 
 export default function HubungiKamiPage() {
+  const [contacts, setContacts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/contact")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.contacts) setContacts(data.contacts);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const getContact = (type) => contacts.find((c) => c.type === type);
+  const address = getContact("address");
+  const phone = getContact("phone");
+  const email = getContact("email");
+
+  if (loading) {
+    return (
+      <main className="relative w-full min-h-screen flex items-center justify-center bg-[#004282]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+      </main>
+    );
+  }
   return (
     // Background biasa, bukan fixed. Padding atas ditambah (pt-28) agar tidak nabrak navbar.
     <main className="relative w-full min-h-screen flex flex-col items-center justify-center bg-[#004282] pt-28 pb-16 px-6">
@@ -68,22 +92,22 @@ export default function HubungiKamiPage() {
             
             <div className="flex flex-col gap-1">
               <h3 className="text-white text-[14px] font-bold font-['Plus_Jakarta_Sans']">Alamat</h3>
-              <p className="text-white/80 text-[14px] font-['Plus_Jakarta_Sans'] leading-relaxed">Jl Karangrejo Barat No 9. Tinjomoyo, KOTA SEMARANG</p>
+              <p className="text-white/80 text-[14px] font-['Plus_Jakarta_Sans'] leading-relaxed">{address?.value || "Jl Karangrejo Barat No 9. Tinjomoyo, KOTA SEMARANG"}</p>
             </div>
             
             <div className="flex flex-col gap-1">
               <h3 className="text-white text-[14px] font-bold font-['Plus_Jakarta_Sans']">Telepon</h3>
-              <a href="tel:0248502010" className="text-white/80 text-[14px] font-['Plus_Jakarta_Sans'] underline hover:text-white transition-colors">024 8502010</a>
+              <a href={`tel:${phone?.value?.replace(/\s/g, "") || "0248502010"}`} className="text-white/80 text-[14px] font-['Plus_Jakarta_Sans'] underline hover:text-white transition-colors">{phone?.value || "024 8502010"}</a>
             </div>
             
             <div className="flex flex-col gap-1">
               <h3 className="text-white text-[14px] font-bold font-['Plus_Jakarta_Sans']">Email</h3>
-              <a href="mailto:info@ptsinarcerahsempurna.com" className="text-white/80 text-[14px] font-['Plus_Jakarta_Sans'] underline hover:text-white transition-colors">info@ptsinarcerahsempurna.com</a>
+              <a href={`mailto:${email?.value || "info@ptsinarcerahsempurna.com"}`} className="text-white/80 text-[14px] font-['Plus_Jakarta_Sans'] underline hover:text-white transition-colors">{email?.value || "info@ptsinarcerahsempurna.com"}</a>
             </div>
             
             <div className="flex flex-col gap-1">
               <h3 className="text-white text-[14px] font-bold font-['Plus_Jakarta_Sans']">Jam Operasional</h3>
-              <p className="text-white/80 text-[14px] font-['Plus_Jakarta_Sans']">Senin - Jumat: 08.00 - 17.00 WIB<br/>Sabtu: 08.00 - 12.00 WIB</p>
+              <p className="text-white/80 text-[14px] font-['Plus_Jakarta_Sans'] whitespace-pre-line">{getContact("general")?.value || "Senin - Jumat: 08.00 - 17.00 WIB\nSabtu: 08.00 - 12.00 WIB"}</p>
             </div>
           </div>
 

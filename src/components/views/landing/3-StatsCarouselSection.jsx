@@ -1,13 +1,25 @@
 "use client";
+import { useState, useEffect } from "react";
 import FadeUp from "@/components/ui/FadeUp";
 
 export default function StatsCarouselSection() {
-  const stats = [
+  const [stats, setStats] = useState([
     { value: "5+", label: "Proyek Selesai" },
     { value: "50+", label: "Klien Puas" },
     { value: "25+", label: "Tahun Pengalaman" },
     { value: "200+", label: "Tim Profesional" }
-  ];
+  ]);
+
+  useEffect(() => {
+    fetch("/api/statistic")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.statistics?.length > 0) {
+          setStats(data.statistics.map((s) => ({ label: s.label, value: s.value })));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Menggunakan file SVG dari folder public
   const carouselImages = [

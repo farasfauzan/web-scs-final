@@ -1,41 +1,56 @@
 "use client";
+import { useState, useEffect } from "react";
 import FadeUp from "@/components/ui/FadeUp";
+import HeroTitle from "@/components/shared/HeroTitle";
+import BoldText from "@/components/shared/BoldText";
+
+const FALLBACK = {
+  subtitle: "PT SINAR CERAH SEMPURNA",
+  title: "**Integrity** isn't just a policy—it's the standard we build by. Your **trust** is our greatest structure.",
+  description: "PT Sinar Cerah Sempurna adalah perusahaan konstruksi dan infrastruktur yang berpengalaman dalam pembangunan gedung, jalan, jembatan, dan berbagai proyek infrastruktur lainnya di Indonesia.",
+  imageUrl: "/hero-bg.svg",
+};
 
 export default function HeroSection() {
+  const [hero, setHero] = useState(FALLBACK);
+
+  useEffect(() => {
+    fetch("/api/hero?page=home")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.heroes?.length > 0) {
+          const h = data.heroes[0];
+          setHero({ title: h.title, subtitle: h.subtitle, description: h.description, imageUrl: h.imageUrl });
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   return (
-    // Lengkungan ditambahkan di sini: rounded-b-[64px]
     <section className="relative w-full h-screen bg-[#004282] overflow-hidden flex items-center rounded-b-[64px]">
-      
-      {/* Background & Overlay Biru Transparan */}
       <div className="absolute inset-0 z-0">
-        <img src="/hero-bg.svg" alt="Background" className="w-full h-full object-cover" />
+        <img src={hero.imageUrl || "/hero-bg.svg"} alt="Background" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-[#004282]/85"></div>
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 w-full grid grid-cols-1 md:grid-cols-[1.2fr_0.8fr] gap-12 items-center">
-        
-        {/* Kolom Kiri: Teks */}
         <div className="flex flex-col gap-4">
           <FadeUp delay={0.1}>
-            <span className="text-white text-xs md:text-sm font-semibold tracking-widest uppercase">
-              PT SINAR CERAH SEMPURNA
-            </span>
+            <BoldText text={hero.subtitle} className="text-white text-xs md:text-sm font-semibold tracking-widest uppercase" as="span" />
           </FadeUp>
           
           <FadeUp delay={0.2}>
-            <h1 className="text-white text-5xl md:text-[64px] font-serif leading-[1.05] tracking-tight">
-              <span className="text-yellow-400 font-bold italic">Integrity</span> isn&apos;t just a policy—it&apos;s the standard we build by. Your <span className="text-yellow-400 font-bold italic">trust</span> is our greatest structure.
-            </h1>
+            <HeroTitle
+              text={hero.title}
+              className="text-white text-5xl md:text-[64px] font-serif leading-[1.05] tracking-tight"
+            />
           </FadeUp>
           
           <FadeUp delay={0.3}>
-            <p className="text-white text-[15px] font-normal font-['Plus_Jakarta_Sans'] leading-relaxed opacity-90 max-w-lg mt-2">
-              PT Sinar Cerah Sempurna adalah perusahaan konstruksi dan infrastruktur yang berpengalaman dalam pembangunan gedung, jalan, jembatan, dan berbagai proyek infrastruktur lainnya di Indonesia.
-            </p>
+            <BoldText text={hero.description} className="text-white text-[15px] font-normal font-['Plus_Jakarta_Sans'] leading-relaxed opacity-90 max-w-lg mt-2" as="p" />
           </FadeUp>
         </div>
 
-        {/* Kolom Kanan: 2 Foto SVG */}
         <FadeUp delay={0.4} className="hidden md:flex gap-5 h-[420px] relative">
           <div className="w-1/2 h-[85%] mt-8 rounded-xl overflow-hidden shadow-2xl border-[3px] border-white/20">
              <img src="/foto-hero1.svg" alt="Konstruksi 1" className="w-full h-full object-cover" />
@@ -44,7 +59,6 @@ export default function HeroSection() {
              <img src="/foto-hero2.svg" alt="Konstruksi 2" className="w-full h-full object-cover" />
           </div>
         </FadeUp>
-
       </div>
     </section>
   );

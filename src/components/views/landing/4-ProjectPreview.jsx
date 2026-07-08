@@ -1,23 +1,33 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import FadeUp from "@/components/ui/FadeUp";
 import ProjectCard from "@/components/shared/ProjectCard";
 import Link from "next/link";
 
+const FALLBACK_PROJECTS = [
+  { id: 1, title: "Renovasi Eks Kantor menjadi Gedung Paviliun", category: "Rumah Sakit", location: "RSUD Aji Muhammad Parikesit", client: "Pemkab Kutai Kartanegara", imageUrl: "" },
+  { id: 2, title: "Pembangunan Gedung Rektorat", category: "Gedung Pendidikan", location: "Universitas Diponegoro", client: "Kemenristekdikti", imageUrl: "" },
+  { id: 3, title: "Ekspansi Mall Central", category: "Pusat Perbelanjaan", location: "Semarang Tengah", client: "PT Retail Indo", imageUrl: "" },
+  { id: 4, title: "Klinik Utama Sehat", category: "Rumah Sakit", location: "Semarang Selatan", client: "Dinas Kesehatan", imageUrl: "" },
+  { id: 5, title: "Renovasi Pasar Johar", category: "Pusat Perbelanjaan", location: "Kota Semarang", client: "Pemkot Semarang", imageUrl: "" },
+];
+
 export default function ProjectPreview() {
   const [activeCategory, setActiveCategory] = useState("Semua");
+  const [allProjects, setAllProjects] = useState(FALLBACK_PROJECTS);
   const categories = ["Semua", "Rumah Sakit", "Gedung Pendidikan", "Pusat Perbelanjaan", "Lainnya"];
 
-  // Data tiruan yang siap diganti dari database nanti
-  const allProjects = [
-    { id: 1, title: "Renovasi Eks Kantor menjadi Gedung Paviliun", category: "Rumah Sakit", location: "RSUD Aji Muhammad Parikesit", client: "Pemkab Kutai Kartanegara", image: "" },
-    { id: 2, title: "Pembangunan Gedung Rektorat", category: "Gedung Pendidikan", location: "Universitas Diponegoro", client: "Kemenristekdikti", image: "" },
-    { id: 3, title: "Ekspansi Mall Central", category: "Pusat Perbelanjaan", location: "Semarang Tengah", client: "PT Retail Indo", image: "" },
-    { id: 4, title: "Klinik Utama Sehat", category: "Rumah Sakit", location: "Semarang Selatan", client: "Dinas Kesehatan", image: "" },
-    { id: 5, title: "Renovasi Pasar Johar", category: "Pusat Perbelanjaan", location: "Kota Semarang", client: "Pemkot Semarang", image: "" },
-  ];
+  useEffect(() => {
+    fetch("/api/project")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.projects?.length > 0) {
+          setAllProjects(data.projects);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
-  // Logika Filter
   const filteredProjects = activeCategory === "Semua" 
     ? allProjects.slice(0, 3) 
     : allProjects.filter(p => p.category === activeCategory).slice(0, 3);
