@@ -1,10 +1,22 @@
+"use client";
+import { useState, useEffect } from "react";
 import FadeUp from "@/components/ui/FadeUp";
 
 export default function SinergiSection() {
-  const networks = Array(4).fill({
-    title: "PT Maharani Globalindo",
-    desc: "perusahaan yang berbasis di Semarang dan bergerak dalam dua lini bisnis utama: jasa konstruksi berskala nasional dan penyelenggaraan perjalanan ibadah umrah"
-  });
+  const [networks, setNetworks] = useState(
+    Array(4).fill({ name: "PT Maharani Globalindo", logoUrl: "", linkUrl: "" })
+  );
+
+  useEffect(() => {
+    fetch("/api/partner")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.partners?.length > 0) {
+          setNetworks(data.partners);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <section className="w-full bg-[#F1F1F1] py-12 px-6 flex flex-col items-center">

@@ -3,8 +3,8 @@ import Link from "next/link";
 export default function Footer() {
   return (
     // Padding atas dan bawah dikurangi (pt-8, pb-4) agar footer lebih pendek
-    <footer className="w-full bg-[#004282] pt-8 pb-4 px-6 md:px-12 border-t border-white/10">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-10 md:gap-6 mb-4">
+    <footer className="w-full bg-[#004282] pt-8 pb-4 border-t border-white/10">
+      <div className="page-container-wide flex flex-col md:flex-row justify-between gap-10 md:gap-6 mb-4">
         
         <div className="flex flex-col gap-3 max-w-xs">
           <div className="flex items-center gap-3">
