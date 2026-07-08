@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdminRole } from "@/lib/auth";
+import { revalidatePath } from "next/cache";
 
 export async function GET() {
   try {
@@ -27,6 +28,10 @@ export async function POST(request) {
       update: { value: data.value, label: data.label, group: data.group },
       create: { key: data.key, value: data.value, label: data.label, group: data.group },
     });
+
+    // Revalidate website layout so updates display instantly on live site
+    revalidatePath("/", "layout");
+
     return NextResponse.json({ setting }, { status: 201 });
   } catch (error) {
     return NextResponse.json({ error: "Failed to save setting" }, { status: 500 });
