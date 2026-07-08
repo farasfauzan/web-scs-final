@@ -1,17 +1,19 @@
 export default function ProjectCard({ project }) {
+  const imgSrc = project?.imageUrl || project?.image || "";
+
   return (
     <div className="bg-white rounded-[20px] overflow-hidden flex flex-col shadow-sm hover:shadow-md transition-all group w-full border border-neutral-100 h-full">
       <div className="w-full h-[160px] bg-neutral-200 relative overflow-hidden shrink-0">
-        {project?.image ? (
-          <img src={project.image} alt={project.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+        {imgSrc ? (
+          <img src={imgSrc} alt={project.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-neutral-400 text-sm font-medium">Gambar Proyek</div>
         )}
       </div>
       <div className="p-4 flex flex-col flex-grow">
-        <span className="text-blue-700 text-xs font-bold font-['Plus_Jakarta_Sans'] mb-1.5">{project?.category || "Kategori"}</span>
+        <span className="text-blue-700 text-xs font-bold font-['Plus_Jakarta_Sans'] mb-1.5">{project?.category || project?.kategori || "Kategori"}</span>
         <h3 className="text-stone-900 text-lg font-bold font-['Plus_Jakarta_Sans'] leading-tight mb-4">
-          {project?.title || "Judul Proyek Konstruksi"}
+          {project?.title || project?.name || "Judul Proyek Konstruksi"}
         </h3>
         <div className="flex flex-col gap-1.5 mt-auto">
           <div className="flex items-center gap-2 text-neutral-500">

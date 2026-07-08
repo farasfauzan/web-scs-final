@@ -1,19 +1,42 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ProjectCard from "@/components/shared/ProjectCard";
-import Pagination from "@/components/shared/Pagination";
+import HeroTitle from "@/components/shared/HeroTitle";
+import BoldText from "@/components/shared/BoldText";
+
+const FALLBACK = Array(12).fill(null).map((_, i) => ({
+  id: i,
+  title: "Renovasi Eks Kantor menjadi Gedung Paviliun",
+  category: "Rumah Sakit",
+  location: "RSUD Aji Muhammad Parikesit",
+  client: "Pemerintah Kabupaten Kutai Kartanegara",
+  imageUrl: "/hero-bg.svg" 
+}));
 
 export default function ProyekPage() {
   const [activeFilter, setActiveFilter] = useState("Semua");
+  const [projects, setProjects] = useState(FALLBACK);
+  const [hero, setHero] = useState({ title: "**Visi** Kami dalam **Karya**", desc: "Dedikasi kami tertuang dalam setiap detail proyek." });
   const categories = ["Semua", "Rumah Sakit", "Gedung Pendidikan", "Pusat Perbelanjaan", "Lainnya"];
 
-  const projects = Array(12).fill({
-    title: "Renovasi Eks Kantor menjadi Gedung Paviliun",
-    category: "Rumah Sakit",
-    location: "RSUD Aji Muhammad Parikesit",
-    client: "Pemerintah Kabupaten Kutai Kartanegara",
-    image: "/hero-bg.svg" 
-  });
+  useEffect(() => {
+    fetch("/api/hero?page=projects")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.heroes?.length > 0) {
+          setHero({ title: data.heroes[0].title, desc: data.heroes[0].description });
+        }
+      })
+      .catch(() => {});
+    fetch("/api/project")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.projects?.length > 0) setProjects(data.projects);
+      })
+      .catch(() => {});
+  }, []);
+
+  const filteredProjects = activeFilter === "Semua" ? projects : projects.filter(p => p.category === activeFilter);
 
   return (
     <main className="w-full bg-[#F1F1F1] min-h-screen pb-24">
@@ -26,12 +49,11 @@ export default function ProyekPage() {
         </div>
 
         <div className="relative z-10 text-center max-w-4xl px-6 flex flex-col items-center gap-5">
-          <h1 className="text-white text-5xl font-extrabold font-['Plus_Jakarta_Sans'] leading-tight">
-            Visi Kami dalam Karya
-          </h1>
-          <p className="text-white/90 text-[17px] font-normal font-['Plus_Jakarta_Sans'] leading-relaxed max-w-[693px]">
-            Dedikasi kami tertuang dalam setiap detail proyek. Kami menggabungkan inovasi konstruksi dengan standar kualitas tertinggi untuk menghadirkan bangunan yang bukan sekadar fungsional, namun inspiratif.
-          </p>
+          <HeroTitle
+            text={hero.title}
+            className="text-white text-5xl font-extrabold font-['Plus_Jakarta_Sans'] leading-tight"
+          />
+          <BoldText text={hero.desc} className="text-white/90 text-[17px] font-normal font-['Plus_Jakarta_Sans'] leading-relaxed max-w-[693px]" as="p" />
         </div>
       </section>
 
@@ -66,9 +88,8 @@ export default function ProyekPage() {
       <section className="w-full flex justify-center pt-16 px-6">
         <div className="max-w-[1152px] w-full flex flex-col gap-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {projects.map((proj, idx) => <ProjectCard key={idx} project={proj} />)}
+            {filteredProjects.map((proj) => <ProjectCard key={proj.id} project={proj} />)}
           </div>
-          <Pagination totalPages={3} basePath="/proyek" />
         </div>
       </section>
 
