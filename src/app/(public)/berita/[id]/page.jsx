@@ -1,20 +1,21 @@
 "use client";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import FadeUp from "@/components/ui/FadeUp";
 
 export default function DetailBeritaPage({ params }) {
+  const { id } = React.use(params);
   const [news, setNews] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`/api/news/${params.id}`)
+    fetch(`/api/news/${id}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.news) setNews(data.news);
       })
       .catch(() => {})
       .finally(() => setIsLoading(false));
-  }, [params.id]);
+  }, [id]);
 
   if (isLoading) return <div className="min-h-screen bg-[#F1F1F1]" />;
   if (!news) {

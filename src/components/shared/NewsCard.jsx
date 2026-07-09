@@ -1,9 +1,11 @@
+import Link from "next/link";
+
 export default function NewsCard({ news }) {
   const imgSrc = news?.imageUrl || news?.image || "";
   const desc = news?.desc || news?.excerpt || news?.content || "Deskripsi berita tidak tersedia.";
 
   return (
-    <div className="bg-white rounded-[20px] overflow-hidden flex flex-col shadow-sm hover:shadow-md transition-all group w-full border border-neutral-100 h-full">
+    <Link href={`/berita/${news.id}`} className="bg-white rounded-[20px] overflow-hidden flex flex-col shadow-sm hover:shadow-md transition-all group w-full border border-neutral-100 h-full">
       <div className="w-full h-[160px] bg-neutral-200 relative overflow-hidden shrink-0">
         {imgSrc ? (
           <img src={imgSrc} alt={news.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -19,6 +21,6 @@ export default function NewsCard({ news }) {
           {desc}
         </p>
       </div>
-    </div>
+    </Link>
   );
 }

@@ -1,20 +1,21 @@
 "use client";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import FadeUp from "@/components/ui/FadeUp";
 
 export default function DetailProyekPage({ params }) {
+  const { id } = React.use(params);
   const [project, setProject] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`/api/project/${params.id}`)
+    fetch(`/api/project/${id}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.project) setProject(data.project);
       })
       .catch(() => {})
       .finally(() => setIsLoading(false));
-  }, [params.id]);
+  }, [id]);
 
   if (isLoading) return <div className="min-h-screen bg-[#F1F1F1]" />;
   if (!project) {
