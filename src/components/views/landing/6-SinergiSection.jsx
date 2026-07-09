@@ -4,7 +4,12 @@ import FadeUp from "@/components/ui/FadeUp";
 
 export default function SinergiSection() {
   const [networks, setNetworks] = useState(
-    Array(4).fill({ name: "PT Maharani Globalindo", logoUrl: "", linkUrl: "" })
+    Array(4).fill({
+      name: "PT Maharani Globalindo",
+      desc: "Perusahaan yang berbasis di Semarang dan bergerak dalam dua lini bisnis utama: jasa konstruksi berskala nasional dan penyelenggaraan perjalanan ibadah umrah.",
+      logoUrl: "",
+      linkUrl: ""
+    })
   );
 
   useEffect(() => {
@@ -19,11 +24,13 @@ export default function SinergiSection() {
   }, []);
 
   return (
-    <section className="w-full bg-[#F1F1F1] py-[clamp(3rem,8vh,6rem)] px-6 flex flex-col items-center">
+    <section className="w-full bg-[#F1F1F1] pt-[clamp(1.5rem,4vh,3rem)] pb-[clamp(3rem,8vh,6rem)] px-6 flex flex-col items-center">
       <div className="max-w-6xl mx-auto w-full flex flex-col gap-[clamp(2rem,5vh,3rem)] items-center">
         
         <FadeUp delay={0.1} className="text-center flex flex-col gap-4 max-w-3xl">
-          <h2 className="text-black text-[clamp(1.75rem,3.5vw,2.25rem)] font-extrabold font-['Plus_Jakarta_Sans'] leading-10">Jejaring Sinergi Kami</h2>
+          <h2 className="text-black text-[clamp(1.75rem,3.5vw,2.25rem)] font-extrabold font-['Plus_Jakarta_Sans'] leading-10">
+            Jejaring Sinergi Kami
+          </h2>
           <p className="text-black text-base font-normal font-['Plus_Jakarta_Sans'] leading-6">
             Setiap unit bisnis kami bekerja dalam harmoni untuk memperkuat visi besar perusahaan. Melalui spesialisasi yang mendalam, kami menghadirkan solusi yang komprehensif bagi setiap tantangan konstruksi yang Anda hadapi.
           </p>
@@ -32,7 +39,7 @@ export default function SinergiSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 w-full mt-4">
           {networks.map((item, idx) => {
             const displayName = item.name || item.title || "PT Maharani Globalindo";
-            const logo = item.logoUrl || "/logo-scs.svg"; // Fallback to logo-scs or a nice default
+            const logo = item.logoUrl || item.image || "/logo-scs.svg"; // Fallback to logo-scs or a nice default
             const hasLink = !!item.linkUrl;
             const WrapperComponent = hasLink ? "a" : "div";
 
@@ -57,6 +64,11 @@ export default function SinergiSection() {
                     displayName
                   )}
                 </h3>
+                {item.desc && (
+                  <p className="text-black text-sm font-normal font-['Plus_Jakarta_Sans']">
+                    {item.desc}
+                  </p>
+                )}
               </FadeUp>
             );
           })}

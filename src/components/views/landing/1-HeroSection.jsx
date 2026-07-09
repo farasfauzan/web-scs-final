@@ -20,7 +20,12 @@ export default function HeroSection() {
       .then((data) => {
         if (data.heroes?.length > 0) {
           const h = data.heroes[0];
-          setHero({ title: h.title, subtitle: h.subtitle, description: h.description, imageUrl: h.imageUrl });
+          setHero({
+            subtitle: h.subtitle || FALLBACK.subtitle,
+            title: h.title || FALLBACK.title,
+            description: h.description || FALLBACK.description,
+            imageUrl: h.imageUrl || FALLBACK.imageUrl,
+          });
         }
       })
       .catch(() => {});
@@ -29,14 +34,18 @@ export default function HeroSection() {
   return (
     <section className="relative w-full min-h-[100svh] py-[clamp(4rem,10vh,8rem)] bg-[#004282] overflow-hidden flex items-center rounded-b-[64px]">
       <div className="absolute inset-0 z-0">
-        <img src={hero.imageUrl || "/hero-bg.svg"} alt="Background" className="w-full h-full object-cover" />
+        <img src={hero.imageUrl} alt="Background" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-[#004282]/85"></div>
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 w-full grid grid-cols-1 md:grid-cols-[1.2fr_0.8fr] gap-12 items-center">
         <div className="flex flex-col gap-4">
           <FadeUp delay={0.1}>
-            <BoldText text={hero.subtitle} className="text-white text-xs md:text-sm font-semibold tracking-widest uppercase" as="span" />
+            <BoldText 
+              text={hero.subtitle} 
+              className="text-white text-xs md:text-sm font-semibold tracking-widest uppercase" 
+              as="span" 
+            />
           </FadeUp>
           
           <FadeUp delay={0.2}>
@@ -47,7 +56,11 @@ export default function HeroSection() {
           </FadeUp>
           
           <FadeUp delay={0.3}>
-            <BoldText text={hero.description} className="text-white text-[15px] font-normal font-['Plus_Jakarta_Sans'] leading-relaxed opacity-90 max-w-lg mt-2" as="p" />
+            <BoldText 
+              text={hero.description} 
+              className="text-white text-[15px] font-normal font-['Plus_Jakarta_Sans'] leading-relaxed opacity-90 max-w-lg mt-2" 
+              as="p" 
+            />
           </FadeUp>
         </div>
 

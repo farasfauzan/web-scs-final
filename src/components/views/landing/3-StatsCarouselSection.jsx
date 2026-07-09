@@ -21,14 +21,9 @@ export default function StatsCarouselSection() {
       .catch(() => {});
   }, []);
 
-  // Menggunakan file SVG dari folder public
   const carouselImages = [
-    "/carousel1.svg",
-    "/carousel2.svg",
-    "/carousel3.svg",
-    "/carousel4.svg",
-    "/carousel5.svg",
-    "/carousel6.svg"
+    "/carousel1.svg", "/carousel2.svg", "/carousel3.svg", 
+    "/carousel4.svg", "/carousel5.svg", "/carousel6.svg"
   ];
 
   return (
@@ -39,7 +34,6 @@ export default function StatsCarouselSection() {
           100% { transform: translateX(-50%); }
         }
         .animate-infinite-scroll {
-          /* Kecepatan animasi diubah menjadi 90s sesuai request */
           animation: infinite-scroll 90s linear infinite;
           width: max-content;
         }

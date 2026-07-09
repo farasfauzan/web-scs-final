@@ -5,38 +5,42 @@ import BoldText from "@/components/shared/BoldText";
 import FadeUp from "@/components/ui/FadeUp";
 
 export default function TentangKamiPage() {
-  const [about, setAbout] = useState(null);
-  const [hero, setHero] = useState({ title: "Membangun dengan **Kepercayaan**, Berkarya dengan **Kualitas**.", subtitle: "" });
+  const [aboutData, setAboutData] = useState(null);
+  const [heroData, setHeroData] = useState(null);
 
   useEffect(() => {
     fetch("/api/hero?page=about")
       .then((res) => res.json())
       .then((data) => {
-        if (data.heroes?.length > 0) {
-          setHero({ title: data.heroes[0].title, subtitle: data.heroes[0].subtitle || data.heroes[0].description });
-        }
+        if (data.heroes?.length > 0) setHeroData(data.heroes[0]);
       })
       .catch(() => {});
+
     fetch("/api/about")
       .then((res) => res.json())
       .then((data) => {
-        if (data.abouts?.length > 0) setAbout(data.abouts[0]);
+        if (data.abouts?.length > 0) setAboutData(data.abouts[0]);
       })
       .catch(() => {});
   }, []);
 
-  const title = about?.title || "Tentang PT Sinar Cerah Sempurna";
-  const subtitle = about?.subtitle || "Berpegang teguh pada motto \"Memberi Kepuasan Kepada Relasi\", kami terus membangun kepercayaan dalam industri konstruksi melalui dedikasi tinggi. Komitmen ini kami wujudkan dengan konsisten meningkatkan kompetensi Sumber Daya Manusia agar selalu terampil dan profesional, demi memberikan hasil kerja terbaik yang memenuhi standar kepuasan setiap relasi kami.";
-  const content = about?.content || "PT Sinar Cerah Sempurna adalah perusahaan konstruksi dan infrastruktur yang berpengalaman dalam pembangunan gedung, jalan, jembatan, dan berbagai proyek infrastruktur lainnya di Indonesia.";
-  const vision = about?.vision || "Menjadi perusahaan konstruksi dan infrastruktur terdepan serta terpercaya di Indonesia, yang diakui karena keunggulan dalam kualitas, keselamatan, dan pembangunan berkelanjutan.";
-  const missionItems = about?.mission ? about.mission.split("\n") : [
-    "Memberikan layanan konstruksi berkualitas tinggi yang melampaui ekspektasi klien dan memenuhi standar internasional.",
-    "Menerapkan praktik terbaik dalam pengelolaan kesehatan, keselamatan kerja, dan lingkungan pada setiap proyek.",
-    "Mendorong inovasi melalui adopsi teknologi dan metodologi konstruksi mutakhir.",
-    "Membangun hubungan jangka panjang dengan klien, mitra, dan pemangku kepentingan berdasarkan kepercayaan dan transparansi.",
-    "Mengembangkan kapabilitas profesional tim kami melalui pelatihan berkelanjutan dan pengembangan karir.",
-    "Berkontribusi pada pembangunan berkelanjutan infrastruktur dan lingkungan binaan Indonesia.",
-  ];
+  const heroTitle = heroData?.title || "Membangun dengan **Kepercayaan**, Berkarya dengan **Kualitas**.";
+  const heroDesc = heroData?.subtitle || heroData?.description || "Berpegang teguh pada motto \"Memberi Kepuasan Kepada Relasi\", kami terus membangun kepercayaan dalam industri konstruksi melalui dedikasi tinggi. Komitmen ini kami wujudkan dengan konsisten meningkatkan kompetensi Sumber Daya Manusia agar selalu terampil dan profesional.";
+
+  const aboutTitle = aboutData?.title || "Tentang PT Sinar Cerah Sempurna";
+  const aboutContent = aboutData?.content || "PT Sinar Cerah Sempurna adalah perusahaan konstruksi dan infrastruktur yang berpengalaman dalam pembangunan gedung, jalan, jembatan, dan berbagai proyek infrastruktur lainnya di Indonesia.";
+  const aboutVision = aboutData?.vision || "Menjadi perusahaan konstruksi dan infrastruktur terdepan serta terpercaya di Indonesia, yang diakui karena keunggulan dalam kualitas, keselamatan, dan pembangunan berkelanjutan.";
+  
+  const aboutMission = aboutData?.mission 
+    ? aboutData.mission.split("\n").filter(m => m.trim() !== '') 
+    : [
+        "Memberikan layanan konstruksi berkualitas tinggi yang melampaui ekspektasi klien dan memenuhi standar internasional.",
+        "Menerapkan praktik terbaik dalam pengelolaan kesehatan, keselamatan kerja, dan lingkungan pada setiap proyek.",
+        "Mendorong inovasi melalui adopsi teknologi dan metodologi konstruksi mutakhir.",
+        "Membangun hubungan jangka panjang dengan klien, mitra, dan pemangku kepentingan berdasarkan kepercayaan dan transparansi.",
+        "Mengembangkan kapabilitas profesional tim kami melalui pelatihan berkelanjutan dan pengembangan karir.",
+        "Berkontribusi pada pembangunan berkelanjutan infrastruktur dan lingkungan binaan Indonesia."
+      ];
 
   return (
     <main className="w-full bg-[#F1F1F1] min-h-screen pb-24">
@@ -44,16 +48,20 @@ export default function TentangKamiPage() {
       {/* HERO SECTION */}
       <section className="relative w-full h-[50vh] min-h-[400px] flex flex-col items-center justify-center rounded-b-[64px] overflow-hidden bg-[#004282]">
         <div className="absolute inset-0 z-0">
-          <img src="/bg-hubungi-kami.svg" alt="Background Tentang Kami" className="w-full h-full object-cover opacity-30" />
+          <img src="/bg-hero-tentang-kami.svg" alt="Background Tentang Kami" className="w-full h-full object-cover opacity-30" />
           <div className="absolute inset-0 bg-[#004282]/85"></div>
         </div>
 
         <div className="relative z-10 text-center max-w-4xl px-6 flex flex-col items-center gap-[clamp(0.75rem,2vh,1.25rem)] mt-10">
           <HeroTitle
-            text={hero.title}
-            className="text-white text-[clamp(2.25rem,4vw,3.5rem)] font-extrabold font-['Plus_Jakarta_Sans'] leading-tight"
+            text={heroTitle}
+            className="text-white text-[clamp(2.25rem,4vw,3.5rem)] font-extrabold font-['Plus_Jakarta_Sans'] leading-tight whitespace-pre-line"
           />
-          <BoldText text={subtitle} className="text-white/90 text-[clamp(0.9rem,1.5vw,1.1rem)] font-normal font-['Plus_Jakarta_Sans'] leading-relaxed max-w-[850px]" as="p" />
+          <BoldText 
+            text={heroDesc} 
+            className="text-white/90 text-[clamp(0.9rem,1.5vw,1.1rem)] font-normal font-['Plus_Jakarta_Sans'] leading-relaxed max-w-[850px]" 
+            as="p" 
+          />
         </div>
       </section>
 
@@ -62,10 +70,10 @@ export default function TentangKamiPage() {
          
          <FadeUp delay={0.1} className="max-w-[800px] w-full text-center flex flex-col gap-4">
             <h2 className="text-[#1E1E1E] text-3xl font-extrabold font-['Plus_Jakarta_Sans']">
-              {title}
+              {aboutTitle}
             </h2>
-            <p className="text-[#757575] text-[15px] font-normal font-['Plus_Jakarta_Sans'] leading-relaxed">
-              {content}
+            <p className="text-[#757575] text-[15px] font-normal font-['Plus_Jakarta_Sans'] leading-relaxed whitespace-pre-line">
+              {aboutContent}
             </p>
          </FadeUp>
 
@@ -73,16 +81,16 @@ export default function TentangKamiPage() {
             <div className="flex flex-col gap-10">
               <div className="text-center flex flex-col gap-3">
                 <h3 className="text-2xl font-bold font-['Plus_Jakarta_Sans'] text-[#1E1E1E]">Visi</h3>
-                <p className="text-[15px] text-[#424242] font-['Plus_Jakarta_Sans'] leading-relaxed max-w-[800px] mx-auto">
-                  {vision}
+                <p className="text-[15px] text-[#424242] font-['Plus_Jakarta_Sans'] leading-relaxed max-w-[800px] mx-auto whitespace-pre-line">
+                  {aboutVision}
                 </p>
               </div>
               
               <div className="flex flex-col gap-3">
                 <h3 className="text-2xl font-bold font-['Plus_Jakarta_Sans'] text-[#1E1E1E] text-center mb-2">Misi</h3>
                 <ul className="list-disc pl-5 md:pl-10 space-y-3 text-[15px] text-[#424242] font-['Plus_Jakarta_Sans'] leading-relaxed marker:text-neutral-400">
-                  {missionItems.map((item, i) => (
-                    <li key={i}>{item}</li>
+                  {aboutMission.map((item, idx) => (
+                    <li key={idx}>{item.replace(/^-\s*/, '')}</li>
                   ))}
                 </ul>
               </div>
@@ -99,7 +107,7 @@ export default function TentangKamiPage() {
 
             <FadeUp delay={0.2} className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-[900px]">
               <div className="flex gap-5">
-                <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-neutral-200 flex items-center justify-center shrink-0">
+                <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-neutral-200 flex items-center justify-center shrink-0 grayscale opacity-80 transition-all duration-300 hover:grayscale-0">
                   <span className="text-xl">🛡️</span>
                 </div>
                 <div className="flex flex-col gap-2">
@@ -108,16 +116,16 @@ export default function TentangKamiPage() {
                 </div>
               </div>
               <div className="flex gap-5">
-                <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-neutral-200 flex items-center justify-center shrink-0">
+                <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-neutral-200 flex items-center justify-center shrink-0 grayscale opacity-80 transition-all duration-300 hover:grayscale-0">
                   <span className="text-xl">💎</span>
                 </div>
                 <div className="flex flex-col gap-2">
                   <h4 className="text-lg font-bold text-[#1E1E1E] font-['Plus_Jakarta_Sans']">Kualitas</h4>
-                  <p className="text-sm text-[#757575] font-['Plus_Jakarta_Sans'] leading-relaxed">Kami berkomitmen pada standar kualitas tertinggi dalam setiap proyek, memastikan hasil yang melampaui ekspektasi klien.</p>
+                  <p className="text-sm text-[#757575] font-['Plus_Jakarta_Sans'] leading-relaxed">Kami berkomitmen pada standar kualitas tertinggi dalam setiap proyek, ensuring hasil yang melampaui ekspektasi klien.</p>
                 </div>
               </div>
               <div className="flex gap-5">
-                <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-neutral-200 flex items-center justify-center shrink-0">
+                <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-neutral-200 flex items-center justify-center shrink-0 grayscale opacity-80 transition-all duration-300 hover:grayscale-0">
                   <span className="text-xl">💡</span>
                 </div>
                 <div className="flex flex-col gap-2">
@@ -126,7 +134,7 @@ export default function TentangKamiPage() {
                 </div>
               </div>
               <div className="flex gap-5">
-                <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-neutral-200 flex items-center justify-center shrink-0">
+                <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-neutral-200 flex items-center justify-center shrink-0 grayscale opacity-80 transition-all duration-300 hover:grayscale-0">
                   <span className="text-xl">🤝</span>
                 </div>
                 <div className="flex flex-col gap-2">

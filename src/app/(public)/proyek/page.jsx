@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import FadeUp from "@/components/ui/FadeUp";
 import ProjectCard from "@/components/shared/ProjectCard";
@@ -8,23 +8,17 @@ import ProjectSkeleton from "@/components/ui/ProjectSkeleton";
 import HeroTitle from "@/components/shared/HeroTitle";
 import BoldText from "@/components/shared/BoldText";
 
-const FALLBACK_PROJECTS = Array(12).fill(null).map((_, i) => ({
-  id: i,
-  title: "Renovasi Eks Kantor menjadi Gedung Paviliun",
-  category: "Rumah Sakit",
-  location: "RSUD Aji Muhammad Parikesit",
-  client: "Pemerintah Kabupaten Kutai Kartanegara",
-  imageUrl: "/hero-bg.svg" 
-}));
-
-export default function ProyekPage() {
+function ProyekContent() {
   const searchParams = useSearchParams();
   const currentPage = searchParams.get("page") || "1";
 
   const [activeFilter, setActiveFilter] = useState("Semua");
   const [searchQuery, setSearchQuery] = useState("");
-  const [projects, setProjects] = useState(FALLBACK_PROJECTS);
-  const [hero, setHero] = useState({ title: "**Visi** Kami dalam **Karya**", desc: "Dedikasi kami tertuang dalam setiap detail proyek." });
+  const [projects, setProjects] = useState([]);
+  const [hero, setHero] = useState({
+    title: "**Visi** Kami dalam **Karya**",
+    desc: "Dedikasi kami tertuang dalam setiap detail proyek. Kami menggabungkan inovasi konstruksi dengan standar kualitas tertinggi untuk menghadirkan bangunan yang bukan sekadar fungsional, namun inspiratif."
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [prevPage, setPrevPage] = useState(currentPage);
 
@@ -36,47 +30,58 @@ export default function ProyekPage() {
   const categories = ["Semua", "Rumah Sakit", "Gedung Pendidikan", "Pusat Perbelanjaan", "Lainnya"];
 
   useEffect(() => {
-    // Ambil Hero Proyek
+    // 1. Ambil data teks Hero
     fetch("/api/hero?page=projects")
       .then((res) => res.json())
       .then((data) => {
         if (data.heroes?.length > 0) {
-          setHero({ title: data.heroes[0].title, desc: data.heroes[0].description });
+          setHero({ 
+            title: data.heroes[0].title || "**Visi** Kami dalam **Karya**", 
+            desc: data.heroes[0].description || "Dedikasi kami tertuang dalam setiap detail proyek."
+          });
         }
       })
       .catch(() => {});
 
-    // Ambil Daftar Proyek
+    // 2. Ambil data Proyek
     fetch("/api/project")
       .then((res) => res.json())
       .then((data) => {
-        if (data.projects?.length > 0) setProjects(data.projects);
+        if (data.projects?.length > 0) {
+          setProjects(data.projects);
+        }
       })
       .catch(() => {})
-      .finally(() => setIsLoading(false));
-  }, []);
+      .finally(() => {
+        // Setelah data selesai diambil, beri jeda sedikit agar animasi skeleton UI-mu terlihat smooth
+        setTimeout(() => setIsLoading(false), 600);
+      });
+  }, []); 
 
+  // Filter logika gabungan: Menyaring data dari database berdasarkan filter & pencarian UI-mu
   const filteredProjects = projects.filter((proj) => {
     const matchCategory = activeFilter === "Semua" || proj.category === activeFilter;
     const lowerCaseQuery = searchQuery.toLowerCase();
+    
+    // Defensive check (berjaga-jaga jika ada data kosong dari database)
+    const title = proj.title?.toLowerCase() || "";
+    const location = proj.location?.toLowerCase() || "";
+    const client = proj.client?.toLowerCase() || "";
+
     const matchSearch = 
-      proj.title.toLowerCase().includes(lowerCaseQuery) ||
-      (proj.location && proj.location.toLowerCase().includes(lowerCaseQuery)) ||
-      (proj.client && proj.client.toLowerCase().includes(lowerCaseQuery));
+      title.includes(lowerCaseQuery) ||
+      location.includes(lowerCaseQuery) ||
+      client.includes(lowerCaseQuery);
+      
     return matchCategory && matchSearch;
   });
-
-  useEffect(() => {
-    if (isLoading) {
-      const timer = setTimeout(() => setIsLoading(false), 800);
-      return () => clearTimeout(timer);
-    }
-  }, [isLoading]); 
 
   const handleFilterChange = (cat) => {
     if (cat === activeFilter) return; 
     setActiveFilter(cat);
     setIsLoading(true);
+    // Efek skeleton muncul sebentar saat pindah kategori
+    setTimeout(() => setIsLoading(false), 500);
   };
 
   return (
@@ -84,7 +89,7 @@ export default function ProyekPage() {
       
       <section className="relative w-full h-[50vh] min-h-[400px] flex flex-col items-center justify-center rounded-b-[64px] overflow-hidden bg-[#004282]">
         <div className="absolute inset-0 z-0">
-          <img src="/hero-bg.svg" alt="Background Proyek" className="w-full h-full object-cover" />
+          <img src="/carousel3.svg" alt="Background Proyek" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-[#004282]/85"></div>
         </div>
 
@@ -93,7 +98,11 @@ export default function ProyekPage() {
             text={hero.title}
             className="text-white text-[clamp(2.25rem,4vw,3.5rem)] font-extrabold font-['Plus_Jakarta_Sans'] leading-tight"
           />
-          <BoldText text={hero.desc} className="text-white/90 text-[clamp(0.9rem,1.5vw,1.1rem)] font-normal font-['Plus_Jakarta_Sans'] leading-relaxed max-w-[693px]" as="p" />
+          <BoldText 
+            text={hero.desc} 
+            className="text-white/90 text-[clamp(0.9rem,1.5vw,1.1rem)] font-normal font-['Plus_Jakarta_Sans'] leading-relaxed max-w-[693px]" 
+            as="p" 
+          />
         </div>
       </section>
 
@@ -154,5 +163,14 @@ export default function ProyekPage() {
       </section>
 
     </main>
+  );
+}
+
+// Mengekspor komponen dengan Suspense sebagai standar keamanan Next.js
+export default function ProyekPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#F1F1F1]" />}>
+      <ProyekContent />
+    </Suspense>
   );
 }
