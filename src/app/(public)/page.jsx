@@ -1,5 +1,34 @@
 import ScrollWrapper from "@/components/views/landing/ScrollWrapper";
+import { prisma } from "@/lib/prisma"; // KOREKSI: Gunakan kurung kurawal (Named Import)
 
-export default function HomePage() {
-  return <ScrollWrapper />;
+export const revalidate = 60;
+
+export default async function HomePage() {
+  // Ambil semua data secara paralel
+  const [heroes, stats, projects, news, partners] = await Promise.all([
+    prisma.hero.findMany({ where: { page: "home", isActive: true } }),
+    prisma.statistic.findMany(),
+    prisma.project.findMany({
+      where: { isActive: true },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.news.findMany({
+      where: { status: "PUBLISHED" },
+      orderBy: { publishedAt: "desc" },
+      take: 3,
+    }),
+    prisma.partner.findMany(),
+  ]);
+
+  const heroData = heroes[0] || null;
+
+  return (
+    <ScrollWrapper
+      heroData={heroData}
+      statsData={stats}
+      projectsData={projects}
+      newsData={news}
+      partnersData={partners}
+    />
+  );
 }
