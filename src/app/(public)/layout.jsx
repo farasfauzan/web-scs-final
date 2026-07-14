@@ -1,6 +1,7 @@
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ChatbotButton from "@/components/shared/ChatbotButton";
+import VisitorTracker from "@/components/shared/VisitorTracker";
 import { getAllSettings } from "@/lib/data";
 
 export default async function PublicLayout({ children }) {
@@ -14,6 +15,7 @@ export default async function PublicLayout({ children }) {
       </main>
       <Footer settings={settings} />
       <ChatbotButton settings={settings} />
+      <VisitorTracker />
     </div>
   );
 }

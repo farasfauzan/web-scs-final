@@ -19,6 +19,8 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState(null);
   const [visitorStats, setVisitorStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [resetting, setResetting] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -79,6 +81,21 @@ export default function AdminDashboard() {
     { label: "Minggu Ini", count: visitorStats?.weekVisitors || 0, icon: "/icons/chart.svg" },
   ];
 
+  const handleResetVisitor = async () => {
+    setResetting(true);
+    try {
+      const res = await fetch("/api/visitor/reset", { method: "POST" });
+      if (!res.ok) throw new Error("Failed to reset");
+      setVisitorStats({ totalVisits: 0, uniqueVisitors: 0, todayVisitors: 0, weekVisitors: 0 });
+    } catch (err) {
+      console.error("Reset error:", err);
+      alert("Gagal mereset data pengunjung.");
+    } finally {
+      setResetting(false);
+    }
+    setShowConfirm(false);
+  };
+
   return (
     <div className="space-y-6">
       {/* Welcome */}
@@ -131,11 +148,62 @@ export default function AdminDashboard() {
       {visitorStats && (
         <div className="bg-white rounded-xl border border-neutral-200 shadow-sm overflow-hidden">
           <div className="px-5 py-4 border-b border-neutral-100 bg-neutral-50/50">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-[#004282]" />
-              <h2 className="text-sm font-bold text-neutral-700">Pengunjung Website</h2>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-[#004282]" />
+                <h2 className="text-sm font-bold text-neutral-700">Pengunjung Website</h2>
+              </div>
+              <button
+                onClick={() => setShowConfirm(true)}
+                disabled={resetting}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                {resetting ? "Resetting..." : "Reset"}
+              </button>
             </div>
           </div>
+
+          {/* Confirmation Modal */}
+          {showConfirm && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowConfirm(false)}>
+              <div
+                className="bg-white p-4 max-w-[200px] mx-3 border border-neutral-300 shadow-lg rounded-lg"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex flex-col items-center text-center gap-4">
+                  <div className="w-10 h-10 bg-red-50 flex items-center justify-center">
+                    <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-neutral-800">Reset Data Pengunjung?</h3>
+                    <p className="text-xs text-neutral-500 mt-1.5 leading-relaxed">
+                      Semua data kunjungan akan dihapus permanen. Tindakan ini tidak bisa dibatalkan.
+                    </p>
+                  </div>
+                  <div className="flex gap-2 w-full pt-1">
+                    <button
+                      onClick={() => setShowConfirm(false)}
+                      className="flex-1 py-2 text-xs font-semibold text-neutral-600 bg-neutral-100 hover:bg-neutral-200 transition-colors"
+                    >
+                      Batal
+                    </button>
+                    <button
+                      onClick={handleResetVisitor}
+                      disabled={resetting}
+                      className="flex-1 py-2 text-xs font-semibold text-white bg-red-500 hover:bg-red-600 transition-colors disabled:opacity-50 cursor-pointer"
+                    >
+                      {resetting ? "Mereshut..." : "Ya, Reset"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-neutral-100">
             {visitorCards.map((card) => (
               <div key={card.label} className="p-5 text-center">

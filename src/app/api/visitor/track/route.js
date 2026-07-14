@@ -3,9 +3,12 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(request) {
   try {
-    // Get visitor IP from headers
+    // Get visitor IP from headers (Cloudflare → Reverse Proxy → Direct)
     const forwarded = request.headers.get("x-forwarded-for");
-    const ip = forwarded?.split(",")[0]?.trim() || request.headers.get("x-real-ip") || "127.0.0.1";
+    const ip = request.headers.get("cf-connecting-ip")
+      || forwarded?.split(",")[0]?.trim()
+      || request.headers.get("x-real-ip")
+      || "127.0.0.1";
 
     // Upsert unique visitor
     const existing = await prisma.uniqueVisitor.findUnique({ where: { ip } });
