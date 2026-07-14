@@ -3,6 +3,27 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
+import CldImg from "@/components/shared/CldImg";
+
+const ICON_MAP = {
+  "proyek": "/icons/briefcase.svg",
+  "selesai": "/icons/briefcase.svg",
+  "klien": "/icons/users.svg",
+  "puas": "/icons/users.svg",
+  "tahun": "/icons/calendar-days.svg",
+  "pengalaman": "/icons/calendar-days.svg",
+  "tim": "/icons/user-group.svg",
+  "profesional": "/icons/user-group.svg",
+};
+
+function guessIcon(label) {
+  if (!label) return "/icons/chart.svg";
+  const lower = label.toLowerCase();
+  for (const [keyword, icon] of Object.entries(ICON_MAP)) {
+    if (lower.includes(keyword)) return icon;
+  }
+  return "/icons/chart.svg";
+}
 
 export default function EditStatisticPage() {
   const router = useRouter();
@@ -39,7 +60,15 @@ export default function EditStatisticPage() {
     }
   };
 
-  const handleChange = (e) => setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+      // Auto-fill icon when label changes
+      ...(name === "label" ? { icon: guessIcon(value) } : {}),
+    }));
+  };
 
   if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#004282]"></div></div>;
 
@@ -71,10 +100,29 @@ export default function EditStatisticPage() {
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Icon</label>
-          <input type="text" name="icon" value={form.icon} onChange={handleChange} placeholder="/icons/chart.svg"
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004282] text-sm" />
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Icon</label>
+            <div className="flex gap-2 items-center">
+              <input type="text" name="icon" value={form.icon} onChange={handleChange} placeholder="Auto-filled from label"
+                className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004282] text-sm" />
+              {form.icon && (
+                <div className="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center shrink-0">
+                  <CldImg src={form.icon} alt="" className="w-5 h-5" />
+                </div>
+              )}
+            </div>
+            <p className="text-xs text-gray-400 mt-1">Auto-filled from label. You can change it manually.</p>
+          </div>
+          <div className="flex items-end">
+            <button
+              type="button"
+              onClick={() => setForm((prev) => ({ ...prev, icon: guessIcon(prev.label) }))}
+              className="w-full px-4 py-2.5 rounded-lg text-sm font-medium text-[#004282] bg-blue-50 hover:bg-blue-100 transition-colors"
+            >
+              Reset Icon
+            </button>
+          </div>
         </div>
 
         <div className="flex gap-3 pt-2">

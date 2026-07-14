@@ -5,6 +5,15 @@ import CldImg from "@/components/shared/CldImg";
 
 const SETTING_GROUPS = [
   {
+    group: "notification",
+    label: "Email Notifications",
+    description: "Configure email settings for contact form submissions",
+    fields: [
+      { key: "contact_email", label: "Contact Notification Email", placeholder: "admin@company.com", type: "email" },
+      { key: "contact_from_email", label: "Sender (From) Email", placeholder: "noreply@yourdomain.com", type: "email", description: "Must be from a verified domain in Resend" },
+    ],
+  },
+  {
     group: "links",
     label: "Navigation Links",
     description: "Configure external links used in the navigation menu",
@@ -169,8 +178,11 @@ export default function SettingPage() {
                       Save
                     </button>
                   </div>
+                  {field.description && (
+                    <p className="text-xs text-gray-400 mb-1.5">{field.description}</p>
+                  )}
                   <input
-                    type="text"
+                    type={field.type || "text"}
                     value={settings[field.key] || ""}
                     onChange={(e) => handleChange(field.key, e.target.value)}
                     placeholder={field.placeholder}
@@ -187,8 +199,12 @@ export default function SettingPage() {
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
         <h3 className="text-sm font-bold text-blue-800 mb-1">How Settings Work</h3>
         <p className="text-xs text-blue-600 leading-relaxed">
-          These settings control the links in the navigation menu, footer content, and company info across your website.
+          These settings control the links in the navigation menu, footer content, company info, and email notifications across your website.
           Changes take effect immediately on the public website. There is no need to edit any code to update these values.
+        </p>
+        <p className="text-xs text-blue-600 leading-relaxed mt-2">
+          <strong>Contact Notification Email</strong> = kemana email dari form Hubungi Kami dikirim.<br />
+          <strong>Sender (From) Email</strong> = alamat pengirim (harus dari domain yang sudah diverifikasi di Resend).
         </p>
       </div>
     </div>

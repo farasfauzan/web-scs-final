@@ -5,10 +5,10 @@ import CldImg from "@/components/shared/CldImg";
 
 export default function StatsCarouselSection() {
   const [stats, setStats] = useState([
-    { value: "5+", label: "Proyek Selesai" },
-    { value: "50+", label: "Klien Puas" },
-    { value: "25+", label: "Tahun Pengalaman" },
-    { value: "200+", label: "Tim Profesional" }
+    { value: "5+", label: "Proyek Selesai", icon: "/icons/briefcase.svg" },
+    { value: "50+", label: "Klien Puas", icon: "/icons/users.svg" },
+    { value: "25+", label: "Tahun Pengalaman", icon: "/icons/calendar-days.svg" },
+    { value: "200+", label: "Tim Profesional", icon: "/icons/user-group.svg" }
   ]);
 
   useEffect(() => {
@@ -16,7 +16,7 @@ export default function StatsCarouselSection() {
       .then((res) => res.json())
       .then((data) => {
         if (data.statistics?.length > 0) {
-          setStats(data.statistics.map((s) => ({ label: s.label, value: s.value })));
+          setStats(data.statistics.map((s) => ({ label: s.label, value: s.value, icon: s.icon || "/icons/chart.svg" })));
         }
       })
       .catch(() => {});
@@ -58,6 +58,9 @@ export default function StatsCarouselSection() {
           <div className="relative z-10 w-full flex justify-center items-center gap-10 md:gap-20">
             {stats.map((stat, idx) => (
               <div key={idx} className="flex flex-col items-center text-center gap-3">
+                <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
+                  <CldImg src={stat.icon || "/icons/chart.svg"} alt="" className="w-6 h-6 brightness-0 invert" />
+                </div>
                 <span className="text-white text-4xl font-extrabold font-['Plus_Jakarta_Sans']">{stat.value}</span>
                 <span className="text-white text-2xl font-semibold font-['Plus_Jakarta_Sans']">{stat.label}</span>
               </div>

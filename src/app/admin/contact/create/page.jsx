@@ -3,6 +3,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import CldImg from "@/components/shared/CldImg";
+
+const ICON_MAP = {
+  phone: "/icons/phone.svg",
+  email: "/icons/envelope.svg",
+  address: "/icons/map-pin.svg",
+  general: "/icons/clock.svg",
+  social: "/icons/clock.svg",
+};
 
 export default function CreateContactPage() {
   const router = useRouter();
@@ -24,7 +33,15 @@ export default function CreateContactPage() {
     }
   };
 
-  const handleChange = (e) => setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+      // Auto-fill icon when type changes
+      ...(name === "type" ? { icon: ICON_MAP[value] || "" } : {}),
+    }));
+  };
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
@@ -66,10 +83,29 @@ export default function CreateContactPage() {
             className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004282] text-sm" />
         </div>
 
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Icon</label>
-          <input type="text" name="icon" value={form.icon} onChange={handleChange} placeholder="/icons/phone.svg or /icons/email.svg"
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004282] text-sm" />
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Icon</label>
+            <div className="flex gap-2 items-center">
+              <input type="text" name="icon" value={form.icon} onChange={handleChange} placeholder="Auto-filled from type"
+                className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004282] text-sm" />
+              {form.icon && (
+                <div className="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center shrink-0">
+                  <CldImg src={form.icon} alt="" className="w-5 h-5" />
+                </div>
+              )}
+            </div>
+            <p className="text-xs text-gray-400 mt-1">Auto-filled from type. You can change it manually.</p>
+          </div>
+          <div className="flex items-end">
+            <button
+              type="button"
+              onClick={() => setForm((prev) => ({ ...prev, icon: ICON_MAP[prev.type] || "" }))}
+              className="w-full px-4 py-2.5 rounded-lg text-sm font-medium text-[#004282] bg-blue-50 hover:bg-blue-100 transition-colors"
+            >
+              Reset Icon
+            </button>
+          </div>
         </div>
 
         <div className="flex gap-3 pt-2">
