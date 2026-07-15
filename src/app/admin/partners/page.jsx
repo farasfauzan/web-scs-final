@@ -7,29 +7,35 @@ import CldImg from "@/components/shared/CldImg";
 export default function PartnerListPage() {
   const [partners, setPartners] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  const fetchPartners = async () => {
-    try {
-      const res = await fetch("/api/partners");
-      const data = await res.json();
-      setPartners(data.partners || []);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => { fetchPartners(); }, []);
+  useEffect(() => {
+    const fetchPartners = async () => {
+      try {
+        const res = await fetch("/api/partners");
+        const data = await res.json();
+        setPartners(data.partners || []);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPartners();
+  }, [refreshTrigger]);
 
   const handleDelete = async (id) => {
     if (!confirm("Are you sure you want to delete this partner?")) return;
     const res = await fetch(`/api/partners/${id}`, { method: "DELETE" });
-    if (res.ok) fetchPartners();
+    if (res.ok) setRefreshTrigger((prev) => prev + 1);
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#004282]"></div></div>;
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#004282]"></div>
+      </div>
+    );
   }
 
   return (
@@ -42,12 +48,21 @@ export default function PartnerListPage() {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-800">Partners</h1>
-              <p className="text-gray-500 text-sm mt-1">Manage partner/affiliate companies</p>
+              <p className="text-gray-500 text-sm mt-1">
+                Manage partner/affiliate companies
+              </p>
             </div>
           </div>
         </div>
-        <Link href="/admin/partners/create" className="inline-flex items-center gap-2 bg-[#004282] text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-900 transition-colors">
-          <CldImg src="/icons/plus.svg" alt="" className="w-4 h-4 brightness-0 invert" />
+        <Link
+          href="/admin/partners/create"
+          className="inline-flex items-center gap-2 bg-[#004282] text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-900 transition-colors"
+        >
+          <CldImg
+            src="/icons/plus.svg"
+            alt=""
+            className="w-4 h-4 brightness-0 invert"
+          />
           Add Partner
         </Link>
       </div>
@@ -59,25 +74,50 @@ export default function PartnerListPage() {
           </div>
         ) : (
           partners.map((partner) => (
-            <div key={partner.id} className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+            <div
+              key={partner.id}
+              className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm"
+            >
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 bg-blue-50 rounded-xl flex items-center justify-center text-2xl overflow-hidden">
                   {partner.logoUrl ? (
-                    <CldImg src={partner.logoUrl} alt={partner.name} className="w-full h-full object-contain" />
+                    <CldImg
+                      src={partner.logoUrl}
+                      alt={partner.name}
+                      className="w-full h-full object-contain"
+                    />
                   ) : (
-                    <CldImg src="/icons/building.svg" alt="" className="w-6 h-6" />
+                    <CldImg
+                      src="/icons/building.svg"
+                      alt=""
+                      className="w-6 h-6"
+                    />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-800 text-sm truncate">{partner.name || "Unnamed Partner"}</h3>
+                  <h3 className="font-semibold text-gray-800 text-sm truncate">
+                    {partner.name || "Unnamed Partner"}
+                  </h3>
                   {partner.linkUrl && (
-                    <p className="text-xs text-gray-500 truncate mt-0.5">{partner.linkUrl}</p>
+                    <p className="text-xs text-gray-500 truncate mt-0.5">
+                      {partner.linkUrl}
+                    </p>
                   )}
                 </div>
               </div>
               <div className="flex justify-end gap-2 mt-3 pt-3 border-t border-gray-50">
-                <Link href={`/admin/partners/${partner.id}`} className="text-[#004282] hover:text-blue-700 text-sm font-medium">Edit</Link>
-                <button onClick={() => handleDelete(partner.id)} className="text-red-500 hover:text-red-600 text-sm font-medium">Delete</button>
+                <Link
+                  href={`/admin/partners/${partner.id}`}
+                  className="text-[#004282] hover:text-blue-700 text-sm font-medium"
+                >
+                  Edit
+                </Link>
+                <button
+                  onClick={() => handleDelete(partner.id)}
+                  className="text-red-500 hover:text-red-600 text-sm font-medium"
+                >
+                  Delete
+                </button>
               </div>
             </div>
           ))
