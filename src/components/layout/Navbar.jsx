@@ -12,33 +12,28 @@ export default function Navbar({ settings = {} }) {
   const [isPastHero, setIsPastHero] = useState(false);
 
   useEffect(() => {
-    // 1. Deteksi apakah rute saat ini memiliki seksi Hero (Gambar latar atas)
+    // KOREKSI: Hapus startsWith("/proyek/") dan startsWith("/berita/")
+    // Agar halaman detail langsung memicu isPastHero = true
     const isKnownHeroPage =
       pathname === "/" ||
       pathname === "/hubungi-kami" ||
       pathname === "/tentang-kami" ||
       pathname === "/proyek" ||
-      pathname === "/berita" ||
-      pathname.startsWith("/proyek/") ||
-      pathname.startsWith("/berita/");
+      pathname === "/berita";
 
     const handleScroll = () => {
       setIsFloating(window.scrollY > 50);
 
-      // KOREKSI: Jika ini halaman 404 (Not Found) atau halaman tanpa Hero,
-      // paksa Navbar menjadi biru/solid seketika agar teks putih tidak hilang.
       if (!isKnownHeroPage) {
         setIsPastHero(true);
         return;
       }
 
-      // 2. Kalkulasi batas tinggi Hero secara dinamis
       const isFullScreenHero = pathname === "/" || pathname === "/hubungi-kami";
       const heroHeight = isFullScreenHero
         ? window.innerHeight
         : Math.max(window.innerHeight * 0.5, 400);
 
-      // 3. Ubah warna 80px sebelum benar-benar keluar dari Hero
       setIsPastHero(window.scrollY > heroHeight - 80);
     };
 
@@ -112,7 +107,6 @@ export default function Navbar({ settings = {} }) {
         </Link>
 
         <div className="flex items-center justify-end gap-5 relative shrink-0">
-          {/* Menu Desktop */}
           <div
             className={`hidden lg:flex items-center gap-7 font-bold font-['Plus_Jakarta_Sans'] text-[14px] transition-colors duration-500 ${textColor}`}
           >
@@ -143,10 +137,10 @@ export default function Navbar({ settings = {} }) {
             Hubungi Kami
           </Link>
 
-          {/* Tombol Burger - Tersedia di Semua Perangkat */}
+          {/* KOREKSI: Tambahan cursor-pointer agar menjadi ikon telunjuk */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="relative focus:outline-none z-[60] ml-1 w-6 h-4"
+            className="relative focus:outline-none z-[60] ml-1 w-6 h-4 cursor-pointer"
             aria-label="Toggle Menu"
           >
             <span
@@ -160,7 +154,6 @@ export default function Navbar({ settings = {} }) {
             ></span>
           </button>
 
-          {/* Isi Dropdown Menu */}
           <div
             className={`absolute top-[calc(100%+12px)] right-0 w-64 bg-white/95 backdrop-blur-xl rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.12)] border border-white/50 overflow-hidden transition-all duration-300 origin-top-right ${
               isMenuOpen
@@ -169,7 +162,6 @@ export default function Navbar({ settings = {} }) {
             }`}
           >
             <div className="flex flex-col p-2 gap-1">
-              {/* KOREKSI: Tambahan Menu Utama Khusus Mobile (lg:hidden) */}
               <div className="flex flex-col lg:hidden border-b border-neutral-100 mb-1 pb-1">
                 {mainLinks.map((link) => (
                   <Link
@@ -181,7 +173,6 @@ export default function Navbar({ settings = {} }) {
                     {link.name}
                   </Link>
                 ))}
-                {/* Tambahan Hubungi Kami (Muncul di HP yang sangat kecil karena tombol aslinya 'hidden sm:inline-block') */}
                 <Link
                   href="/hubungi-kami"
                   onClick={() => setIsMenuOpen(false)}
@@ -191,7 +182,6 @@ export default function Navbar({ settings = {} }) {
                 </Link>
               </div>
 
-              {/* Menu Tautan Eksternal (Tampil di Desktop & Mobile) */}
               {utilityMenu.map((item, idx) => {
                 const isExternal = item.href.startsWith("http");
                 const LinkComponent = isExternal ? "a" : Link;

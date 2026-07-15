@@ -46,7 +46,6 @@ export default async function TentangKamiPage() {
     <main className="w-full bg-[#F1F1F1] min-h-screen pb-24">
       <section className="relative w-full h-[50vh] min-h-[400px] flex flex-col items-center justify-center rounded-b-[64px] overflow-hidden bg-[#004282]">
         <div className="absolute inset-0 z-0">
-          {/* KOREKSI: Penambahan object-top */}
           <CldImg
             src={heroData?.imageUrl || "/bg-hero-tentang-kami.svg"}
             alt="Background Tentang Kami"
@@ -122,11 +121,14 @@ export default async function TentangKamiPage() {
             delay={0.2}
             className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-[900px]"
           >
+            {/* KOREKSI: 4 Emoji (Integritas, Kualitas, Inovasi, Kerjasama) Diganti menjadi Image/img tag */}
             <div className="flex gap-5">
-              <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-neutral-200 flex items-center justify-center shrink-0 grayscale transition-all duration-300 hover:grayscale-0">
-                <span className="text-xl" role="img" aria-label="Integritas">
-                  🛡️
-                </span>
+              <div className="w-14 h-14 bg-white rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.05)] border border-neutral-100 flex items-center justify-center shrink-0">
+                <img
+                  src="/integritas.svg"
+                  alt="Integritas"
+                  className="w-6 h-6 object-contain opacity-80"
+                />
               </div>
               <div className="flex flex-col gap-2">
                 <h4 className="text-lg font-bold text-[#1E1E1E]">Integritas</h4>
@@ -136,11 +138,14 @@ export default async function TentangKamiPage() {
                 </p>
               </div>
             </div>
+
             <div className="flex gap-5">
-              <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-neutral-200 flex items-center justify-center shrink-0 grayscale transition-all duration-300 hover:grayscale-0">
-                <span className="text-xl" role="img" aria-label="Kualitas">
-                  💎
-                </span>
+              <div className="w-14 h-14 bg-white rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.05)] border border-neutral-100 flex items-center justify-center shrink-0">
+                <img
+                  src="/kualitas.svg"
+                  alt="Kualitas"
+                  className="w-6 h-6 object-contain opacity-80"
+                />
               </div>
               <div className="flex flex-col gap-2">
                 <h4 className="text-lg font-bold text-[#1E1E1E]">Kualitas</h4>
@@ -150,11 +155,14 @@ export default async function TentangKamiPage() {
                 </p>
               </div>
             </div>
+
             <div className="flex gap-5">
-              <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-neutral-200 flex items-center justify-center shrink-0 grayscale transition-all duration-300 hover:grayscale-0">
-                <span className="text-xl" role="img" aria-label="Inovasi">
-                  💡
-                </span>
+              <div className="w-14 h-14 bg-white rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.05)] border border-neutral-100 flex items-center justify-center shrink-0">
+                <img
+                  src="/inovasi.svg"
+                  alt="Inovasi"
+                  className="w-6 h-6 object-contain opacity-80"
+                />
               </div>
               <div className="flex flex-col gap-2">
                 <h4 className="text-lg font-bold text-[#1E1E1E]">Inovasi</h4>
@@ -165,11 +173,14 @@ export default async function TentangKamiPage() {
                 </p>
               </div>
             </div>
+
             <div className="flex gap-5">
-              <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-neutral-200 flex items-center justify-center shrink-0 grayscale transition-all duration-300 hover:grayscale-0">
-                <span className="text-xl" role="img" aria-label="Kolaborasi">
-                  🤝
-                </span>
+              <div className="w-14 h-14 bg-white rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.05)] border border-neutral-100 flex items-center justify-center shrink-0">
+                <img
+                  src="/kerja-sama-tim.svg"
+                  alt="Kerja Sama Tim"
+                  className="w-6 h-6 object-contain opacity-80"
+                />
               </div>
               <div className="flex flex-col gap-2">
                 <h4 className="text-lg font-bold text-[#1E1E1E]">
