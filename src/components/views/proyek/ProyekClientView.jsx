@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import FadeUp from "@/components/ui/FadeUp";
 import ProjectCard from "@/components/shared/ProjectCard";
@@ -7,21 +7,16 @@ import Pagination from "@/components/shared/Pagination";
 import ProjectSkeleton from "@/components/ui/ProjectSkeleton";
 import HeroTitle from "@/components/shared/HeroTitle";
 import BoldText from "@/components/shared/BoldText";
-import { IMAGE_SIZES } from "@/lib/cloudinary";
-import OptimizedImage from "@/components/shared/OptimizedImage";
+import CldImg from "@/components/shared/CldImg";
 
-// 1. Komponen Hero (Bebas dari useSearchParams agar render seketika tanpa skeleton)
 function ProyekHero({ heroData }) {
   return (
     <section className="relative w-full h-[50vh] min-h-[400px] flex flex-col items-center justify-center rounded-b-[64px] overflow-hidden bg-[#004282]">
       <div className="absolute inset-0 z-0">
-        <OptimizedImage
+        <CldImg
           src={heroData?.imageUrl || "/carousel3.svg"}
           alt=""
-          fill
-          priority
-          cldOptions={IMAGE_SIZES.hero}
-          className="object-cover"
+          className="w-full h-full object-cover object-top"
         />
         <div className="absolute inset-0 bg-[#004282]/85"></div>
       </div>
@@ -43,7 +38,6 @@ function ProyekHero({ heroData }) {
   );
 }
 
-// 2. Komponen Interaktif (Filter, Search, Grid, Pagination)
 function ProyekInteractive({ initialProjects }) {
   const searchParams = useSearchParams();
   const currentPage = Number(searchParams.get("page")) || 1;
@@ -57,6 +51,10 @@ function ProyekInteractive({ initialProjects }) {
     "Rumah Sakit",
     "Gedung Pendidikan",
     "Pusat Perbelanjaan",
+    "Fasilitas Olahraga",
+    "Infrastruktur Publik",
+    "Perumahan",
+    "Komersial & Perkantoran",
     "Lainnya",
   ];
 
@@ -98,12 +96,14 @@ function ProyekInteractive({ initialProjects }) {
         id="daftar-konten"
         className="relative z-20 -mt-[26px] flex justify-center px-6"
       >
+        {/* KOREKSI 1: Mengembalikan max-w-7xl (1280px) dan justify-between agar tetap mepet ujung layout */}
         <FadeUp
           delay={0.2}
-          className="w-full max-w-7xl flex flex-col lg:flex-row justify-between items-center gap-6"
+          className="w-full max-w-7xl flex flex-col lg:flex-row justify-between items-center lg:items-start gap-4 md:gap-6"
         >
+          {/* Pembungkus Kategori - KOREKSI 2: Lebar dimaksimalkan ke lg:max-w-[800px] */}
           <div
-            className="flex items-center p-1.5 bg-white rounded-full shadow-md overflow-x-auto w-full lg:w-auto scrollbar-hide"
+            className="flex items-center lg:flex-wrap p-1.5 bg-white rounded-[24px] shadow-md overflow-x-auto lg:overflow-visible w-full lg:max-w-[800px] scrollbar-hide shrink-0"
             role="tablist"
             aria-label="Kategori Proyek"
           >
@@ -113,7 +113,7 @@ function ProyekInteractive({ initialProjects }) {
                 role="tab"
                 aria-selected={activeFilter === cat}
                 onClick={() => handleFilterChange(cat)}
-                className={`px-6 py-2.5 rounded-full text-[14px] font-semibold transition-all duration-300 whitespace-nowrap cursor-pointer ${
+                className={`px-5 py-2.5 rounded-full text-[14px] font-semibold transition-all duration-300 whitespace-nowrap cursor-pointer shrink-0 ${
                   activeFilter === cat
                     ? "bg-[#6B7AE5] text-white shadow-sm"
                     : "bg-transparent text-neutral-500 hover:text-[#004282]"
@@ -123,7 +123,9 @@ function ProyekInteractive({ initialProjects }) {
               </button>
             ))}
           </div>
-          <div className="flex items-center bg-white rounded-full pl-6 pr-1.5 py-1.5 shadow-md w-full lg:w-[320px] shrink-0">
+
+          {/* Search Bar - KOREKSI 3: Diperlebar secara fisik menjadi lg:w-[440px] */}
+          <div className="flex items-center bg-white rounded-full pl-6 pr-1.5 py-1.5 shadow-md w-full lg:w-[440px] shrink-0">
             <input
               type="text"
               placeholder="Cari proyek, lokasi, klien..."
@@ -131,7 +133,7 @@ function ProyekInteractive({ initialProjects }) {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="flex-grow bg-transparent border-none outline-none text-neutral-600 text-[15px]"
             />
-            <div className="w-10 h-10 rounded-full bg-[#004282] flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-full bg-[#6B7AE5] flex items-center justify-center shrink-0 hover:bg-[#5a68d4] transition-colors cursor-pointer">
               <svg
                 className="w-4 h-4 text-white"
                 fill="none"
@@ -183,13 +185,11 @@ function ProyekInteractive({ initialProjects }) {
   );
 }
 
-// Pembungkus Ekspor dengan Suspense yang tepat sasaran
 export default function ProyekClientView({ heroData, initialProjects }) {
   return (
     <main className="w-full bg-[#F1F1F1] min-h-screen pb-24">
       <ProyekHero heroData={heroData} />
 
-      {/* Suspense HANYA memblokir area daftar konten, Hero tetap tayang sempurna */}
       <Suspense
         fallback={
           <section className="w-full flex justify-center pt-[clamp(3rem,5vh,4rem)] px-6">

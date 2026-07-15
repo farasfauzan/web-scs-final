@@ -1,8 +1,6 @@
 import FadeUp from "@/components/ui/FadeUp";
 import HeroTitle from "@/components/shared/HeroTitle";
 import BoldText from "@/components/shared/BoldText";
-import { IMAGE_SIZES } from "@/lib/cloudinary";
-import OptimizedImage from "@/components/shared/OptimizedImage";
 import CldImg from "@/components/shared/CldImg";
 
 const FALLBACK = {
@@ -20,13 +18,11 @@ export default function HeroSection({ data }) {
   return (
     <section className="relative w-full min-h-[100svh] py-[clamp(4rem,10vh,8rem)] bg-[#004282] overflow-hidden flex items-center rounded-b-[64px]">
       <div className="absolute inset-0 z-0">
-        <OptimizedImage
+        {/* KOREKSI: Penambahan object-top agar gambar terkunci di atas */}
+        <CldImg
           src={hero.imageUrl}
           alt="Background"
-          fill
-          priority
-          cldOptions={IMAGE_SIZES.hero}
-          className="object-cover"
+          className="w-full h-full object-cover object-top"
         />
         <div className="absolute inset-0 bg-[#004282]/85"></div>
       </div>

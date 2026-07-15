@@ -8,11 +8,10 @@ export default async function PublicLayout({ children }) {
   const settings = await getAllSettings();
 
   return (
-    <div className="relative min-h-screen flex flex-col justify-between">
+    // KOREKSI: Tambahkan overflow-x-hidden di div terluar ini
+    <div className="relative min-h-screen flex flex-col justify-between overflow-x-hidden">
       <Navbar settings={settings} />
-      <main className="flex-grow">
-        {children}
-      </main>
+      <main className="flex-grow w-full">{children}</main>
       <Footer settings={settings} />
       <ChatbotButton settings={settings} />
       <VisitorTracker />

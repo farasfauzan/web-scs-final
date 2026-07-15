@@ -1,8 +1,7 @@
 import HeroTitle from "@/components/shared/HeroTitle";
 import BoldText from "@/components/shared/BoldText";
 import FadeUp from "@/components/ui/FadeUp";
-import { IMAGE_SIZES } from "@/lib/cloudinary";
-import OptimizedImage from "@/components/shared/OptimizedImage";
+import CldImg from "@/components/shared/CldImg";
 import { prisma } from "@/lib/prisma";
 
 export const revalidate = 3600;
@@ -47,12 +46,11 @@ export default async function TentangKamiPage() {
     <main className="w-full bg-[#F1F1F1] min-h-screen pb-24">
       <section className="relative w-full h-[50vh] min-h-[400px] flex flex-col items-center justify-center rounded-b-[64px] overflow-hidden bg-[#004282]">
         <div className="absolute inset-0 z-0">
-          <OptimizedImage
+          {/* KOREKSI: Penambahan object-top */}
+          <CldImg
             src={heroData?.imageUrl || "/bg-hero-tentang-kami.svg"}
             alt="Background Tentang Kami"
-            fill
-            cldOptions={IMAGE_SIZES.hero}
-            className="object-cover"
+            className="w-full h-full object-cover object-top"
           />
           <div className="absolute inset-0 bg-[#004282]/85"></div>
         </div>

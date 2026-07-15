@@ -8,21 +8,17 @@ import SearchBar from "@/components/views/berita/SearchBar";
 import NewsSkeleton from "@/components/ui/NewsSkeleton";
 import HeroTitle from "@/components/shared/HeroTitle";
 import BoldText from "@/components/shared/BoldText";
-import { IMAGE_SIZES } from "@/lib/cloudinary";
-import OptimizedImage from "@/components/shared/OptimizedImage";
+import CldImg from "@/components/shared/CldImg";
 
-// 1. Komponen Hero (Aman dari Suspense)
 function BeritaHero({ heroData }) {
   return (
     <section className="relative w-full h-[50vh] min-h-[400px] flex flex-col items-center justify-center rounded-b-[64px] overflow-hidden bg-[#004282]">
       <div className="absolute inset-0 z-0">
-        <OptimizedImage
+        {/* KOREKSI: Penambahan object-top */}
+        <CldImg
           src={heroData?.imageUrl || "/carousel1.svg"}
           alt=""
-          fill
-          priority
-          cldOptions={IMAGE_SIZES.hero}
-          className="object-cover"
+          className="w-full h-full object-cover object-top"
         />
         <div className="absolute inset-0 bg-[#004282]/85"></div>
       </div>
@@ -44,7 +40,6 @@ function BeritaHero({ heroData }) {
   );
 }
 
-// 2. Komponen Interaktif
 function BeritaInteractive({ initialNews }) {
   const searchParams = useSearchParams();
   const query = searchParams?.get("q")?.toLowerCase() || "";
@@ -110,7 +105,6 @@ function BeritaInteractive({ initialNews }) {
   );
 }
 
-// Pembungkus Ekspor dengan Suspense yang tepat sasaran
 export default function BeritaClientView({ heroData, initialNews }) {
   return (
     <main className="w-full bg-[#F1F1F1] min-h-screen pb-24">
