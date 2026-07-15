@@ -59,6 +59,7 @@ model Project {
   location      String?
   client        String?
   imageUrl      String?
+  galleryImages String[]
   completedDate String?
   isActive      Boolean  @default(true)
   createdAt     DateTime @default(now())
@@ -66,16 +67,17 @@ model Project {
 }
 
 model News {
-  id          Int        @id @default(autoincrement())
-  slug        String     @unique
-  title       String
-  excerpt     String?
-  content     String
-  imageUrl    String?
-  status      NewsStatus @default(DRAFT)
-  publishedAt DateTime?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id            Int        @id @default(autoincrement())
+  slug          String     @unique
+  title         String
+  excerpt       String?
+  content       String
+  imageUrl      String?
+  galleryImages String[]
+  status        NewsStatus @default(DRAFT)
+  publishedAt   DateTime?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 }
 
 model Partner {

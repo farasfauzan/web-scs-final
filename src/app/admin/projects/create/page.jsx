@@ -4,12 +4,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import ImageUpload from "@/components/admin/ImageUpload";
+import GalleryUpload from "@/components/admin/GalleryUpload";
 
 const CATEGORIES = ["Rumah Sakit", "Gedung Pendidikan", "Pusat Perbelanjaan", "Fasilitas Olahraga", "Infrastruktur Publik", "Perumahan", "Komersial & Perkantoran", "Lainnya"];
 
 export default function CreateProjectPage() {
   const router = useRouter();
-  const [form, setForm] = useState({ title: "", description: "", category: "Lainnya", location: "", client: "", imageUrl: "", completedDate: "", isActive: true });
+  const [form, setForm] = useState({ title: "", description: "", category: "Lainnya", location: "", client: "", imageUrl: "", galleryImages: [], completedDate: "", isActive: true });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -93,6 +94,14 @@ export default function CreateProjectPage() {
           currentImage={form.imageUrl}
           onImageChange={(url) => setForm((prev) => ({ ...prev, imageUrl: url }))}
           label="Project Image"
+        />
+
+        <hr className="border-gray-100" />
+
+        <GalleryUpload
+          images={form.galleryImages}
+          onImagesChange={(urls) => setForm((prev) => ({ ...prev, galleryImages: urls }))}
+          label="Galeri Foto Proyek"
         />
 
         <div className="flex items-center gap-3">

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import ImageUpload from "@/components/admin/ImageUpload";
+import GalleryUpload from "@/components/admin/GalleryUpload";
 
 export default function CreateNewsPage() {
   const router = useRouter();
@@ -13,6 +14,7 @@ export default function CreateNewsPage() {
     excerpt: "",
     content: "",
     imageUrl: "",
+    galleryImages: [],
     status: "DRAFT",
     publishedAt: null,
   });
@@ -114,6 +116,14 @@ export default function CreateNewsPage() {
             </select>
           </div>
         </div>
+
+        <hr className="border-gray-100" />
+
+        <GalleryUpload
+          images={form.galleryImages}
+          onImagesChange={(urls) => setForm((prev) => ({ ...prev, galleryImages: urls }))}
+          label="Galeri Foto Berita"
+        />
 
         <div className="flex gap-3 pt-2">
           <button type="submit" disabled={loading}

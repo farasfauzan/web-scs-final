@@ -25,7 +25,12 @@ export async function POST(request) {
     }
 
     const data = await request.json();
-    const project = await prisma.project.create({ data });
+    // Ensure galleryImages is always an array
+    const createData = {
+      ...data,
+      galleryImages: data.galleryImages || [],
+    };
+    const project = await prisma.project.create({ data: createData });
     return NextResponse.json({ project }, { status: 201 });
   } catch (error) {
     return NextResponse.json({ error: "Failed to create project" }, { status: 500 });

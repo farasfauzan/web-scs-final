@@ -31,9 +31,15 @@ export async function PUT(request, { params }) {
       }
     }
 
+    // Ensure galleryImages is always an array
+    const updateData = {
+      ...data,
+      galleryImages: data.galleryImages || [],
+    };
+
     const news = await prisma.news.update({
       where: { id: Number(id) },
-      data,
+      data: updateData,
     });
     return NextResponse.json({ news });
   } catch (error) {

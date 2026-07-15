@@ -28,7 +28,7 @@ export default function DetailBeritaPage({ params }) {
     );
   }
 
-  const galleryImages = news.gallery || news.images || [];
+  const galleryImages = news.galleryImages || news.gallery || news.images || [];
 
   const formatYellowText = (text) => {
     if (!text) return null;

@@ -4,13 +4,14 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import ImageUpload from "@/components/admin/ImageUpload";
+import GalleryUpload from "@/components/admin/GalleryUpload";
 
 const CATEGORIES = ["Rumah Sakit", "Gedung Pendidikan", "Pusat Perbelanjaan", "Fasilitas Olahraga", "Infrastruktur Publik", "Perumahan", "Komersial & Perkantoran", "Lainnya"];
 
 export default function EditProjectPage() {
   const router = useRouter();
   const params = useParams();
-  const [form, setForm] = useState({ title: "", description: "", category: "Lainnya", location: "", client: "", imageUrl: "", completedDate: "", isActive: true });
+  const [form, setForm] = useState({ title: "", description: "", category: "Lainnya", location: "", client: "", imageUrl: "", galleryImages: [], completedDate: "", isActive: true });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -21,7 +22,7 @@ export default function EditProjectPage() {
       const data = await res.json();
       if (data.project) {
         const p = data.project;
-        setForm({ title: p.title || "", description: p.description || "", category: p.category || "Lainnya", location: p.location || "", client: p.client || "", imageUrl: p.imageUrl || "", completedDate: p.completedDate || "", isActive: p.isActive ?? true });
+        setForm({ title: p.title || "", description: p.description || "", category: p.category || "Lainnya", location: p.location || "", client: p.client || "", imageUrl: p.imageUrl || "", galleryImages: p.galleryImages || [], completedDate: p.completedDate || "", isActive: p.isActive ?? true });
       }
       setLoading(false);
     };
@@ -110,6 +111,14 @@ export default function EditProjectPage() {
           currentImage={form.imageUrl}
           onImageChange={(url) => setForm((prev) => ({ ...prev, imageUrl: url }))}
           label="Project Image"
+        />
+
+        <hr className="border-gray-100" />
+
+        <GalleryUpload
+          images={form.galleryImages}
+          onImagesChange={(urls) => setForm((prev) => ({ ...prev, galleryImages: urls }))}
+          label="Galeri Foto Proyek"
         />
 
         <div className="flex items-center gap-3">

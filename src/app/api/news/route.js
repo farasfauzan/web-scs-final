@@ -25,7 +25,12 @@ export async function POST(request) {
     }
 
     const data = await request.json();
-    const news = await prisma.news.create({ data });
+    // Ensure galleryImages is always an array
+    const createData = {
+      ...data,
+      galleryImages: data.galleryImages || [],
+    };
+    const news = await prisma.news.create({ data: createData });
     return NextResponse.json({ news }, { status: 201 });
   } catch (error) {
     return NextResponse.json({ error: "Failed to create news" }, { status: 500 });

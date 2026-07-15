@@ -4,11 +4,12 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import ImageUpload from "@/components/admin/ImageUpload";
+import GalleryUpload from "@/components/admin/GalleryUpload";
 
 export default function EditNewsPage() {
   const router = useRouter();
   const params = useParams();
-  const [form, setForm] = useState({ slug: "", title: "", excerpt: "", content: "", imageUrl: "", status: "DRAFT" });
+  const [form, setForm] = useState({ slug: "", title: "", excerpt: "", content: "", imageUrl: "", galleryImages: [], status: "DRAFT" });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -19,7 +20,7 @@ export default function EditNewsPage() {
       const data = await res.json();
       if (data.news) {
         const n = data.news;
-        setForm({ slug: n.slug || "", title: n.title || "", excerpt: n.excerpt || "", content: n.content || "", imageUrl: n.imageUrl || "", status: n.status || "DRAFT" });
+        setForm({ slug: n.slug || "", title: n.title || "", excerpt: n.excerpt || "", content: n.content || "", imageUrl: n.imageUrl || "", galleryImages: n.galleryImages || [], status: n.status || "DRAFT" });
       }
       setLoading(false);
     };
@@ -105,6 +106,14 @@ export default function EditNewsPage() {
             </select>
           </div>
         </div>
+
+        <hr className="border-gray-100" />
+
+        <GalleryUpload
+          images={form.galleryImages}
+          onImagesChange={(urls) => setForm((prev) => ({ ...prev, galleryImages: urls }))}
+          label="Galeri Foto Berita"
+        />
 
         <div className="flex gap-3 pt-2">
           <button type="submit" disabled={saving}

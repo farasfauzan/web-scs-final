@@ -78,13 +78,17 @@ async function sendViaResend({ name, email, phone, subject, message, contactEmai
   return data;
 }
 
-async function sendViaNodemailer({ name, email, phone, subject, message, contactEmail, fromEmail, fromName, emailSubject }) {
+async function sendViaNodemailer({ name, email, phone, subject, message, contactEmail, fromName, emailSubject }) {
   const { htmlBody, textBody } = await renderEmailContent(name, email, phone, subject, message);
 
   const transporter = createNodemailerTransporter();
 
+  // Nodemailer via Gmail SMTP harus pakai email Gmail sebagai pengirim,
+  // bukan __REDACTED__@__REDACTED__.dev (karena Gmail akan menolaknya)
+  const nodemailerFrom = process.env.SMTP_USER || "__REDACTED__@__REDACTED__.com";
+
   const info = await transporter.sendMail({
-    from: `${fromName} <${fromEmail}>`,
+    from: `${fromName} <${nodemailerFrom}>`,
     replyTo: email,
     to: contactEmail,
     subject: emailSubject,
@@ -149,7 +153,9 @@ export async function POST(request) {
       console.warn("⚠️ Resend gagal, fallback ke nodemailer:", resendErr.message);
       // Fallback ke nodemailer
       try {
-        await sendViaNodemailer(emailPayload);
+        // Hapus fromEmail dari payload untuk Nodemailer — dia pakai SMTP_USER sendiri
+    const { fromEmail: _, ...nodemailerPayload } = emailPayload;
+    await sendViaNodemailer(nodemailerPayload);
         console.log("✅ Contact email sent via nodemailer (fallback)");
       } catch (nodemailerErr) {
         console.error("❌ Nodemailer juga gagal:", nodemailerErr);
