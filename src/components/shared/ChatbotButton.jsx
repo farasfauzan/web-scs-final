@@ -5,10 +5,51 @@ import { motion, AnimatePresence } from "framer-motion";
 import CldImg from "@/components/shared/CldImg";
 
 // ═══════════════════════════════════════════════════════════
-// KNOWLEDGE BASE — Semua informasi tentang PT Sinar Cerah Sempurna
+// ALGORITMA ANTI-TYPO (Proteksi Super Ketat)
+// ═══════════════════════════════════════════════════════════
+function levenshtein(a, b) {
+  if (a.length === 0) return b.length;
+  if (b.length === 0) return a.length;
+  const matrix = [];
+  for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+  for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j] + 1,
+        );
+      }
+    }
+  }
+  return matrix[b.length][a.length];
+}
+
+function isFuzzyMatch(word, keyword) {
+  if (word === keyword) return true;
+
+  // Jika selisih panjang lebih dari 2 huruf, tolak mentah-mentah (mencegah "hi" masuk ke "hikari")
+  if (Math.abs(word.length - keyword.length) > 2) return false;
+
+  // Proteksi Khusus Kata Pendek: Mencegah "hai" ber-mutasi menjadi "hasil"
+  if (word.length <= 3 || keyword.length <= 3) {
+    return word.includes(keyword) || keyword.includes(word);
+  }
+
+  const distance = levenshtein(word, keyword);
+  const allowedTypos = keyword.length <= 5 ? 1 : 2;
+  return distance <= allowedTypos;
+}
+
+// ═══════════════════════════════════════════════════════════
+// KNOWLEDGE BASE — Dwibahasa (ID & EN) (Full Data 1000+ Baris)
 // ═══════════════════════════════════════════════════════════
 
-function getDynamicKnowledgeBase(settings) {
+function getDynamicKnowledgeBase(settings, lang = "id") {
   const address =
     settings.footer_address ||
     "Jl. Karangrejo Barat No 09, RT. 02 RW. 02 (Kp. Pentul), Tinjomoyo, Semarang";
@@ -16,7 +57,25 @@ function getDynamicKnowledgeBase(settings) {
   const email = settings.footer_email || "info@ptsinarcerahsempurna.com";
   const companyName = settings.company_name || "Sinar Cerah Sempurna";
 
-  return [
+  const kb = [
+    {
+      topic: "arti_nama",
+      keywords: [
+        "kenapa hikari",
+        "arti nama",
+        "meaning",
+        "why hikari",
+        "namamu",
+        "your name",
+        "asal nama",
+        "siapa hikari",
+        "namanya",
+      ],
+      answer: {
+        id: "Nama 'Hikari' (光) berasal dari bahasa Jepang yang berarti 'Cahaya'. 🌟\n\nNama ini dipilih karena mencerminkan PT Sinar Cerah Sempurna yang selalu berusaha menjadi cahaya penerang dan memberikan solusi terbaik dalam setiap proyek konstruksi Anda! ✨",
+        en: "The name 'Hikari' (光) comes from Japanese, meaning 'Light'. 🌟\n\nThis name was chosen because it reflects PT Sinar Cerah Sempurna, which always strives to be the guiding light and provide the best solutions in every construction project! ✨",
+      },
+    },
     {
       topic: "profil_perusahaan",
       keywords: [
@@ -29,8 +88,12 @@ function getDynamicKnowledgeBase(settings) {
         "profil",
         "company",
         "about",
+        "who",
       ],
-      answer: `PT ${companyName} adalah perusahaan konstruksi dan infrastruktur yang berpengalaman dalam pembangunan gedung, jalan, jembatan, dan berbagai proyek infrastruktur lainnya di Indonesia. Kami berpegang teguh pada motto "Memberi Kepuasan Kepada Relasi".`,
+      answer: {
+        id: `PT ${companyName} adalah perusahaan konstruksi dan infrastruktur yang berpengalaman dalam pembangunan gedung, jalan, jembatan, dan berbagai proyek infrastruktur lainnya di Indonesia. Kami berpegang teguh pada motto "Memberi Kepuasan Kepada Relasi".`,
+        en: `PT ${companyName} is an experienced construction and infrastructure company specializing in buildings, roads, bridges, and various other infrastructure projects in Indonesia. We firmly adhere to our motto "Providing Satisfaction to Our Partners".`,
+      },
     },
     {
       topic: "layanan",
@@ -38,6 +101,7 @@ function getDynamicKnowledgeBase(settings) {
         "layanan",
         "jasa",
         "service",
+        "services",
         "apa saja",
         "ditawarkan",
         "kerjakan",
@@ -45,9 +109,12 @@ function getDynamicKnowledgeBase(settings) {
         "pekerjaan",
         "bidang",
         "spesialisasi",
+        "offer",
       ],
-      answer:
-        "Layanan kami meliputi:\n\n🏗️ Pembangunan Gedung & Bangunan Komersial\n🛣️ Konstruksi Jalan & Jembatan\n🏛️ Proyek Infrastruktur Publik\n🔧 Renovasi & Rehabilitasi Bangunan\n📐 Konsultasi Perencanaan Konstruksi\n\nSemua proyek dikerjakan dengan standar kualitas tinggi dan tim profesional berpengalaman.",
+      answer: {
+        id: "Layanan kami meliputi:\n\n🏗️ Pembangunan Gedung & Bangunan Komersial\n🛣️ Konstruksi Jalan & Jembatan\n🏛️ Proyek Infrastruktur Publik\n🔧 Renovasi & Rehabilitasi Bangunan\n📐 Konsultasi Perencanaan Konstruksi\n\nSemua proyek dikerjakan dengan standar kualitas tinggi dan tim profesional berpengalaman.",
+        en: "Our services include:\n\n🏗️ Building & Commercial Construction\n🛣️ Road & Bridge Construction\n🏛️ Public Infrastructure Projects\n🔧 Building Renovation & Rehabilitation\n📐 Construction Planning Consultation\n\nAll projects are executed with high-quality standards by our experienced professional team.",
+      },
     },
     {
       topic: "lokasi",
@@ -61,26 +128,44 @@ function getDynamicKnowledgeBase(settings) {
         "address",
         "tempat",
         "office",
+        "location",
+        "where",
       ],
-      answer: `📍 Kantor kami berlokasi di:\n${address}.\n\nAnda bisa langsung berkunjung ke kantor kami atau menghubungi melalui halaman Hubungi Kami di website ini.`,
+      answer: {
+        id: `📍 Kantor kami berlokasi di:\n${address}.\n\nAnda bisa langsung berkunjung ke kantor kami atau menghubungi melalui halaman Hubungi Kami di website ini.`,
+        en: `📍 Our office is located at:\n${address}.\n\nYou can visit our office directly or contact us through the Contact Us page on this website.`,
+      },
     },
     {
       topic: "visi",
       keywords: ["visi", "vision", "cita-cita", "harapan"],
-      answer:
-        "Visi kami: Menjadi perusahaan konstruksi dan infrastruktur terdepan serta terpercaya di Indonesia, yang diakui karena keunggulan dalam kualitas, keselamatan, dan pembangunan berkelanjutan.",
+      answer: {
+        id: "Visi kami: Menjadi perusahaan konstruksi dan infrastruktur terdepan serta terpercaya di Indonesia, yang diakui karena keunggulan dalam kualitas, keselamatan, dan pembangunan berkelanjutan.",
+        en: "Our Vision: To become a leading and trusted construction and infrastructure company in Indonesia, recognized for excellence in quality, safety, and sustainable development.",
+      },
     },
     {
       topic: "misi",
       keywords: ["misi", "mission", "tugas"],
-      answer:
-        "Misi kami:\n\n1️⃣ Memberikan layanan konstruksi berkualitas tinggi yang melampaui ekspektasi klien\n2️⃣ Menerapkan praktik terbaik K3L pada setiap proyek\n3️⃣ Mendorong inovasi melalui teknologi konstruksi mutakhir\n4️⃣ Membangun hubungan jangka panjang berdasarkan kepercayaan\n5️⃣ Mengembangkan kapabilitas profesional tim\n6️⃣ Berkontribusi pada pembangunan berkelanjutan Indonesia",
+      answer: {
+        id: "Misi kami:\n\n1️⃣ Memberikan layanan konstruksi berkualitas tinggi yang melampaui ekspektasi klien\n2️⃣ Menerapkan praktik terbaik K3L pada setiap proyek\n3️⃣ Mendorong inovasi melalui teknologi konstruksi mutakhir\n4️⃣ Membangun hubungan jangka panjang berdasarkan kepercayaan\n5️⃣ Mengembangkan kapabilitas profesional tim\n6️⃣ Berkontribusi pada pembangunan berkelanjutan Indonesia",
+        en: "Our Mission:\n\n1️⃣ Deliver high-quality construction services that exceed client expectations\n2️⃣ Implement HSE (Health, Safety, Environment) best practices in every project\n3️⃣ Drive innovation through cutting-edge construction technology\n4️⃣ Build long-term relationships based on trust\n5️⃣ Develop the professional capabilities of our team\n6️⃣ Contribute to Indonesia's sustainable development",
+      },
     },
     {
       topic: "visi_misi",
-      keywords: ["visi misi", "visi dan misi", "tujuan", "goal", "target"],
-      answer:
-        "🎯 Visi: Menjadi perusahaan konstruksi terdepan dan terpercaya di Indonesia dalam kualitas, keselamatan, dan pembangunan berkelanjutan.\n\n📋 Misi:\n• Layanan berkualitas tinggi melampaui ekspektasi\n• Praktik terbaik K3L di setiap proyek\n• Inovasi teknologi konstruksi mutakhir\n• Hubungan jangka panjang berbasis kepercayaan\n• Pengembangan profesional tim berkelanjutan",
+      keywords: [
+        "visi misi",
+        "visi dan misi",
+        "tujuan",
+        "goal",
+        "target",
+        "vision and mission",
+      ],
+      answer: {
+        id: "🎯 Visi: Menjadi perusahaan konstruksi terdepan dan terpercaya di Indonesia dalam kualitas, keselamatan, dan pembangunan berkelanjutan.\n\n📋 Misi:\n• Layanan berkualitas tinggi melampaui ekspektasi\n• Praktik terbaik K3L di setiap proyek\n• Inovasi teknologi konstruksi mutakhir\n• Hubungan jangka panjang berbasis kepercayaan\n• Pengembangan profesional tim berkelanjutan",
+        en: "🎯 Vision: To be a leading and trusted construction company in Indonesia in quality, safety, and sustainability.\n\n📋 Mission:\n• High-quality services exceeding expectations\n• HSE best practices in every project\n• Cutting-edge construction technology innovation\n• Long-term trust-based relationships\n• Continuous professional team development",
+      },
     },
     {
       topic: "pengalaman",
@@ -94,24 +179,32 @@ function getDynamicKnowledgeBase(settings) {
         "pencapaian",
         "prestasi",
         "seberapa",
+        "experience",
+        "achievement",
       ],
-      answer:
-        "📊 Pencapaian PT Sinar Cerah Sempurna:\n\n✅ 5+ Proyek Besar Selesai\n✅ 50+ Klien Puas\n✅ 25+ Tahun Pengalaman\n✅ 200+ Tim Profesional\n\nDengan pengalaman lebih dari dua dekade, kami telah membuktikan komitmen pada kualitas dan kepuasan klien.",
+      answer: {
+        id: "📊 Pencapaian PT Sinar Cerah Sempurna:\n\n✅ 5+ Proyek Besar Selesai\n✅ 50+ Klien Puas\n✅ 25+ Tahun Pengalaman\n✅ 200+ Tim Profesional\n\nDengan pengalaman lebih dari dua dekade, kami telah membuktikan komitmen pada kualitas dan kepuasan klien.",
+        en: "📊 PT Sinar Cerah Sempurna's Achievements:\n\n✅ 5+ Major Projects Completed\n✅ 50+ Satisfied Clients\n✅ 25+ Years of Experience\n✅ 200+ Professional Team Members\n\nWith over two decades of experience, we have proven our commitment to quality and client satisfaction.",
+      },
     },
     {
       topic: "nilai",
       keywords: [
         "nilai",
         "value",
+        "values",
         "prinsip",
         "budaya",
         "kultur",
         "inti",
         "fondasi",
         "keunggulan",
+        "core",
       ],
-      answer:
-        "Fondasi utama keunggulan kami:\n\n🛡️ Integritas — Kejujuran, transparansi, dan tanggung jawab penuh\n💎 Kualitas — Standar tertinggi di setiap proyek\n💡 Inovasi — Teknologi dan metode konstruksi terbaru\n🤝 Kerja Sama Tim — Kolaborasi kuat untuk hasil terbaik",
+      answer: {
+        id: "Fondasi utama keunggulan kami:\n\n🛡️ Integritas — Kejujuran, transparansi, dan tanggung jawab penuh\n💎 Kualitas — Standar tertinggi di setiap proyek\n💡 Inovasi — Teknologi dan metode konstruksi terbaru\n🤝 Kerja Sama Tim — Kolaborasi kuat untuk hasil terbaik",
+        en: "The core foundations of our excellence:\n\n🛡️ Integrity — Honesty, transparency, and full responsibility\n💎 Quality — Highest standards in every project\n💡 Innovation — Latest construction technology and methods\n🤝 Teamwork — Strong collaboration for the best results",
+      },
     },
     {
       topic: "kontak",
@@ -125,22 +218,29 @@ function getDynamicKnowledgeBase(settings) {
         "reach",
         "whatsapp",
         "wa",
+        "call",
       ],
-      answer: `Anda bisa menghubungi kami melalui:\n\n1️⃣ Halaman "Hubungi Kami" di website ini\n2️⃣ Kunjungi kantor: ${address}\n3️⃣ Telepon: ${phone}\n4️⃣ Email: ${email}\n\nTim kami siap membantu mewujudkan visi konstruksi Anda! 🏗️`,
+      answer: {
+        id: `Anda bisa menghubungi kami melalui:\n\n1️⃣ Halaman "Hubungi Kami" di website ini\n2️⃣ Kunjungi kantor: ${address}\n3️⃣ Telepon: ${phone}\n4️⃣ Email: ${email}\n\nTim kami siap membantu mewujudkan visi konstruksi Anda! 🏗️`,
+        en: `You can reach us through:\n\n1️⃣ The "Contact Us" page on this website\n2️⃣ Visit our office: ${address}\n3️⃣ Phone: ${phone}\n4️⃣ Email: ${email}\n\nOur team is ready to help bring your construction vision to life! 🏗️`,
+      },
     },
     {
       topic: "proyek",
       keywords: [
         "proyek",
         "project",
+        "projects",
         "portfolio",
         "contoh proyek",
         "hasil kerja",
         "pernah",
         "dikerjakan",
       ],
-      answer:
-        "Kami telah mengerjakan berbagai proyek konstruksi dan infrastruktur di Indonesia. Anda bisa melihat detail proyek-proyek kami di halaman Proyek pada website ini.\n\nSetiap proyek kami kerjakan dengan standar kualitas tertinggi dan komitmen pada kepuasan klien. 🏗️",
+      answer: {
+        id: "Kami telah mengerjakan berbagai proyek konstruksi dan infrastruktur di Indonesia. Anda bisa melihat detail proyek-proyek kami di halaman Proyek pada website ini.\n\nSetiap proyek kami kerjakan dengan standar kualitas tertinggi dan komitmen pada kepuasan klien. 🏗️",
+        en: "We have worked on various construction and infrastructure projects in Indonesia. You can view the details of our projects on the Projects page of this website.\n\nEvery project is executed with the highest quality standards and a commitment to client satisfaction. 🏗️",
+      },
     },
     {
       topic: "berita",
@@ -152,8 +252,12 @@ function getDynamicKnowledgeBase(settings) {
         "kabar",
         "informasi terbaru",
         "artikel",
+        "article",
       ],
-      answer: `Untuk berita dan informasi terbaru seputar PT ${companyName}, silakan kunjungi halaman Berita di website kami.\n\nDi sana Anda bisa menemukan update proyek, pencapaian, dan berbagai kegiatan perusahaan. 📰`,
+      answer: {
+        id: `Untuk berita dan informasi terbaru seputar PT ${companyName}, silakan kunjungi halaman Berita di website kami.\n\nDi sana Anda bisa menemukan update proyek, pencapaian, dan berbagai kegiatan perusahaan. 📰`,
+        en: `For the latest news and information about PT ${companyName}, please visit the News page on our website.\n\nThere you can find project updates, achievements, and various company activities. 📰`,
+      },
     },
     {
       topic: "karir",
@@ -168,8 +272,12 @@ function getDynamicKnowledgeBase(settings) {
         "job",
         "pekerjaan di",
         "gabung",
+        "vacancy",
       ],
-      answer: `Tertarik bergabung dengan tim kami? PT ${companyName} selalu mencari talenta terbaik!\n\nUntuk informasi lowongan, silakan hubungi kami melalui halaman Hubungi Kami atau kunjungi langsung kantor kami di Semarang. 👷‍♂️`,
+      answer: {
+        id: `Tertarik bergabung dengan tim kami? PT ${companyName} selalu mencari talenta terbaik!\n\nUntuk informasi lowongan, silakan hubungi kami melalui halaman Hubungi Kami atau kunjungi langsung kantor kami di Semarang. 👷‍♂️`,
+        en: `Interested in joining our team? PT ${companyName} is always looking for the best talent!\n\nFor job vacancy information, please contact us through the Contact Us page or visit our office directly in Semarang. 👷‍♂️`,
+      },
     },
     {
       topic: "keselamatan",
@@ -180,9 +288,12 @@ function getDynamicKnowledgeBase(settings) {
         "keamanan",
         "aman",
         "standar keselamatan",
+        "hse",
       ],
-      answer:
-        "Keselamatan adalah prioritas utama kami. Kami menerapkan:\n\n🔒 Standar K3L (Kesehatan, Keselamatan Kerja & Lingkungan)\n📋 Prosedur keselamatan ketat di setiap proyek\n👷 Pelatihan rutin untuk seluruh tim lapangan\n✅ Peralatan pelindung diri (APD) lengkap\n\nKeselamatan bukan hanya kebijakan, tetapi budaya kerja kami.",
+      answer: {
+        id: "Keselamatan adalah prioritas utama kami. Kami menerapkan:\n\n🔒 Standar K3L (Kesehatan, Keselamatan Kerja & Lingkungan)\n📋 Prosedur keselamatan ketat di setiap proyek\n👷 Pelatihan rutin untuk seluruh tim lapangan\n✅ Peralatan pelindung diri (APD) lengkap\n\nKeselamatan bukan hanya kebijakan, tetapi budaya kerja kami.",
+        en: "Safety is our top priority. We implement:\n\n🔒 HSE (Health, Safety, and Environment) Standards\n📋 Strict safety procedures on every project\n👷 Regular training for all field teams\n✅ Complete personal protective equipment (PPE)\n\nSafety is not just a policy, it is our work culture.",
+      },
     },
     {
       topic: "kerjasama",
@@ -195,15 +306,21 @@ function getDynamicKnowledgeBase(settings) {
         "konsultasi",
         "ajukan",
         "konsul",
+        "collaboration",
+        "partnership",
       ],
-      answer:
-        "Kami sangat terbuka untuk kerja sama dan konsultasi proyek! 🤝\n\nLangkah untuk memulai:\n1️⃣ Hubungi kami via halaman Hubungi Kami\n2️⃣ Ceritakan kebutuhan proyek Anda\n3️⃣ Tim kami akan melakukan analisis dan konsultasi\n4️⃣ Kami berikan proposal yang sesuai kebutuhan\n\nMari wujudkan visi konstruksi Anda bersama kami!",
+      answer: {
+        id: "Kami sangat terbuka untuk kerja sama dan konsultasi proyek! 🤝\n\nLangkah untuk memulai:\n1️⃣ Hubungi kami via halaman Hubungi Kami\n2️⃣ Ceritakan kebutuhan proyek Anda\n3️⃣ Tim kami akan melakukan analisis dan konsultasi\n4️⃣ Kami berikan proposal yang sesuai kebutuhan\n\nMari wujudkan visi konstruksi Anda bersama kami!",
+        en: "We are very open to project collaborations and consultations! 🤝\n\nSteps to get started:\n1️⃣ Contact us via the Contact Us page\n2️⃣ Tell us your project needs\n3️⃣ Our team will conduct analysis and consultation\n4️⃣ We will provide a proposal tailored to your needs\n\nLet's bring your construction vision to life with us!",
+      },
     },
     {
       topic: "motto",
       keywords: ["motto", "slogan", "tagline", "semboyan"],
-      answer:
-        'Motto kami: "Memberi Kepuasan Kepada Relasi" 🌟\n\nMotto ini mencerminkan komitmen kami untuk selalu mengutamakan kepuasan klien dan mitra kerja dalam setiap proyek yang kami jalankan.',
+      answer: {
+        id: 'Motto kami: "Memberi Kepuasan Kepada Relasi" 🌟\n\nMotto ini mencerminkan komitmen kami untuk selalu mengutamakan kepuasan klien dan mitra kerja dalam setiap proyek yang kami jalankan.',
+        en: 'Our motto: "Providing Satisfaction to Our Partners" 🌟\n\nThis motto reflects our commitment to always prioritize client and partner satisfaction in every project we undertake.',
+      },
     },
     {
       topic: "jam_kerja",
@@ -215,8 +332,13 @@ function getDynamicKnowledgeBase(settings) {
         "hari apa",
         "jadwal",
         "waktu buka",
+        "working hours",
+        "open",
       ],
-      answer: `🕒 Jam Operasional PT ${companyName}:\n\n• Senin - Jumat: 08.00 - 17.00 WIB\n• Sabtu: 08.00 - 12.00 WIB\n• Minggu & Hari Libur Nasional: Tutup\n\nSilakan kunjungi atau hubungi kami pada jam tersebut untuk respon terbaik.`,
+      answer: {
+        id: `🕒 Jam Operasional PT ${companyName}:\n\n• Senin - Jumat: 08.00 - 17.00 WIB\n• Sabtu: 08.00 - 12.00 WIB\n• Minggu & Hari Libur Nasional: Tutup\n\nSilakan kunjungi atau hubungi kami pada jam tersebut untuk respon terbaik.`,
+        en: `🕒 PT ${companyName} Operating Hours:\n\n• Monday - Friday: 08.00 - 17.00 WIB\n• Saturday: 08.00 - 12.00 WIB\n• Sunday & Public Holidays: Closed\n\nPlease visit or contact us during these hours for the best response.`,
+      },
     },
     {
       topic: "anak_perusahaan",
@@ -228,8 +350,13 @@ function getDynamicKnowledgeBase(settings) {
         "sinergi",
         "unit bisnis",
         "anak usaha",
+        "subsidiary",
+        "network",
       ],
-      answer: `PT ${companyName} bersinergi dengan jejaring bisnis kami, salah satunya adalah:\n\n🏢 PT Maharani Globalindo\nPerusahaan yang berbasis di Semarang yang bergerak dalam dua lini utama: Jasa Konstruksi berskala nasional dan penyelenggaraan perjalanan ibadah Umrah terpercaya.`,
+      answer: {
+        id: `PT ${companyName} bersinergi dengan jejaring bisnis kami, salah satunya adalah:\n\n🏢 PT Maharani Globalindo\nPerusahaan yang berbasis di Semarang yang bergerak dalam dua lini utama: Jasa Konstruksi berskala nasional dan penyelenggaraan perjalanan ibadah Umrah terpercaya.`,
+        en: `PT ${companyName} synergizes with our business network, one of which is:\n\n🏢 PT Maharani Globalindo\nA Semarang-based company operating in two main lines: national-scale Construction Services and trusted Umrah pilgrimage travel arrangements.`,
+      },
     },
     {
       topic: "sejarah",
@@ -239,8 +366,13 @@ function getDynamicKnowledgeBase(settings) {
         "didirikan",
         "asal usul",
         "perjalanan",
+        "history",
+        "founded",
       ],
-      answer: `PT ${companyName} memiliki sejarah panjang lebih dari 25 tahun di Indonesia. Didirikan dengan komitmen kuat untuk memajukan pembangunan infrastruktur nasional, kami bertransformasi menjadi kontraktor terpercaya dengan puluhan proyek sukses berskala nasional.`,
+      answer: {
+        id: `PT ${companyName} memiliki sejarah panjang lebih dari 25 tahun di Indonesia. Didirikan dengan komitmen kuat untuk memajukan pembangunan infrastruktur nasional, kami bertransformasi menjadi kontraktor terpercaya dengan puluhan proyek sukses berskala nasional.`,
+        en: `PT ${companyName} has a long history of over 25 years in Indonesia. Founded with a strong commitment to advancing national infrastructure development, we have transformed into a trusted contractor with dozens of successful national-scale projects.`,
+      },
     },
     {
       topic: "keunggulan",
@@ -251,8 +383,13 @@ function getDynamicKnowledgeBase(settings) {
         "kenapa harus",
         "mengapa",
         "bagus",
+        "advantage",
+        "why choose",
       ],
-      answer: `Mengapa memilih PT ${companyName}?\n\n💯 Berpengalaman 25+ tahun di bidang infrastruktur\n🏆 Hasil konstruksi berstandar kualitas tinggi\n👷 Didukung oleh 200+ SDM ahli dan bersertifikat\n🛡️ Komitmen keselamatan K3L yang ketat\n🤝 Transparan, jujur, dan berintegritas`,
+      answer: {
+        id: `Mengapa memilih PT ${companyName}?\n\n💯 Berpengalaman 25+ tahun di bidang infrastruktur\n🏆 Hasil konstruksi berstandar kualitas tinggi\n👷 Didukung oleh 200+ SDM ahli dan bersertifikat\n🛡️ Komitmen keselamatan K3L yang ketat\n🤝 Transparan, jujur, dan berintegritas`,
+        en: `Why choose PT ${companyName}?\n\n💯 25+ years of experience in infrastructure\n🏆 High-quality standard construction results\n👷 Supported by 200+ certified experts\n🛡️ Strict HSE safety commitment\n🤝 Transparent, honest, and full of integrity`,
+      },
     },
     {
       topic: "sertifikasi",
@@ -263,8 +400,13 @@ function getDynamicKnowledgeBase(settings) {
         "ijin",
         "izin",
         "sertifikat",
+        "certification",
+        "license",
       ],
-      answer: `PT ${companyName} memiliki legalitas lengkap dan sertifikasi industri standar nasional & internasional untuk memastikan setiap proyek dikerjakan secara aman, legal, dan berkualitas tinggi.`,
+      answer: {
+        id: `PT ${companyName} memiliki legalitas lengkap dan sertifikasi industri standar nasional & internasional untuk memastikan setiap proyek dikerjakan secara aman, legal, dan berkualitas tinggi.`,
+        en: `PT ${companyName} has complete legality and national & international standard industry certifications to ensure every project is executed safely, legally, and with high quality.`,
+      },
     },
     {
       topic: "wilayah",
@@ -277,9 +419,13 @@ function getDynamicKnowledgeBase(settings) {
         "luar jawa",
         "nasional",
         "lokasi proyek",
+        "region",
+        "coverage",
       ],
-      answer:
-        "Jangkauan layanan kami bersifat NASIONAL 🇮🇩.\n\nKami melayani proyek konstruksi di berbagai wilayah di seluruh Indonesia, baik di dalam pulau Jawa maupun luar pulau Jawa, didukung oleh logistik dan manajemen rantai pasok yang andal.",
+      answer: {
+        id: "Jangkauan layanan kami bersifat NASIONAL 🇮🇩.\n\nKami melayani proyek konstruksi di berbagai wilayah di seluruh Indonesia, baik di dalam pulau Jawa maupun luar pulau Jawa, didukung oleh logistik dan manajemen rantai pasok yang andal.",
+        en: "Our service coverage is NATIONAL 🇮🇩.\n\nWe serve construction projects in various regions throughout Indonesia, both inside and outside Java, supported by reliable logistics and supply chain management.",
+      },
     },
     {
       topic: "mitra_klien",
@@ -292,9 +438,13 @@ function getDynamicKnowledgeBase(settings) {
         "instansi",
         "bumn",
         "pemerintah",
+        "client",
+        "clients",
       ],
-      answer:
-        "Kami melayani berbagai segmen klien, termasuk:\n\n🏢 Instansi Pemerintah (Kementerian & Dinas Pekerjaan Umum)\n🏛️ BUMN (Badan Usaha Milik Negara)\n🏬 Perusahaan Swasta Nasional & Multinasional\n🏘️ Pengembang Properti & Perorangan",
+      answer: {
+        id: "Kami melayani berbagai segmen klien, termasuk:\n\n🏢 Instansi Pemerintah (Kementerian & Dinas Pekerjaan Umum)\n🏛️ BUMN (Badan Usaha Milik Negara)\n🏬 Perusahaan Swasta Nasional & Multinasional\n🏘️ Pengembang Properti & Perorangan",
+        en: "We serve various client segments, including:\n\n🏢 Government Agencies (Ministries & Public Works Departments)\n🏛️ SOEs (State-Owned Enterprises)\n🏬 National & Multinational Private Companies\n🏘️ Property Developers & Individuals",
+      },
     },
     {
       topic: "portal_aplikasi",
@@ -305,8 +455,13 @@ function getDynamicKnowledgeBase(settings) {
         "login karyawan",
         "internal",
         "link aplikasi",
+        "application",
+        "system",
       ],
-      answer: `Portal Aplikasi SCS merupakan sistem internal yang digunakan khusus oleh manajemen dan karyawan PT ${companyName} untuk kebutuhan koordinasi proyek, administrasi, dan operasional internal.`,
+      answer: {
+        id: `Portal Aplikasi SCS merupakan sistem internal yang digunakan khusus oleh manajemen dan karyawan PT ${companyName} untuk kebutuhan koordinasi proyek, administrasi, dan operasional internal.`,
+        en: `The SCS Application Portal is an internal system used specifically by the management and employees of PT ${companyName} for project coordination, administration, and internal operational needs.`,
+      },
     },
     {
       topic: "sop",
@@ -316,8 +471,12 @@ function getDynamicKnowledgeBase(settings) {
         "prosedur",
         "panduan kerja",
         "aturan",
+        "procedure",
       ],
-      answer: `SOP (Standard Operating Procedure) PT ${companyName} adalah dokumen panduan resmi bagi tim kami di lapangan maupun kantor untuk memastikan standar keselamatan, efisiensi kerja, dan kualitas konstruksi tetap terjaga di setiap proyek.`,
+      answer: {
+        id: `SOP (Standard Operating Procedure) PT ${companyName} adalah dokumen panduan resmi bagi tim kami di lapangan maupun kantor untuk memastikan standar keselamatan, efisiensi kerja, dan kualitas konstruksi tetap terjaga di setiap proyek.`,
+        en: `The SOP (Standard Operating Procedure) of PT ${companyName} is the official guide document for our team in the field and office to ensure safety standards, work efficiency, and construction quality are maintained in every project.`,
+      },
     },
     {
       topic: "metode_kerja",
@@ -328,23 +487,93 @@ function getDynamicKnowledgeBase(settings) {
         "bim",
         "digital",
         "modern",
+        "method",
+        "technology",
       ],
-      answer:
-        "Kami mengadopsi metode konstruksi modern & berkelanjutan, termasuk:\n\n📐 Pemanfaatan BIM (Building Information Modeling)\n⚙️ Alat konstruksi berspesifikasi tinggi\n🍃 Praktik Green Construction untuk meminimalkan dampak lingkungan\n⚡ Manajemen waktu proyek yang ketat berbasis digital",
+      answer: {
+        id: "Kami mengadopsi metode konstruksi modern & berkelanjutan, termasuk:\n\n📐 Pemanfaatan BIM (Building Information Modeling)\n⚙️ Alat konstruksi berspesifikasi tinggi\n🍃 Praktik Green Construction untuk meminimalkan dampak lingkungan\n⚡ Manajemen waktu proyek yang ketat berbasis digital",
+        en: "We adopt modern & sustainable construction methods, including:\n\n📐 Utilization of BIM (Building Information Modeling)\n⚙️ High-specification construction equipment\n🍃 Green Construction practices to minimize environmental impact\n⚡ Strict digital-based project time management",
+      },
     },
   ];
+
+  return kb.map((entry) => ({
+    topic: entry.topic,
+    keywords: entry.keywords,
+    answer: entry.answer[lang],
+  }));
 }
 
-function getQuickFaq(settings) {
-  const companyName = settings.company_name || "Sinar Cerah Sempurna";
-  return [
-    `Apa itu PT ${companyName}?`,
-    "Apa saja layanan yang ditawarkan?",
-    "Di mana lokasi kantor?",
-    "Apa visi dan misi perusahaan?",
-    "Berapa pengalaman di industri?",
-    "Bagaimana cara menghubungi?",
-  ];
+// ═══════════════════════════════════════════════════════════
+// ANAK PERTANYAAN (DYNAMIC FAQ TREE)
+// ═══════════════════════════════════════════════════════════
+
+const FAQ_TREE = {
+  default: {
+    id: [
+      "Apa itu PT SCS?",
+      "Apa saja layanan yang ditawarkan?",
+      "Di mana lokasi kantor?",
+    ],
+    en: [
+      "What is PT SCS?",
+      "What services are offered?",
+      "Where is the office located?",
+    ],
+  },
+  profil_perusahaan: {
+    id: [
+      "Apa visi dan misi perusahaan?",
+      "Berapa lama pengalamannya?",
+      "Siapa saja klien SCS?",
+    ],
+    en: [
+      "What is the company's vision and mission?",
+      "How much industry experience?",
+      "Who are SCS's clients?",
+    ],
+  },
+  layanan: {
+    id: [
+      "Cek contoh proyek yang pernah dikerjakan",
+      "Sertifikasi dan legalitas",
+      "Metode kerja yang digunakan",
+    ],
+    en: [
+      "Check examples of past projects",
+      "Certification and legality",
+      "Working methods used",
+    ],
+  },
+  lokasi: {
+    id: [
+      "Bagaimana cara menghubungi?",
+      "Jam operasional kantor?",
+      "Bisa jangkau wilayah luar kota?",
+    ],
+    en: [
+      "How to contact you?",
+      "Office operating hours?",
+      "Can you reach outside regions?",
+    ],
+  },
+  arti_nama: {
+    id: [
+      "Nilai dan budaya perusahaan?",
+      "Sejarah berdirinya perusahaan",
+      "Siapa yang membuat website ini?",
+    ],
+    en: [
+      "Company values and culture?",
+      "History of the company",
+      "Who built this website?",
+    ],
+  },
+};
+
+function getDynamicFaq(lang, currentTopic) {
+  let faqs = FAQ_TREE[currentTopic] || FAQ_TREE["default"];
+  return faqs[lang];
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -360,32 +589,19 @@ function findBestAnswer(input, knowledgeBase) {
 
   for (const entry of knowledgeBase) {
     let score = 0;
-
     for (const keyword of entry.keywords) {
-      // Exact substring match (bonus point)
       if (lower.includes(keyword)) {
         score += keyword.split(/\s+/).length * 3;
       }
-
-      // Individual word matching
       const kwWords = keyword.split(/\s+/);
       for (const kw of kwWords) {
         for (const word of words) {
-          // Exact word
-          if (word === kw) score += 2;
-          // Fuzzy: word starts with keyword or vice versa (min 3 chars)
-          else if (word.length >= 3 && kw.length >= 3) {
-            if (
-              word.startsWith(kw.substring(0, 3)) ||
-              kw.startsWith(word.substring(0, 3))
-            ) {
-              score += 1;
-            }
+          if (isFuzzyMatch(word, kw)) {
+            score += 2;
           }
         }
       }
     }
-
     if (score > bestScore) {
       bestScore = score;
       bestMatch = entry;
@@ -395,10 +611,6 @@ function findBestAnswer(input, knowledgeBase) {
   return bestScore >= 2 ? bestMatch : null;
 }
 
-// ═══════════════════════════════════════════════════════════
-// GREETING / SMALL TALK DETECTION
-// ═══════════════════════════════════════════════════════════
-
 const GREETINGS = {
   patterns: [
     "halo",
@@ -406,54 +618,36 @@ const GREETINGS = {
     "hi",
     "hello",
     "hey",
-    "selamat",
+    "selamat pagi",
+    "selamat siang",
+    "selamat sore",
+    "selamat malam",
     "pagi",
     "siang",
     "sore",
     "malam",
     "assalamualaikum",
     "apa kabar",
+    "good morning",
+    "good afternoon",
+    "good evening",
+    "konnichiwa",
+    "ohayou",
+    "ohayo",
+    "konbanwa",
+    "how are you",
   ],
-  responses: [
-    "Halo juga! 😊 Ada yang bisa saya bantu tentang PT Sinar Cerah Sempurna?",
-    "Hai! 👋 Senang bisa membantu Anda. Mau tanya apa tentang SCS?",
-    "Halo! Selamat datang di SCS AI. Silakan tanyakan apa saja tentang perusahaan kami! 🏗️",
-  ],
+  responses: {
+    id: [
+      "Halo! 😊 Saya Hikari. Ada yang bisa saya bantu tentang PT Sinar Cerah Sempurna?",
+      "Hai! 👋 Senang bisa membantu Anda. Mau tanya apa tentang SCS ke Hikari?",
+    ],
+    en: [
+      "Hello! 😊 I am Hikari. How can I help you regarding PT Sinar Cerah Sempurna?",
+      "Hi! 👋 Glad to help. What would you like to ask Hikari about SCS?",
+    ],
+  },
 };
-
-const THANKS = {
-  patterns: ["terima kasih", "makasih", "thanks", "thank you", "thx", "tq"],
-  responses: [
-    "Sama-sama! 😊 Jangan ragu untuk bertanya lagi ya!",
-    "Terima kasih kembali! Senang bisa membantu! 🙌",
-    "Dengan senang hati! Ada yang lain yang bisa saya bantu? 😊",
-  ],
-};
-
-const GOODBYE = {
-  patterns: ["bye", "dadah", "sampai jumpa", "see you", "goodbye"],
-  responses: [
-    "Sampai jumpa! Terima kasih sudah menghubungi SCS AI 👋",
-    "Bye! Jangan ragu untuk bertanya lagi kapan saja 😊",
-  ],
-};
-
-function checkSmallTalk(input) {
-  const lower = input.toLowerCase();
-
-  for (const group of [GREETINGS, THANKS, GOODBYE]) {
-    if (group.patterns.some((p) => lower.includes(p))) {
-      return group.responses[
-        Math.floor(Math.random() * group.responses.length)
-      ];
-    }
-  }
-  return null;
-}
-
-// ═══════════════════════════════════════════════════════════
-// EASTER EGG 🥚
-// ═══════════════════════════════════════════════════════════
 
 const EASTER_EGG = {
   patterns: [
@@ -469,126 +663,306 @@ const EASTER_EGG = {
     "programmer",
     "tim developer",
     "web developer",
+    "who made",
   ],
   response: {
-    text: "🎉 Easter egg unlocked!\n\nWebsite ini dibuat dengan ❤️ oleh tim developer keren ini:\n\n👨‍💻 Tim Web Developer SCS\n\nMereka adalah otak di balik layar yang membangun website PT Sinar Cerah Sempurna dari nol! 🚀",
-    image: "/team-photo.jpg",
+    id: {
+      text: "🎉 Easter egg unlocked!\n\nWebsite ini dibuat dengan ❤️ oleh tim developer keren ini:\n\n👨‍💻 Tim Web Developer SCS\n\nMereka adalah otak di balik layar yang membangun website PT Sinar Cerah Sempurna dari nol! 🚀",
+      image: "/team-photo.jpg",
+    },
+    en: {
+      text: "🎉 Easter egg unlocked!\n\nThis website was built with ❤️ by this awesome developer team:\n\n👨‍💻 SCS Web Developer Team\n\nThey are the brains behind the scenes who built the PT Sinar Cerah Sempurna website from scratch! 🚀",
+      image: "/team-photo.jpg",
+    },
   },
 };
 
+function checkSmallTalk(input, lang) {
+  const lower = input.toLowerCase().replace(/[?!.,]/g, "");
+  const words = lower.split(/\s+/);
+
+  const isMatch = GREETINGS.patterns.some((p) => {
+    if (p.includes(" ")) return lower.includes(p);
+    return words.some((w) => w === p || isFuzzyMatch(w, p));
+  });
+
+  if (isMatch) {
+    return GREETINGS.responses[lang][
+      Math.floor(Math.random() * GREETINGS.responses[lang].length)
+    ];
+  }
+  return null;
+}
+
 function checkEasterEgg(input) {
   const lower = input.toLowerCase();
-  return EASTER_EGG.patterns.some((p) => lower.includes(p));
+  return EASTER_EGG.patterns.some(
+    (p) => lower.includes(p) || isFuzzyMatch(lower, p),
+  );
 }
 
-// ═══════════════════════════════════════════════════════════
-// FALLBACK RESPONSES
-// ═══════════════════════════════════════════════════════════
-
-const FALLBACK_RESPONSES = [
-  "Hmm, saya belum punya informasi spesifik tentang itu. 🤔 Coba tanyakan tentang layanan, lokasi, atau profil PT Sinar Cerah Sempurna!\n\nAtau hubungi tim kami langsung melalui halaman Hubungi Kami.",
-  "Maaf, saya belum bisa menjawab pertanyaan tersebut. 😅 Saya bisa membantu Anda mengenai:\n• Profil perusahaan\n• Layanan konstruksi\n• Lokasi kantor\n• Visi & Misi\n• Cara menghubungi kami",
-  "Pertanyaan menarik! Tapi saya belum punya jawabannya. 🙏 Untuk informasi lebih detail, silakan hubungi tim kami melalui halaman Hubungi Kami di website.",
-];
-
-function generateResponse(input, settings) {
-  // 0. Check easter egg 🥚
+function generateResponse(input, settings, lang) {
   if (checkEasterEgg(input)) {
-    return { type: "easter_egg", ...EASTER_EGG.response };
+    return {
+      text: EASTER_EGG.response[lang].text,
+      image: EASTER_EGG.response[lang].image,
+      type: "easter_egg",
+      topic: "default",
+    };
   }
 
-  // 1. Check small talk
-  const smallTalk = checkSmallTalk(input);
-  if (smallTalk) return smallTalk;
-
-  // 2. Check knowledge base
-  const knowledgeBase = getDynamicKnowledgeBase(settings);
+  const knowledgeBase = getDynamicKnowledgeBase(settings, lang);
   const match = findBestAnswer(input, knowledgeBase);
-  if (match) return match.answer;
+  if (match) return { text: match.answer, type: "bot", topic: match.topic };
 
-  // 3. Fallback
-  return FALLBACK_RESPONSES[
-    Math.floor(Math.random() * FALLBACK_RESPONSES.length)
-  ];
+  const smallTalk = checkSmallTalk(input, lang);
+  if (smallTalk) return { text: smallTalk, type: "bot", topic: "default" };
+
+  const fallbacks = {
+    id: [
+      "Hmm, Hikari belum menangkap maksudnya. 🤔 Coba tanyakan tentang layanan, lokasi, atau profil PT Sinar Cerah Sempurna!",
+    ],
+    en: [
+      "Hmm, Hikari didn't quite get that. 🤔 Try asking about the services, location, or profile of PT Sinar Cerah Sempurna!",
+    ],
+  };
+  return { text: fallbacks[lang][0], type: "bot", topic: "default" };
 }
 
 // ═══════════════════════════════════════════════════════════
-// COMPONENT
+// COMPONENT UTAMA
 // ═══════════════════════════════════════════════════════════
 
 export default function ChatbotButton({ settings = {} }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [hasUnread, setHasUnread] = useState(false); // State untuk Titik Merah
+  const [lang, setLang] = useState("id");
+
   const [messages, setMessages] = useState([
     {
+      id: "welcome-msg",
       type: "bot",
-      text: "Halo! 👋 Saya SCS AI, asisten virtual PT Sinar Cerah Sempurna.\n\nSilakan pilih pertanyaan di bawah atau ketik langsung apa yang ingin Anda tanyakan!",
+      isWelcome: true,
+      text: "Halo! 👋 Saya Hikari, asisten virtual PT Sinar Cerah Sempurna.\n\nSilakan pilih pertanyaan di bawah atau ketik langsung apa yang ingin Anda tanyakan!",
+      reaction: null,
     },
   ]);
+
   const [showFaq, setShowFaq] = useState(true);
+  const [activeTopic, setActiveTopic] = useState("default");
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const messagesEndRef = useRef(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  const [feedbackState, setFeedbackState] = useState("none"); // none, prompted, awaiting_text, done
+
+  const messagesEndRef = useRef(null);
+  const inactivityTimerRef = useRef(null);
+
+  // Menyimpan referensi state terbaru untuk digunakan di dalam setTimeout
+  const langRef = useRef(lang);
+  useEffect(() => {
+    langRef.current = lang;
+  }, [lang]);
+
+  const isOpenRef = useRef(isOpen);
+  useEffect(() => {
+    isOpenRef.current = isOpen;
+  }, [isOpen]);
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages, isTyping]);
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isTyping, feedbackState, activeTopic]);
 
-  const addBotMessage = (response) => {
-    setIsTyping(true);
-    const textLength =
-      typeof response === "string" ? response.length : response.text.length;
-    const delay = Math.min(400 + textLength * 2, 1500);
-    setTimeout(() => {
-      setIsTyping(false);
-      if (typeof response === "object" && response.type === "easter_egg") {
-        setMessages((prev) => [
-          ...prev,
-          { type: "bot", text: response.text, image: response.image },
-        ]);
-      } else {
-        setMessages((prev) => [
-          ...prev,
+  // FUNGSI PEMICU FEEDBACK (Harus diletakkan di atas sebelum dipanggil oleh Timer)
+  const triggerFeedback = (delay = 0) => {
+    setFeedbackState((prev) => {
+      if (prev !== "none") return prev; // Mencegah muncul dua kali
+
+      setTimeout(() => {
+        setMessages((msgs) => [
+          ...msgs,
           {
-            type: "bot",
-            text: typeof response === "string" ? response : response.text,
+            id: `feedback-${Date.now()}`,
+            type: "feedback_prompt",
+            text:
+              langRef.current === "id"
+                ? "Apakah jawaban Hikari membantu sejauh ini?"
+                : "Has Hikari been helpful so far?",
           },
         ]);
-      }
+
+        // Munculkan titik merah jika user sedang menutup chat
+        if (!isOpenRef.current) {
+          setHasUnread(true);
+        }
+      }, delay);
+
+      return "prompted";
+    });
+  };
+
+  // TIMER 3 MENIT INACTIVITY
+  useEffect(() => {
+    if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
+
+    // Mulai hitung mundur 3 menit JIKA user sudah nge-chat minimal 1 kali, dan feedback belum muncul
+    const userHasInteracted = messages.some((m) => m.type === "user");
+
+    if (userHasInteracted && feedbackState === "none") {
+      inactivityTimerRef.current = setTimeout(() => {
+        triggerFeedback(0); // Sekarang aman karena fungsinya sudah dideklarasikan di atas
+      }, 180000); // 180.000 ms = 3 Menit
+    }
+
+    return () => clearTimeout(inactivityTimerRef.current);
+  }, [messages, feedbackState]);
+
+  const sendFeedbackToAdmin = async (type, detail = "") => {
+    try {
+      await fetch("/api/chatbot/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type,
+          detail,
+          timestamp: new Date().toISOString(),
+        }),
+      });
+    } catch (e) {
+      console.error("Failed to send feedback", e);
+    }
+  };
+
+  const addBotMessage = (responseObj) => {
+    setIsTyping(true);
+    const textLength = responseObj.text.length;
+    const delay = Math.min(400 + textLength * 2, 1500);
+
+    setTimeout(() => {
+      setIsTyping(false);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `bot-${Date.now()}`,
+          type: responseObj.type || "bot",
+          text: responseObj.text,
+          image: responseObj.image,
+          reaction: null,
+        },
+      ]);
     }, delay);
   };
 
-  const handleFaqClick = (question) => {
-    setMessages((prev) => [...prev, { type: "user", text: question }]);
-    setShowFaq(false);
-    const response = generateResponse(question, settings);
-    addBotMessage(response);
-    setTimeout(() => setShowFaq(true), 1800);
-  };
-
-  const handleSend = () => {
-    const trimmed = inputValue.trim();
-    if (!trimmed) return;
-
-    setMessages((prev) => [...prev, { type: "user", text: trimmed }]);
+  const processUserInput = (text) => {
+    setMessages((prev) => [
+      ...prev,
+      { id: `user-${Date.now()}`, type: "user", text, reaction: null },
+    ]);
     setInputValue("");
     setShowFaq(false);
 
-    const response = generateResponse(trimmed, settings);
-    addBotMessage(response);
+    // Jika mode penerimaan saran
+    if (feedbackState === "awaiting_text") {
+      addBotMessage({
+        text:
+          lang === "id"
+            ? "Terima kasih atas masukannya! Hikari akan belajar menjadi lebih baik. 🙏"
+            : "Thank you for your feedback! Hikari will learn to be better. 🙏",
+        type: "bot",
+      });
+      setFeedbackState("done");
+      sendFeedbackToAdmin("negative_suggestion", text);
+      setTimeout(() => setShowFaq(true), 1800);
+      return;
+    }
+
+    // Alur percakapan normal
+    const responseData = generateResponse(text, settings, lang);
+    addBotMessage(responseData);
+
+    // Perbarui FAQ Tree berdasarkan topik jawaban
+    setActiveTopic(responseData.topic);
     setTimeout(() => setShowFaq(true), 1800);
+
+    // LOGIKA END OF BRANCH:
+    // Jika topik saat ini bukan default dan tidak memiliki anak pertanyaan di FAQ_TREE
+    const isEndOfBranch =
+      responseData.topic !== "default" && !FAQ_TREE[responseData.topic];
+
+    if (isEndOfBranch) {
+      triggerFeedback(3500); // Tunggu 3.5 detik (setelah bot selesai ngetik jawabannya) baru munculkan feedback
+    }
+  };
+
+  const handleFeedbackSelect = (emoji) => {
+    sendFeedbackToAdmin("emoji_rating", emoji);
+
+    if (emoji === "😢") {
+      setFeedbackState("awaiting_text");
+      addBotMessage({
+        text:
+          lang === "id"
+            ? "Maaf jika jawaban Hikari belum memuaskan. 😔 Boleh beritahu apa yang bisa Hikari perbaiki?"
+            : "Sorry if Hikari's answer wasn't satisfactory. 😔 Could you tell me what I can improve?",
+        type: "bot",
+      });
+    } else {
+      setFeedbackState("done");
+      addBotMessage({
+        text:
+          lang === "id"
+            ? "Terima kasih atas tanggapannya! Senang bisa membantu. ✨"
+            : "Thank you for the feedback! Happy to help. ✨",
+        type: "bot",
+      });
+    }
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter") handleSend();
+    if (e.key === "Enter" && inputValue.trim()) {
+      processUserInput(inputValue.trim());
+    }
+  };
+
+  const toggleLanguage = () => {
+    setLang((prevLang) => {
+      const newLang = prevLang === "id" ? "en" : "id";
+      setMessages((prevMessages) => {
+        if (prevMessages.length === 1 && prevMessages[0].isWelcome) {
+          return [
+            {
+              id: prevMessages[0].id,
+              type: "bot",
+              isWelcome: true,
+              reaction: null,
+              text:
+                newLang === "id"
+                  ? "Halo! 👋 Saya Hikari, asisten virtual PT Sinar Cerah Sempurna.\n\nSilakan pilih pertanyaan di bawah atau ketik langsung apa yang ingin Anda tanyakan!"
+                  : "Hello! 👋 I am Hikari, PT Sinar Cerah Sempurna's virtual assistant.\n\nPlease select a question below or directly type what you want to ask!",
+            },
+          ];
+        }
+        return prevMessages;
+      });
+      return newLang;
+    });
+  };
+
+  const toggleReaction = (msgId) => {
+    setMessages((prev) =>
+      prev.map((m) =>
+        m.id === msgId ? { ...m, reaction: m.reaction ? null : "❤️" } : m,
+      ),
+    );
+  };
+
+  const handleToggleChat = () => {
+    if (!isOpen) setHasUnread(false); // Hilangkan titik merah saat chat dibuka
+    setIsOpen(!isOpen);
   };
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end font-['Plus_Jakarta_Sans']">
-      {/* Jendela Chat (Muncul dengan efek air mengembang dari logo) */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -616,19 +990,12 @@ export default function ChatbotButton({ settings = {} }) {
               y: 70,
               scale: 0.9,
             }}
-            transition={{
-              type: "spring",
-              damping: 24,
-              stiffness: 220,
-            }}
+            transition={{ type: "spring", damping: 24, stiffness: 220 }}
             className="bg-white shadow-2xl border border-neutral-200 overflow-hidden flex flex-col absolute bottom-[70px] right-0 origin-bottom-right"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Jendela Chatbot SCS AI"
           >
             <div className="w-[340px] h-[480px] flex flex-col justify-between shrink-0">
               {/* Header */}
-              <div className="bg-[#004282] px-4 py-3.5 text-white flex items-center justify-between shrink-0">
+              <div className="bg-[#004282] px-4 py-3.5 text-white flex items-center justify-between shrink-0 shadow-sm z-10">
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
                     <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
@@ -639,7 +1006,7 @@ export default function ChatbotButton({ settings = {} }) {
                   </div>
                   <div className="flex flex-col">
                     <span className="font-bold text-sm leading-tight">
-                      SCS AI
+                      Hikari
                     </span>
                     <div className="flex items-center gap-1.5">
                       <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
@@ -648,50 +1015,90 @@ export default function ChatbotButton({ settings = {} }) {
                   </div>
                 </div>
                 <button
-                  onClick={() => setIsOpen(false)}
-                  className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors text-white text-lg"
+                  onClick={toggleLanguage}
+                  className="text-[11px] font-bold bg-white/20 px-2.5 py-1.5 rounded-md hover:bg-white/30 transition-colors border border-white/10"
                 >
-                  ×
+                  {lang === "id" ? "EN" : "ID"}
                 </button>
               </div>
 
               {/* Area Pesan */}
-              <div className="flex-grow p-4 overflow-y-auto space-y-3 bg-[#f7f7f8]">
-                {messages.map((msg, idx) => (
+              <div className="flex-grow p-4 overflow-y-auto overscroll-contain space-y-4 bg-[#f7f7f8] pb-6">
+                {messages.map((msg) => (
                   <motion.div
-                    key={idx}
+                    key={msg.id}
                     initial={{ opacity: 0, scale: 0.95, y: 12 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
-                    transition={{ ease: [0.16, 1, 0.3, 1], duration: 0.4 }}
                     className={`flex ${msg.type === "user" ? "justify-end" : "justify-start"}`}
                   >
-                    <div
-                      className={`px-3.5 py-2.5 rounded-2xl text-[13px] leading-relaxed max-w-[85%] whitespace-pre-line ${
-                        msg.type === "user"
-                          ? "bg-[#004282] text-white rounded-br-md"
-                          : "bg-white text-[#1E1E1E] border border-neutral-200 rounded-bl-md shadow-sm"
-                      }`}
-                    >
-                      {msg.text}
-                      {msg.image && (
-                        <CldImg
-                          src={msg.image}
-                          alt="Tim Developer"
-                          className="w-full rounded-xl mt-2 shadow-md border border-neutral-100"
-                        />
-                      )}
-                    </div>
+                    {msg.type === "feedback_prompt" ? (
+                      // UI Kartu Feedback (Inline Telegram Style)
+                      <div className="flex flex-col gap-1.5 w-full items-start">
+                        <div className="bg-white text-[#1E1E1E] border border-neutral-200 px-3.5 py-2.5 rounded-2xl rounded-bl-md shadow-sm max-w-[85%] text-[13px]">
+                          {msg.text}
+                        </div>
+                        {feedbackState === "prompted" && (
+                          <div className="flex gap-1.5 mt-0.5">
+                            {["❤️", "👍", "😢"].map((emoji) => (
+                              <button
+                                key={emoji}
+                                onClick={() => handleFeedbackSelect(emoji)}
+                                className="bg-white border border-neutral-200 shadow-sm px-4 py-1.5 rounded-full text-sm hover:bg-blue-50 active:scale-95 transition-all flex items-center justify-center"
+                              >
+                                {emoji}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      // UI Chat Bubble Normal dengan Reaksi
+                      <div className="relative group">
+                        <div
+                          className={`px-3.5 py-2.5 rounded-2xl text-[13px] leading-relaxed max-w-[240px] whitespace-pre-line relative ${
+                            msg.type === "user"
+                              ? "bg-[#004282] text-white rounded-br-md"
+                              : "bg-white text-[#1E1E1E] border border-neutral-200 rounded-bl-md shadow-sm"
+                          }`}
+                        >
+                          {msg.text}
+                          {msg.image && (
+                            <CldImg
+                              src={msg.image}
+                              alt="Image"
+                              className="w-full rounded-xl mt-2 shadow-sm border border-neutral-100"
+                            />
+                          )}
+
+                          {/* Badge Reaksi Aktif (WhatsApp Style) */}
+                          {msg.reaction && (
+                            <div
+                              className={`absolute -bottom-2.5 ${
+                                msg.type === "user" ? "right-2" : "left-2"
+                              } bg-white border border-neutral-200 shadow-sm rounded-full px-1.5 py-0.5 text-[11px] z-10 scale-100 animate-in zoom-in-50`}
+                            >
+                              {msg.reaction}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Tombol Reaksi Hover */}
+                        <button
+                          onClick={() => toggleReaction(msg.id)}
+                          className={`absolute bottom-0 opacity-0 group-hover:opacity-100 transition-opacity bg-white shadow-md border border-neutral-100 rounded-full p-1 text-xs z-10 hover:scale-110 ${
+                            msg.type === "user" ? "-left-6" : "-right-6"
+                          }`}
+                          title="Love message"
+                        >
+                          ❤️
+                        </button>
+                      </div>
+                    )}
                   </motion.div>
                 ))}
 
-                {/* Typing Indicator */}
                 {isTyping && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95, y: 8 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    transition={{ ease: [0.16, 1, 0.3, 1], duration: 0.4 }}
-                    className="flex justify-start"
-                  >
+                  <div className="flex justify-start">
                     <div className="bg-white border border-neutral-200 px-4 py-3 rounded-2xl rounded-bl-md shadow-sm flex gap-1.5">
                       <span
                         className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce"
@@ -706,52 +1113,62 @@ export default function ChatbotButton({ settings = {} }) {
                         style={{ animationDelay: "300ms" }}
                       ></span>
                     </div>
-                  </motion.div>
+                  </div>
                 )}
 
-                {/* FAQ Buttons */}
                 <AnimatePresence>
-                  {showFaq && !isTyping && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 8, scale: 0.98 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 4 }}
-                      transition={{ ease: [0.16, 1, 0.3, 1], duration: 0.35 }}
-                      className="flex flex-wrap gap-1.5 pt-1"
-                    >
-                      {getQuickFaq(settings).map((q, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => handleFaqClick(q)}
-                          className="text-[11px] font-medium text-[#004282] bg-blue-50 hover:bg-blue-100 border border-blue-200 px-3 py-1.5 rounded-full transition-colors text-left"
-                        >
-                          {q}
-                        </button>
-                      ))}
-                    </motion.div>
-                  )}
+                  {showFaq &&
+                    !isTyping &&
+                    feedbackState !== "awaiting_text" && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 4 }}
+                        className="flex flex-wrap gap-1.5 pt-1"
+                      >
+                        {getDynamicFaq(lang, activeTopic).map((q, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => processUserInput(q)}
+                            className="text-[11px] font-medium text-[#004282] bg-blue-50 hover:bg-blue-100 border border-blue-200 px-3 py-1.5 rounded-full transition-colors text-left"
+                          >
+                            {q}
+                          </button>
+                        ))}
+                      </motion.div>
+                    )}
                 </AnimatePresence>
 
                 <div ref={messagesEndRef} />
               </div>
 
               {/* Input */}
-              <div className="p-3 border-t border-neutral-200 bg-white flex gap-2 shrink-0">
+              <div className="p-3 border-t border-neutral-200 bg-white flex gap-2 shrink-0 z-10">
                 <input
                   type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Ketik pertanyaan Anda..."
+                  placeholder={
+                    feedbackState === "awaiting_text"
+                      ? lang === "id"
+                        ? "Ketik saran Anda..."
+                        : "Type your suggestion..."
+                      : lang === "id"
+                        ? "Ketik pertanyaan Anda..."
+                        : "Type your question..."
+                  }
                   className="flex-grow border border-neutral-300 rounded-xl px-3.5 py-2.5 text-[13px] focus:outline-none focus:border-[#004282] focus:ring-1 focus:ring-[#004282]/20 transition-all"
                   autoFocus
                 />
                 <button
-                  onClick={handleSend}
+                  onClick={() => {
+                    if (inputValue.trim()) processUserInput(inputValue.trim());
+                  }}
                   disabled={!inputValue.trim()}
                   className="bg-[#004282] text-white px-4 py-2.5 rounded-xl text-[13px] font-bold hover:bg-blue-900 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  Kirim
+                  {lang === "id" ? "Kirim" : "Send"}
                 </button>
               </div>
             </div>
@@ -759,16 +1176,18 @@ export default function ChatbotButton({ settings = {} }) {
         )}
       </AnimatePresence>
 
-      {/* Tombol Utama (Tetap Ada di Bawah) */}
+      {/* Tombol Utama */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-14 h-14 bg-yellow-400 hover:bg-yellow-500 text-[#004282] rounded-full shadow-xl transition-all duration-200 focus:outline-none group active:scale-95 flex items-center justify-center z-10"
-        aria-label="Chatbot AI"
-        aria-expanded={isOpen}
+        onClick={handleToggleChat}
+        className="relative w-14 h-14 bg-yellow-400 hover:bg-yellow-500 text-[#004282] rounded-full shadow-xl transition-all duration-200 focus:outline-none group active:scale-95 flex items-center justify-center z-10"
       >
+        {/* Titik Merah Notifikasi */}
+        {hasUnread && !isOpen && (
+          <span className="absolute top-0 right-0 w-3.5 h-3.5 bg-red-500 border-2 border-white rounded-full"></span>
+        )}
+
         <motion.svg
           animate={{ rotate: isOpen ? 180 : 0, scale: isOpen ? 0.95 : 1 }}
-          transition={{ ease: [0.16, 1, 0.3, 1], duration: 0.35 }}
           className="w-7 h-7 fill-current transform group-hover:rotate-12 transition-transform duration-200"
           viewBox="0 0 24 24"
         >
