@@ -3,9 +3,6 @@ import { verifyToken } from "@/lib/auth";
 
 const COOKIE_NAME = "scs_admin_token";
 
-/**
- * Map of old admin/api paths to their new pluralized locations.
- */
 const REDIRECT_MAP = {
   "/admin/admin": "/admin/users",
   "/admin/project": "/admin/projects",
@@ -18,9 +15,6 @@ const REDIRECT_MAP = {
   "/api/setting": "/api/settings",
 };
 
-/**
- * Mencegat rute lama dan mengalihkannya secara permanen (308) ke rute baru.
- */
 function tryRedirect(pathname, request) {
   for (const [oldPrefix, newPrefix] of Object.entries(REDIRECT_MAP)) {
     if (pathname === oldPrefix || pathname.startsWith(oldPrefix + "/")) {
@@ -31,33 +25,27 @@ function tryRedirect(pathname, request) {
   return null;
 }
 
-// KOREKSI UTAMA: Nama fungsi wajib "middleware", bukan "proxy"
-export async function middleware(request) {
+// KOREKSI: Gunakan fungsi proxy sesuai konvensi Next.js 16+
+export async function proxy(request) {
   const { pathname } = request.nextUrl;
 
-  // --- Step 1: Redirect rute lama ke rute baru (Berlaku untuk Admin & API) ---
   const redirect = tryRedirect(pathname, request);
   if (redirect) return redirect;
 
-  // --- Step 2: Bypass perlindungan untuk API dan halaman login ---
-  // API tidak diproteksi di sini karena API memiliki proteksi JWT sendiri di route.js masing-masing
   if (!pathname.startsWith("/admin") || pathname === "/admin/login") {
     return NextResponse.next();
   }
 
-  // --- Step 3: Pengecekan Token Sesi ---
   const token = request.cookies.get(COOKIE_NAME)?.value;
   if (!token) {
     return NextResponse.redirect(new URL("/admin/login", request.url));
   }
 
-  // --- Step 4: Verifikasi Kriptografi Token ---
   const payload = await verifyToken(token);
   if (!payload) {
     return NextResponse.redirect(new URL("/admin/login", request.url));
   }
 
-  // --- Step 5: Otorisasi Role ---
   if (payload.role !== "ADMIN") {
     return NextResponse.redirect(new URL("/admin/login", request.url));
   }
@@ -65,7 +53,7 @@ export async function middleware(request) {
   return NextResponse.next();
 }
 
-// KOREKSI UTAMA: Matcher harus mencakup /api agar REDIRECT_MAP untuk API bisa bekerja
+// Tetap pertahankan penambahan /api/:path* pada matcher
 export const config = {
   matcher: ["/admin/:path*", "/api/:path*"],
 };
