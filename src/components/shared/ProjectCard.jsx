@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { IMAGE_SIZES } from "@/lib/cloudinary";
 import OptimizedImage from "@/components/shared/OptimizedImage";
+import { encodeId } from "@/lib/encode-id";
 
 export default function ProjectCard({ project }) {
   const imgSrc = project?.imageUrl || project?.image || "";
 
   return (
     <Link
-      href={`/proyek/${project.id}`}
+      href={`/proyek/${encodeId(project.id)}`}
       className="bg-white rounded-[20px] overflow-hidden flex flex-col shadow-sm hover:shadow-md transition-all group w-full border border-neutral-100 h-full"
     >
       {/* KOREKSI: Tinggi gambar dikecilkan di mobile */}

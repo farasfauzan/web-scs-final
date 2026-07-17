@@ -2,11 +2,14 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdminRole } from "@/lib/auth";
 import { handleImageChange, deleteCloudinaryImage } from "@/lib/cloudinary-server";
+import { decodeId } from "@/lib/encode-id";
 
 export async function GET(request, { params }) {
   try {
     const { id } = await params;
-    const project = await prisma.project.findUnique({ where: { id: Number(id) } });
+    const realId = decodeId(id);
+    if (realId === null || realId === 0) return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
+    const project = await prisma.project.findUnique({ where: { id: Number(realId) } });
     if (!project) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json({ project });
   } catch (error) {
@@ -21,11 +24,13 @@ export async function PUT(request, { params }) {
     }
 
     const { id } = await params;
+    const realId = decodeId(id);
+    if (realId === null || realId === 0) return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
     const data = await request.json();
 
     // 🔥 If imageUrl is being updated, delete the old Cloudinary image
     if (data.imageUrl) {
-      const existing = await prisma.project.findUnique({ where: { id: Number(id) } });
+      const existing = await prisma.project.findUnique({ where: { id: Number(realId) } });
       if (existing?.imageUrl) {
         await handleImageChange(existing.imageUrl, data.imageUrl);
       }
@@ -58,9 +63,11 @@ export async function DELETE(request, { params }) {
     }
 
     const { id } = await params;
+    const realId = decodeId(id);
+    if (realId === null || realId === 0) return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
 
     // 🔥 Delete associated Cloudinary image before deleting the record
-    const existing = await prisma.project.findUnique({ where: { id: Number(id) } });
+    const existing = await prisma.project.findUnique({ where: { id: Number(realId) } });
     if (existing?.imageUrl) {
       await deleteCloudinaryImage(existing.imageUrl);
     }

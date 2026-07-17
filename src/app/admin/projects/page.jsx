@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import CldImg from "@/components/shared/CldImg";
+import { encodeId } from "@/lib/encode-id";
 
 export default function ProjectListPage() {
   const [projects, setProjects] = useState([]);
@@ -121,13 +122,13 @@ export default function ProjectListPage() {
                   </td>
                   <td className="p-4 text-right">
                     <Link
-                      href={`/admin/projects/${project.id}`}
+                      href={`/admin/projects/${encodeId(project.id)}`}
                       className="text-[#004282] hover:text-blue-700 text-sm font-medium mr-3"
                     >
                       Edit
                     </Link>
                     <button
-                      onClick={() => handleDelete(project.id)}
+                      onClick={() => handleDelete(encodeId(project.id))}
                       className="text-red-500 hover:text-red-600 text-sm font-medium"
                     >
                       Delete

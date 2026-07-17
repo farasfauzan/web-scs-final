@@ -1,4 +1,5 @@
 import { getProjects, getNews } from "@/lib/data";
+import { encodeId } from "@/lib/encode-id";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://sinarcerahsempurna.com";
 
@@ -40,7 +41,7 @@ export default async function sitemap() {
   // Dynamic project pages
   const projects = await getProjects();
   const projectPages = projects.map((project) => ({
-    url: `${BASE_URL}/proyek/${project.id}`,
+    url: `${BASE_URL}/proyek/${encodeId(project.id)}`,
     lastModified: project.updatedAt,
     changeFrequency: "monthly" as const,
     priority: 0.6,
@@ -49,7 +50,7 @@ export default async function sitemap() {
   // Dynamic news pages
   const newsItems = await getNews("PUBLISHED");
   const newsPages = newsItems.map((news) => ({
-    url: `${BASE_URL}/berita/${news.id}`,
+    url: `${BASE_URL}/berita/${encodeId(news.id)}`,
     lastModified: news.updatedAt || news.publishedAt || new Date(),
     changeFrequency: "monthly" as const,
     priority: 0.6,

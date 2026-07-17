@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import CldImg from "@/components/shared/CldImg";
+import { encodeId } from "@/lib/encode-id";
 
 export default function NewsListPage() {
   const [news, setNews] = useState([]);
@@ -32,7 +33,7 @@ export default function NewsListPage() {
 
   const handleStatusToggle = async (item) => {
     const newStatus = item.status === "PUBLISHED" ? "DRAFT" : "PUBLISHED";
-    await fetch(`/api/news/${item.id}`, {
+    await fetch(`/api/news/${encodeId(item.id)}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -142,13 +143,13 @@ export default function NewsListPage() {
                   </td>
                   <td className="p-4 text-right">
                     <Link
-                      href={`/admin/news/${item.id}`}
+                      href={`/admin/news/${encodeId(item.id)}`}
                       className="text-[#004282] hover:text-blue-700 text-sm font-medium mr-3"
                     >
                       Edit
                     </Link>
                     <button
-                      onClick={() => handleDelete(item.id)}
+                      onClick={() => handleDelete(encodeId(item.id))}
                       className="text-red-500 hover:text-red-600 text-sm font-medium"
                     >
                       Delete
