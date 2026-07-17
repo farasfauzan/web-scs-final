@@ -72,9 +72,9 @@ function getDynamicKnowledgeBase(settings, lang = "id") {
         "namanya",
       ],
       answer: {
-        id: "Nama 'Hikari' (光) berasal dari bahasa Jepang yang berarti 'Cahaya'. 🌟\n\nNama ini dipilih karena mencerminkan PT Sinar Cerah Sempurna yang selalu berusaha menjadi cahaya penerang dan memberikan solusi terbaik dalam setiap proyek konstruksi Anda! ✨",
-        en: "The name 'Hikari' (光) comes from Japanese, meaning 'Light'. 🌟\n\nThis name was chosen because it reflects PT Sinar Cerah Sempurna, which always strives to be the guiding light and provide the best solutions in every construction project! ✨",
-      },
+              id: "Nama 'Sinar' diambil dari nama perusahaan kami — PT Sinar Cerah Sempurna. 'Sinar' berarti cahaya yang menerangi, melambangkan harapan, kejelasan, dan kepercayaan yang ingin kami berikan di setiap proyek konstruksi. Kami hadir untuk menjadi cahaya pemandu solusi terbaik bagi Anda! ✨",
+              en: "The name 'Sinar' comes from our company name — PT Sinar Cerah Sempurna. 'Sinar' means a ray of light, symbolizing the hope, clarity, and trust we aim to deliver in every construction project. We're here to be your guiding light for the best solutions! ✨",
+            },
     },
     {
       topic: "profil_perusahaan",
@@ -639,12 +639,12 @@ const GREETINGS = {
   ],
   responses: {
     id: [
-      "Halo! 😊 Saya Hikari. Ada yang bisa saya bantu tentang PT Sinar Cerah Sempurna?",
-      "Hai! 👋 Senang bisa membantu Anda. Mau tanya apa tentang SCS ke Hikari?",
+      "Halo! 😊 Saya Sinar, asisten virtual PT Sinar Cerah Sempurna. Ada yang bisa saya bantu terkait layanan, proyek, atau informasi perusahaan kami?",
+      "Hai! 👋 Senang bisa membantu. Silakan tanyakan apa saja tentang SCS ke Sinar — mulai dari profil, proyek, hingga konsultasi konstruksi.",
     ],
     en: [
-      "Hello! 😊 I am Hikari. How can I help you regarding PT Sinar Cerah Sempurna?",
-      "Hi! 👋 Glad to help. What would you like to ask Hikari about SCS?",
+      "Hello! 😊 I am Sinar, the virtual assistant of PT Sinar Cerah Sempurna. How can I help you regarding our services, projects, or company information?",
+      "Hi! 👋 Glad to help. Feel free to ask Sinar anything about SCS — from profile, projects, to construction consultation.",
     ],
   },
 };
@@ -719,13 +719,13 @@ function generateResponse(input, settings, lang) {
   if (smallTalk) return { text: smallTalk, type: "bot", topic: "default" };
 
   const fallbacks = {
-    id: [
-      "Hmm, Hikari belum menangkap maksudnya. 🤔 Coba tanyakan tentang layanan, lokasi, atau profil PT Sinar Cerah Sempurna!",
-    ],
-    en: [
-      "Hmm, Hikari didn't quite get that. 🤔 Try asking about the services, location, or profile of PT Sinar Cerah Sempurna!",
-    ],
-  };
+      id: [
+        "Hmm, Sinar belum menangkap maksudnya. 🤔 Coba tanyakan tentang layanan, lokasi, atau profil PT Sinar Cerah Sempurna!",
+      ],
+      en: [
+        "Hmm, Sinar didn't quite get that. 🤔 Try asking about the services, location, or profile of PT Sinar Cerah Sempurna!",
+      ],
+    };
   return { text: fallbacks[lang][0], type: "bot", topic: "default" };
 }
 
@@ -739,14 +739,14 @@ export default function ChatbotButton({ settings = {} }) {
   const [lang, setLang] = useState("id");
 
   const [messages, setMessages] = useState([
-    {
-      id: "welcome-msg",
-      type: "bot",
-      isWelcome: true,
-      text: "Halo! 👋 Saya Hikari, asisten virtual PT Sinar Cerah Sempurna.\n\nSilakan pilih pertanyaan di bawah atau ketik langsung apa yang ingin Anda tanyakan!",
-      reaction: null,
-    },
-  ]);
+      {
+        id: "welcome-msg",
+        type: "bot",
+        isWelcome: true,
+        text: "Halo! 👋 Saya Sinar, asisten virtual PT Sinar Cerah Sempurna.\n\nSilakan pilih pertanyaan di bawah atau ketik langsung apa yang ingin Anda tanyakan!",
+        reaction: null,
+      },
+    ]);
 
   const [showFaq, setShowFaq] = useState(true);
   const [activeTopic, setActiveTopic] = useState("default");
@@ -775,40 +775,40 @@ export default function ChatbotButton({ settings = {} }) {
 
   // FUNGSI PEMICU FEEDBACK (Ditingkatkan agar Anti-Duplikasi)
   const triggerFeedback = (delay = 0) => {
-    // 1. Cek apakah pesan feedback sudah ada di layar (Guard Clause)
-    const feedbackExists = messages.some((m) => m.type === "feedback_prompt");
-    if (feedbackExists) return;
+      // 1. Cek apakah pesan feedback sudah ada di layar (Guard Clause)
+      const feedbackExists = messages.some((m) => m.type === "feedback_prompt");
+      if (feedbackExists) return;
 
-    setFeedbackState((prev) => {
-      if (prev !== "none") return prev; // Mencegah muncul dua kali
+      setFeedbackState((prev) => {
+        if (prev !== "none") return prev; // Mencegah muncul dua kali
 
-      setTimeout(() => {
-        setMessages((msgs) => {
-          // Double check di dalam setMessages untuk keamanan extra
-          if (msgs.some((m) => m.type === "feedback_prompt")) return msgs;
+        setTimeout(() => {
+          setMessages((msgs) => {
+            // Double check di dalam setMessages untuk keamanan extra
+            if (msgs.some((m) => m.type === "feedback_prompt")) return msgs;
 
-          return [
-            ...msgs,
-            {
-              id: "feedback-prompt", // ID Statis agar tidak mungkin duplikat
-              type: "feedback_prompt",
-              text:
-                langRef.current === "id"
-                  ? "Apakah jawaban Hikari membantu sejauh ini?"
-                  : "Has Hikari been helpful so far?",
-            },
-          ];
-        });
+            return [
+              ...msgs,
+              {
+                id: "feedback-prompt", // ID Statis agar tidak mungkin duplikat
+                type: "feedback_prompt",
+                text:
+                  langRef.current === "id"
+                    ? "Apakah jawaban Sinar membantu sejauh ini?"
+                    : "Has Sinar been helpful so far?",
+              },
+            ];
+          });
 
-        // Munculkan titik merah jika user sedang menutup chat
-        if (!isOpenRef.current) {
-          setHasUnread(true);
-        }
-      }, delay);
+          // Munculkan titik merah jika user sedang menutup chat
+          if (!isOpenRef.current) {
+            setHasUnread(true);
+          }
+        }, delay);
 
-      return "prompted";
-    });
-  };
+        return "prompted";
+      });
+    };
 
   // TIMER 3 MENIT INACTIVITY
   useEffect(() => {
@@ -871,19 +871,19 @@ export default function ChatbotButton({ settings = {} }) {
     setShowFaq(false);
 
     // Jika mode penerimaan saran
-    if (feedbackState === "awaiting_text") {
-      addBotMessage({
-        text:
-          lang === "id"
-            ? "Terima kasih atas masukannya! Hikari akan belajar menjadi lebih baik. 🙏"
-            : "Thank you for your feedback! Hikari will learn to be better. 🙏",
-        type: "bot",
-      });
-      setFeedbackState("done");
-      sendFeedbackToAdmin("negative_suggestion", text);
-      setTimeout(() => setShowFaq(true), 1800);
-      return;
-    }
+        if (feedbackState === "awaiting_text") {
+          addBotMessage({
+            text:
+              lang === "id"
+                ? "Terima kasih atas masukannya! Sinar akan belajar menjadi lebih baik. 🙏"
+                : "Thank you for your feedback! Sinar will learn to be better. 🙏",
+            type: "bot",
+          });
+          setFeedbackState("done");
+          sendFeedbackToAdmin("negative_suggestion", text);
+          setTimeout(() => setShowFaq(true), 1800);
+          return;
+        }
 
     // Alur percakapan normal
     const responseData = generateResponse(text, settings, lang);
@@ -907,24 +907,24 @@ export default function ChatbotButton({ settings = {} }) {
     sendFeedbackToAdmin("emoji_rating", emoji);
 
     if (emoji === "😢") {
-      setFeedbackState("awaiting_text");
-      addBotMessage({
-        text:
-          lang === "id"
-            ? "Maaf jika jawaban Hikari belum memuaskan. 😔 Boleh beritahu apa yang bisa Hikari perbaiki?"
-            : "Sorry if Hikari's answer wasn't satisfactory. 😔 Could you tell me what I can improve?",
-        type: "bot",
-      });
-    } else {
-      setFeedbackState("done");
-      addBotMessage({
-        text:
-          lang === "id"
-            ? "Terima kasih atas tanggapannya! Senang bisa membantu. ✨"
-            : "Thank you for the feedback! Happy to help. ✨",
-        type: "bot",
-      });
-    }
+          setFeedbackState("awaiting_text");
+          addBotMessage({
+            text:
+              lang === "id"
+                ? "Maaf jika jawaban Sinar belum memuaskan. 😔 Boleh beritahu apa yang bisa Sinar perbaiki?"
+                : "Sorry if Sinar's answer wasn't satisfactory. 😔 Could you tell me what I can improve?",
+            type: "bot",
+          });
+        } else {
+          setFeedbackState("done");
+          addBotMessage({
+            text:
+              lang === "id"
+                ? "Terima kasih atas masukannya! Sinar akan belajar menjadi lebih baik. 🙏"
+                : "Thank you for your feedback! Sinar will learn to be better. 🙏",
+            type: "bot",
+          });
+        }
   };
 
   const handleKeyDown = (e) => {
@@ -945,9 +945,9 @@ export default function ChatbotButton({ settings = {} }) {
               isWelcome: true,
               reaction: null,
               text:
-                newLang === "id"
-                  ? "Halo! 👋 Saya Hikari, asisten virtual PT Sinar Cerah Sempurna.\n\nSilakan pilih pertanyaan di bawah atau ketik langsung apa yang ingin Anda tanyakan!"
-                  : "Hello! 👋 I am Hikari, PT Sinar Cerah Sempurna's virtual assistant.\n\nPlease select a question below or directly type what you want to ask!",
+                              newLang === "id"
+                                ? "Halo! 👋 Saya Sinar, asisten virtual PT Sinar Cerah Sempurna.\n\nSilakan pilih pertanyaan di bawah atau ketik langsung apa yang ingin Anda tanyakan!"
+                                : "Hello! 👋 I am Sinar, PT Sinar Cerah Sempurna's virtual assistant.\n\nPlease select a question below or directly type what you want to ask!",
             },
           ];
         }
@@ -1015,8 +1015,8 @@ export default function ChatbotButton({ settings = {} }) {
                   </div>
                   <div className="flex flex-col">
                     <span className="font-bold text-sm leading-tight">
-                      Hikari
-                    </span>
+                                          Sinar
+                                        </span>
                     <div className="flex items-center gap-1.5">
                       <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
                       <span className="text-[10px] text-white/80">Online</span>
