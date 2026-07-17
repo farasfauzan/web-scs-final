@@ -118,7 +118,7 @@ export default async function TentangKamiPage() {
       </section>
 
       {/* --- DIREKTUR SECTION (FLOATING CARD) --- */}
-      <section className="relative w-[calc(100%-2rem)] md:w-[calc(100%-4rem)] max-w-[1440px] mx-auto overflow-hidden bg-[#004282] mt-16 rounded-[32px] md:rounded-[48px] shadow-xl">
+      <section className="relative w-[calc(100%-2rem)] md:w-[calc(100%-4rem)] max-w-[1440px] mx-auto overflow-hidden bg-[#004282] mt-16 rounded-[32px] md:rounded-[48px] shadow-2xl border border-white/10">
         <div className="absolute inset-0 z-0">
           <CldImg
             src={heroData?.imageUrl || "/bg-hero-tentang-kami.svg"}
@@ -126,23 +126,29 @@ export default async function TentangKamiPage() {
             className="w-full h-full object-cover object-top"
           />
           <div className="absolute inset-0 bg-[#004282]/85"></div>
+          {/* Gradient Gelap di dasar card untuk efek lantai */}
+          <div className="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-black/85 to-transparent pointer-events-none"></div>
         </div>
 
         <FadeUp
           delay={0.3}
           className="relative z-10 w-full max-w-[1152px] mx-auto flex flex-col md:flex-row items-stretch justify-between px-6 lg:px-8 gap-8 md:gap-16"
         >
-          {/* Kolom Foto Direktur */}
-          <div className="w-full md:w-5/12 flex flex-col justify-end items-center md:items-start pt-12 md:pt-16">
-            <img
-              src="/sir-direkture.svg"
-              alt={dirName}
-              className="w-full max-w-[320px] md:max-w-[400px] object-contain drop-shadow-2xl"
-            />
+          {/* Kolom Kiri: Foto Direktur & Bayangan (self-end agar rapat ke bawah) */}
+          <div className="w-full md:w-5/12 flex flex-col justify-end items-center md:items-start self-end">
+            <div className="relative flex flex-col items-center w-full">
+              <img
+                src="/sir-direkture.svg"
+                alt={dirName}
+                className="relative z-10 w-full max-w-[340px] md:max-w-[440px] object-contain drop-shadow-2xl"
+              />
+              {/* Efek bayangan (drop shadow) tepat di bawah kursi/kaki */}
+              <div className="absolute bottom-0 w-[75%] h-[20px] md:h-[24px] bg-black/90 blur-[12px] rounded-[100%] translate-y-1/2 z-0"></div>
+            </div>
           </div>
 
-          {/* Kolom Teks & Quote */}
-          <div className="w-full md:w-7/12 flex flex-col justify-between text-white pt-10 md:pt-20 pb-12 md:pb-16">
+          {/* Kolom Kanan: Teks & Quote (justify-between memisah konten atas dan bawah) */}
+          <div className="w-full md:w-7/12 flex flex-col justify-between gap-12 text-white pt-12 md:pt-24 pb-16 md:pb-24">
             <div className="flex flex-col gap-6">
               <div className="w-14 h-14 bg-[#FFD700] flex items-center justify-center shadow-lg shrink-0 rounded-lg">
                 <svg
@@ -155,16 +161,16 @@ export default async function TentangKamiPage() {
               </div>
 
               <div className="flex flex-col gap-4">
-                <h3 className="text-3xl md:text-4xl font-extrabold font-['Plus_Jakarta_Sans'] leading-tight">
+                <h3 className="text-3xl md:text-4xl font-extrabold font-['Plus_Jakarta_Sans'] leading-tight drop-shadow-md">
                   {dirQuoteTitle}
                 </h3>
-                <p className="text-white/85 text-[15px] font-normal leading-relaxed text-left">
+                <p className="text-white/90 text-[15px] font-normal leading-relaxed text-left drop-shadow-md">
                   {dirQuoteDesc}
                 </p>
               </div>
             </div>
 
-            <div className="flex flex-col gap-1 mt-10 md:mt-0">
+            <div className="flex flex-col gap-1 drop-shadow-lg">
               <span className="text-xl font-bold font-['Plus_Jakarta_Sans'] tracking-wide">
                 {dirName}
               </span>
@@ -184,7 +190,7 @@ export default async function TentangKamiPage() {
               Fondasi Utama Keunggulan Kami
             </h2>
             <p className="text-[#757575] text-[15px] font-normal max-w-2xl mx-auto leading-relaxed">
-              Nilai-nilai ini adalah inti dari setiap keputusan, desain, and
+              Nilai-nilai ini adalah inti dari setiap keputusan, desain, dan
               struktur yang kami bangun.
             </p>
           </FadeUp>
