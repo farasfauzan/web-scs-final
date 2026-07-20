@@ -152,3 +152,11 @@ model VisitStats {
   totalVisits    Int
   uniqueVisitors Int
 }
+
+model ChatbotEvaluation {
+  id        Int      @id @default(autoincrement())
+  type      String   // "emoji_rating" or "negative_suggestion"
+  detail    String   // the emoji or the user's text suggestion
+  ip        String?
+  createdAt DateTime @default(now())
+}

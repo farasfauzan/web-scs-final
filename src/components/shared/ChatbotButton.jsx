@@ -934,9 +934,11 @@ export default function ChatbotButton({ settings = {} }) {
   };
 
   const handleFeedbackSelect = (emoji) => {
-    sendFeedbackToAdmin("emoji_rating", emoji);
+    const negativeEmojis = ["👎"];
 
-    if (emoji === "😢") {
+    if (negativeEmojis.includes(emoji)) {
+      // Only save negative feedback to the log
+      sendFeedbackToAdmin("emoji_rating", emoji);
       setFeedbackState("awaiting_text");
       addBotMessage({
         text:
@@ -946,6 +948,7 @@ export default function ChatbotButton({ settings = {} }) {
         type: "bot",
       });
     } else {
+      // Positive feedback is NOT saved to the log
       setFeedbackState("done");
       addBotMessage({
         text:
@@ -1077,15 +1080,22 @@ export default function ChatbotButton({ settings = {} }) {
                         </div>
                         {feedbackState === "prompted" && (
                           <div className="flex gap-1.5 mt-0.5">
-                            {["❤️", "👍", "😢"].map((emoji) => (
-                              <button
-                                key={emoji}
-                                onClick={() => handleFeedbackSelect(emoji)}
-                                className="bg-white border border-neutral-200 shadow-sm px-4 py-1.5 rounded-full text-sm hover:bg-blue-50 active:scale-95 transition-all flex items-center justify-center"
-                              >
-                                {emoji}
-                              </button>
-                            ))}
+                            {["❤️", "👍", "👎"].map((emoji) => {
+                              const isPositive = ["❤️", "👍"].includes(emoji);
+                              return (
+                                <button
+                                  key={emoji}
+                                  onClick={() => handleFeedbackSelect(emoji)}
+                                  className={`bg-white border shadow-sm px-3 py-1.5 rounded-full text-sm active:scale-95 transition-all flex items-center justify-center ${
+                                    isPositive
+                                      ? "border-green-200 hover:bg-green-50"
+                                      : "border-red-200 hover:bg-red-50"
+                                  }`}
+                                >
+                                  {emoji}
+                                </button>
+                              );
+                            })}
                           </div>
                         )}
                       </div>

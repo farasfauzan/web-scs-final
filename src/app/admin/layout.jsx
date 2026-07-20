@@ -18,6 +18,7 @@ const SIDEBAR_ITEMS = [
   { label: "Partners", href: "/admin/partners", icon: "/icons/partner.svg" },
   { label: "Statistics", href: "/admin/statistics", icon: "/icons/statistic.svg" },
   { label: "Settings", href: "/admin/settings", icon: "/icons/setting.svg" },
+  { label: "Evaluasi User", href: "/admin/evaluations", icon: "/icons/about.svg" },
   { label: "Admin Users", href: "/admin/users", icon: "/icons/admin.svg" },
   { label: "Activity Log", href: "/admin/logs", icon: "/icons/eye.svg" },
 ];
