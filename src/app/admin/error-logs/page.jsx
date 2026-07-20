@@ -43,8 +43,12 @@ export default function AdminErrorLogsPage() {
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 });
   const [loading, setLoading] = useState(true);
   const [methodFilter, setMethodFilter] = useState("ALL");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [routeFilter, setRouteFilter] = useState("");
+  const [expandedId, setExpandedId] = useState(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [copiedId, setCopiedId] = useState(null);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -73,7 +77,31 @@ export default function AdminErrorLogsPage() {
     fetchLogs(1);
   }, []);
 
-  const filteredLogs = methodFilter === "ALL" ? logs : logs.filter((l) => l.method === methodFilter);
+  // Hitung statistik error per route
+  const routeStats = logs.reduce((acc, l) => {
+    const route = l.route || "unknown";
+    acc[route] = (acc[route] || 0) + 1;
+    return acc;
+  }, {});
+  const topRoutes = Object.entries(routeStats)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5);
+
+  // Filter by method + search + route
+  const filteredLogs = logs.filter((l) => {
+    if (methodFilter !== "ALL" && l.method !== methodFilter) return false;
+    if (searchQuery && !l.errorMessage?.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+    if (routeFilter && !l.route?.toLowerCase().includes(routeFilter.toLowerCase())) return false;
+    return true;
+  });
+
+  const handleCopy = async (text, id) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch {}
+  };
 
   const handleDeleteAll = async () => {
     setDeleting(true);
@@ -94,23 +122,52 @@ export default function AdminErrorLogsPage() {
   return (
     <div className="space-y-4 lg:space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center shrink-0">
-              <svg className="w-5 h-5 text-[#004282]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">          <div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5 text-[#004282]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <div>
+                <h1 className="text-xl lg:text-2xl font-bold text-gray-800">Error Logs</h1>
+                <p className="text-gray-500 text-xs lg:text-sm mt-0.5">
+                  {pagination.total} error tercatat
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-xl lg:text-2xl font-bold text-gray-800">Error Logs</h1>
-              <p className="text-gray-500 text-xs lg:text-sm mt-0.5">
-                {pagination.total} error tercatat
-              </p>
-            </div>
+            {/* Top Error Routes */}
+            {topRoutes.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-3">
+                {topRoutes.map(([route, count]) => (
+                  <span key={route} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-red-50 text-red-600 border border-red-100">
+                    <span className="font-mono truncate max-w-[120px]">{route}</span>
+                    <span className="bg-red-200 text-red-700 px-1.5 py-0.5 rounded-full text-[10px] font-bold">{count}</span>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
+          <div className="relative">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Cari error..."
+              className="pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#004282] bg-white w-36 lg:w-44"
+            />
+          </div>
+          <input
+            type="text"
+            value={routeFilter}
+            onChange={(e) => setRouteFilter(e.target.value)}
+            placeholder="Filter route..."
+            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#004282] bg-white w-28 lg:w-36"
+          />
           <select
             value={methodFilter}
             onChange={(e) => setMethodFilter(e.target.value)}
@@ -217,17 +274,46 @@ export default function AdminErrorLogsPage() {
                 ) : (
                   filteredLogs.map((log) => {
                     const methodColor = METHOD_COLORS[log.method] || "bg-gray-100 text-gray-600";
+                    const isExpanded = expandedId === log.id;
                     return (
                       <tr key={log.id} className="hover:bg-gray-50/50 transition-colors">
                         <td className="px-5 py-4 text-sm text-gray-600 whitespace-nowrap">{formatDate(log.createdAt)}</td>
-                        <td className="px-5 py-4 text-sm font-mono text-gray-600">{log.route || "-"}</td>
+                        <td className="px-5 py-4 text-sm font-mono text-gray-600 max-w-[200px] truncate" title={log.route || "-"}>{log.route || "-"}</td>
                         <td className="px-5 py-4">
                           <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${methodColor}`}>
                             {log.method || "-"}
                           </span>
                         </td>
-                        <td className="px-5 py-4 text-sm text-gray-600" title={log.errorMessage || "-"}>
-                          {truncateMessage(log.errorMessage)}
+                        <td className="px-5 py-4 text-sm">
+                          <button
+                            onClick={() => setExpandedId(isExpanded ? null : log.id)}
+                            className="text-left w-full group"
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className={`text-gray-600 ${isExpanded ? '' : 'truncate max-w-[250px]'}`}>
+                                {isExpanded ? log.errorMessage || '-' : truncateMessage(log.errorMessage)}
+                              </span>
+                              {log.errorMessage && log.errorMessage.length > 80 && (
+                                <svg className={`w-4 h-4 shrink-0 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                </svg>
+                              )}
+                            </div>
+                          </button>
+                          {isExpanded && log.errorMessage && (
+                            <div className="mt-2 flex gap-2">
+                              <button
+                                onClick={() => handleCopy(log.errorMessage, log.id)}
+                                className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-[#004282] transition-colors"
+                              >
+                                {copiedId === log.id ? (
+                                  <><svg className="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg> Tersalin</>
+                                ) : (
+                                  <><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg> Salin</>
+                                )}
+                              </button>
+                            </div>
+                          )}
                         </td>
                         <td className="px-5 py-4 text-sm text-gray-500">{formatUserAgent(log.userAgent)}</td>
                       </tr>
@@ -290,6 +376,7 @@ export default function AdminErrorLogsPage() {
           ) : (
             filteredLogs.map((log) => {
               const methodColor = METHOD_COLORS[log.method] || "bg-gray-100 text-gray-600";
+              const isExpanded = expandedId === log.id;
               return (
                 <div key={log.id} className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
                   <div className="p-4 space-y-2.5">
@@ -302,9 +389,35 @@ export default function AdminErrorLogsPage() {
                     <div className="text-xs font-mono text-gray-600 truncate">
                       <span className="text-gray-400 font-medium">Route:</span> {log.route || "-"}
                     </div>
-                    <div className="text-xs text-gray-600" title={log.errorMessage || "-"}>
-                      <span className="text-gray-400 font-medium">Error:</span>{" "}
-                      {truncateMessage(log.errorMessage, 60)}
+                    <div>
+                      <button
+                        onClick={() => setExpandedId(isExpanded ? null : log.id)}
+                        className="text-left w-full"
+                      >
+                        <div className="flex items-center gap-1">
+                          <span className="text-xs text-gray-400 font-medium shrink-0">Error:</span>
+                          <span className={`text-xs text-gray-600 ${isExpanded ? '' : 'truncate'}`}>
+                            {isExpanded ? log.errorMessage || '-' : truncateMessage(log.errorMessage, 60)}
+                          </span>
+                          {log.errorMessage && log.errorMessage.length > 60 && (
+                            <svg className={`w-3 h-3 shrink-0 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          )}
+                        </div>
+                      </button>
+                      {isExpanded && log.errorMessage && (
+                        <button
+                          onClick={() => handleCopy(log.errorMessage, log.id)}
+                          className="mt-1.5 inline-flex items-center gap-1 text-[10px] text-gray-500 hover:text-[#004282] transition-colors"
+                        >
+                          {copiedId === log.id ? (
+                            <><svg className="w-3 h-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg> Tersalin</>
+                          ) : (
+                            <><svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg> Salin</>
+                          )}
+                        </button>
+                      )}
                     </div>
                     <div className="text-xs text-gray-500">
                       <span className="text-gray-400 font-medium">UA:</span> {formatUserAgent(log.userAgent)}

@@ -110,7 +110,6 @@ model News {
   publishedAt   DateTime?
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
-  comments      Comment[]
 }
 
 model Partner {
@@ -179,36 +178,3 @@ model ChatbotEvaluation {
   createdAt DateTime @default(now())
 }
 
-model Comment {
-  id         Int      @id @default(autoincrement())
-  newsId     Int
-  name       String
-  email      String
-  content    String
-  isApproved Boolean @default(false)
-  createdAt  DateTime @default(now())
-
-  news News @relation(fields: [newsId], references: [id], onDelete: Cascade)
-
-  @@index([newsId])
-  @@index([createdAt])
-}
-
-model Subscriber {
-  id          Int      @id @default(autoincrement())
-  email       String   @unique
-  subscribedAt DateTime @default(now())
-  isActive    Boolean  @default(true)
-}
-
-model ContentRevision {
-  id        Int      @id @default(autoincrement())
-  model     String   // "News", "Project", "About", "Hero", etc.
-  modelId   Int
-  data      String   // JSON string of the previous content
-  changedBy String?
-  createdAt DateTime @default(now())
-
-  @@index([model, modelId])
-  @@index([createdAt])
-}
