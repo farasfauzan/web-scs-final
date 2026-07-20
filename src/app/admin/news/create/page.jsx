@@ -50,7 +50,7 @@ export default function CreateNewsPage() {
     const { name, value } = e.target;
     setForm((prev) => {
       const updated = { ...prev, [name]: value };
-      if (name === "title" && !prev.slug) {
+      if (name === "title") {
         updated.slug = generateSlug(value);
       }
       return updated;
@@ -83,8 +83,9 @@ export default function CreateNewsPage() {
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-1">Slug</label>
           <input type="text" name="slug" value={form.slug} onChange={handleChange} required
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004282] text-sm" />
-          <p className="text-xs text-gray-500 mt-1">Auto-generated from title. Must be unique.</p>
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 text-sm cursor-not-allowed"
+            readOnly />
+          <p className="text-xs text-gray-500 mt-1">Otomatis terisi dari judul. Tidak perlu diisi manual.</p>
         </div>
 
         <div>

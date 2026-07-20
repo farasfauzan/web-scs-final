@@ -10,7 +10,7 @@ const CATEGORIES = ["Rumah Sakit", "Gedung Pendidikan", "Pusat Perbelanjaan", "F
 
 export default function CreateProjectPage() {
   const router = useRouter();
-  const [form, setForm] = useState({ title: "", description: "", category: "Lainnya", location: "", client: "", imageUrl: "", galleryImages: [], completedDate: "", isActive: true });
+  const [form, setForm] = useState({ title: "", description: "", category: "Lainnya", location: "", mapsUrl: "", client: "", imageUrl: "", galleryImages: [], completedDate: "", isActive: true });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -83,6 +83,14 @@ export default function CreateProjectPage() {
             <input type="text" name="location" value={form.location} onChange={handleChange}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004282] text-sm" />
           </div>
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Maps URL (Google Maps Embed Link)</label>
+            <input type="text" name="mapsUrl" value={form.mapsUrl} onChange={handleChange} placeholder="https://maps.google.com/..."
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004282] text-sm" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">Client</label>
             <input type="text" name="client" value={form.client} onChange={handleChange}

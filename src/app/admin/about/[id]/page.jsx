@@ -15,6 +15,12 @@ export default function EditAboutPage() {
   const params = useParams();
   const [form, setForm] = useState({ title: "", subtitle: "", content: "", vision: "", mission: "" });
   const [nilaiForm, setNilaiForm] = useState({});
+  const [direkturForm, setDirekturForm] = useState({
+    dirQuoteTitle: "",
+    dirQuoteDesc: "",
+    dirName: "",
+    dirRole: "",
+  });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -30,7 +36,7 @@ export default function EditAboutPage() {
           setForm({ title: a.title || "", subtitle: a.subtitle || "", content: a.content || "", vision: a.vision || "", mission: a.mission || "" });
         }
 
-        // Fetch settings for nilai values
+        // Fetch settings for nilai values and direktur info
         const settingsRes = await fetch("/api/settings");
         const settingsData = await settingsRes.json();
         const sm = settingsData.settingsMap || {};
@@ -41,6 +47,13 @@ export default function EditAboutPage() {
           nilai[n.descKey] = sm[n.descKey] || "";
         });
         setNilaiForm(nilai);
+
+        setDirekturForm({
+          dirQuoteTitle: sm["dirQuoteTitle"] || "",
+          dirQuoteDesc: sm["dirQuoteDesc"] || "",
+          dirName: sm["dirName"] || "",
+          dirRole: sm["dirRole"] || "",
+        });
       } catch (err) {
         console.error(err);
       } finally {
@@ -78,6 +91,23 @@ export default function EditAboutPage() {
         }),
       ]);
 
+      // Save direktur info to settings
+      const DIREKTUR_KEYS = [
+        { key: "dirQuoteTitle", label: "Judul Quote Direktur", group: "about" },
+        { key: "dirQuoteDesc", label: "Isi Quote Direktur", group: "about" },
+        { key: "dirName", label: "Nama Direktur", group: "about" },
+        { key: "dirRole", label: "Jabatan Direktur", group: "about" },
+      ];
+      DIREKTUR_KEYS.forEach((d) => {
+        savePromises.push(
+          fetch("/api/settings", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ key: d.key, value: direkturForm[d.key], label: d.label, group: d.group }),
+          })
+        );
+      });
+
       await Promise.all(savePromises);
       router.push("/admin/about");
     } catch (err) {
@@ -89,6 +119,7 @@ export default function EditAboutPage() {
 
   const handleChange = (e) => setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   const handleNilaiChange = (key, value) => setNilaiForm((prev) => ({ ...prev, [key]: value }));
+  const handleDirekturChange = (key, value) => setDirekturForm((prev) => ({ ...prev, [key]: value }));
 
   if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#004282]"></div></div>;
 
@@ -170,6 +201,59 @@ export default function EditAboutPage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+
+        <hr className="border-gray-200" />
+
+        {/* Direktur / Quote Section */}
+        <div>
+          <h3 className="text-base font-bold text-gray-800 mb-1">Kata Sambutan Direktur</h3>
+          <p className="text-xs text-gray-500 mb-4">Edit informasi dan quote dari direktur yang ditampilkan di halaman Tentang Kami.</p>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Judul Quote</label>
+              <input
+                type="text"
+                value={direkturForm.dirQuoteTitle || ""}
+                onChange={(e) => handleDirekturChange("dirQuoteTitle", e.target.value)}
+                placeholder="Judul Utama"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004282] text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Isi Quote</label>
+              <textarea
+                value={direkturForm.dirQuoteDesc || ""}
+                onChange={(e) => handleDirekturChange("dirQuoteDesc", e.target.value)}
+                placeholder="Deskripsi atau kata sambutan direktur..."
+                rows={4}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004282] text-sm resize-none"
+              />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Nama</label>
+                <input
+                  type="text"
+                  value={direkturForm.dirName || ""}
+                  onChange={(e) => handleDirekturChange("dirName", e.target.value)}
+                  placeholder="Ir. H. Soeharto, MT."
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004282] text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Jabatan</label>
+                <input
+                  type="text"
+                  value={direkturForm.dirRole || ""}
+                  onChange={(e) => handleDirekturChange("dirRole", e.target.value)}
+                  placeholder="Direktur"
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004282] text-sm"
+                />
+              </div>
+            </div>
           </div>
         </div>
 

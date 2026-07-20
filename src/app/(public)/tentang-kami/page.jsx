@@ -45,10 +45,10 @@ export default async function TentangKamiPage() {
       ];
 
   const dirQuoteTitle =
-    settings?.dirQuoteTitle || "Kami adalah perusahaan gg gaming";
+    settings?.dirQuoteTitle || "PT. Sinar Cerah Sempurna";
   const dirQuoteDesc =
     settings?.dirQuoteDesc ||
-    "Kami adalah perusahaan gg gaming Kami adalah perusahaan gg gaming Kami adalah perusahaan gg gaming Kami adalah perusahaan gg gaming Kami adalah perusahaan gg gaming Kami adalah perusahaan gg gaming Kami adalah perusahaan gg gaming Kami adalah perusahaan gg gaming Kami adalah perusahaan gg gaming Kami adalah perusahaan gg gaming Kami adalah perusahaan gg gaming";
+    "Merupakan perusahaan konstruksi yang berkomitmen untuk memberikan kualitas terbaik dalam setiap proyek, dengan fokus pada inovasi, keselamatan, dan kepuasan klien.";
   const dirName = settings?.dirName || "Ir. H. Soeharto, MT.";
   const dirRole = settings?.dirRole || "Direktur";
 

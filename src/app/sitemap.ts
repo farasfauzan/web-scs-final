@@ -38,7 +38,7 @@ export default async function sitemap() {
     },
   ];
 
-  // Dynamic project pages
+  // Dynamic project pages (using encoded ID)
   const projects = await getProjects();
   const projectPages = projects.map((project) => ({
     url: `${BASE_URL}/proyek/${encodeId(project.id)}`,
@@ -47,10 +47,10 @@ export default async function sitemap() {
     priority: 0.6,
   }));
 
-  // Dynamic news pages
+  // Dynamic news pages - now using slug instead of encoded ID
   const newsItems = await getNews("PUBLISHED");
   const newsPages = newsItems.map((news) => ({
-    url: `${BASE_URL}/berita/${encodeId(news.id)}`,
+    url: `${BASE_URL}/berita/${news.slug}`,
     lastModified: news.updatedAt || news.publishedAt || new Date(),
     changeFrequency: "monthly" as const,
     priority: 0.6,

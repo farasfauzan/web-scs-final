@@ -6,19 +6,19 @@ import CldImg from "@/components/shared/CldImg";
 import InteractiveGallery from "@/components/ui/InteractiveGallery";
 
 export default function DetailBeritaPage({ params }) {
-  const { id } = React.use(params);
+  const { slug } = React.use(params);
   const [news, setNews] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`/api/news/${id}`)
+    fetch(`/api/news/slug/${slug}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.news) setNews(data.news);
       })
       .catch(() => {})
       .finally(() => setIsLoading(false));
-  }, [id]);
+  }, [slug]);
 
   if (isLoading) return <div className="min-h-screen bg-zinc-100" />;
   if (!news) {

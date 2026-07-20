@@ -47,6 +47,7 @@ function BeritaInteractive({ initialNews }) {
 
   const formattedNews = initialNews.map((n) => ({
     id: n.id,
+    slug: n.slug,
     title: n.title,
     desc: n.excerpt || n.content,
     imageUrl: n.imageUrl || "",

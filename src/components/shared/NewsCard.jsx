@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { IMAGE_SIZES } from "@/lib/cloudinary";
 import OptimizedImage from "@/components/shared/OptimizedImage";
-import { encodeId } from "@/lib/encode-id";
 
 export default function NewsCard({ news }) {
   const imgSrc = news?.imageUrl || news?.image || "";
@@ -13,7 +12,7 @@ export default function NewsCard({ news }) {
 
   return (
     <Link
-      href={`/berita/${encodeId(news.id)}`}
+      href={`/berita/${news?.slug || news?.id}`}
       className="bg-white rounded-[20px] overflow-hidden flex flex-col shadow-sm hover:shadow-md transition-all group w-full border border-neutral-100 h-full"
     >
       {/* KOREKSI: Tinggi gambar dikecilkan di mobile */}

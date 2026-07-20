@@ -10,6 +10,10 @@ export default function EditNewsPage() {
   const router = useRouter();
   const params = useParams();
   const [form, setForm] = useState({ slug: "", title: "", excerpt: "", content: "", imageUrl: "", galleryImages: [], status: "DRAFT" });
+
+  const generateSlug = (title) => {
+    return title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  };
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -62,7 +66,16 @@ export default function EditNewsPage() {
     }
   };
 
-  const handleChange = (e) => setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => {
+      const updated = { ...prev, [name]: value };
+      if (name === "title") {
+        updated.slug = generateSlug(value);
+      }
+      return updated;
+    });
+  };
 
   if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#004282]"></div></div>;
 
@@ -92,7 +105,9 @@ export default function EditNewsPage() {
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-1">Slug</label>
           <input type="text" name="slug" value={form.slug} onChange={handleChange} required
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004282] text-sm" />
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 text-sm cursor-not-allowed"
+            readOnly />
+          <p className="text-xs text-gray-500 mt-1">Otomatis terisi dari judul. Tidak perlu diisi manual.</p>
         </div>
 
         <div>

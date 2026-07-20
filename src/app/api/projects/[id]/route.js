@@ -47,7 +47,7 @@ export async function PUT(request, { params }) {
     };
 
     const project = await prisma.project.update({
-      where: { id: Number(id) },
+      where: { id: Number(realId) },
       data: updateData,
     });
     return NextResponse.json({ project });
@@ -72,7 +72,7 @@ export async function DELETE(request, { params }) {
       await deleteCloudinaryImage(existing.imageUrl);
     }
 
-    await prisma.project.delete({ where: { id: Number(id) } });
+    await prisma.project.delete({ where: { id: Number(realId) } });
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ error: "Failed to delete project" }, { status: 500 });
