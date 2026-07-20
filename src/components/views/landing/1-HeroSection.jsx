@@ -7,7 +7,7 @@ import BoldText from "@/components/shared/BoldText";
 import CldImg from "@/components/shared/CldImg";
 
 const FALLBACK = {
-  subtitle: "PT SINAR CERAH SEMPURNA",
+  subtitle: "",
   title:
     "**Integrity** isn't just a policy—it's the standard we build by. Your **trust** is our greatest structure.",
   description:
@@ -98,9 +98,8 @@ export default function HeroSection({ data }) {
 
       {/* Tanda Panah Interaktif */}
       <div
-        className={`absolute bottom-8 left-1/2 -translate-x-1/2 z-20 transition-opacity duration-500 ${
-          showArrow ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
+        className={`absolute bottom-8 left-1/2 -translate-x-1/2 z-20 transition-opacity duration-500 ${showArrow ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
       >
         <button
           onClick={scrollToNext}

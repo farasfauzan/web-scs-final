@@ -220,10 +220,12 @@ export default function DetailProyekPage({ params }) {
               </div>
             </div>
 
-            <div className="w-full aspect-video md:aspect-auto md:h-[260px] rounded-xl md:rounded-2xl overflow-hidden relative bg-zinc-200 shadow-inner border border-neutral-100">
+            <div className="w-full aspect-video md:aspect-auto md:h-[260px] rounded-xl md:rounded-2xl overflow-hidden relative bg-zinc-200 shadow-inner border border-neutral-100 group">
               {(() => {
-                const url = project.mapsUrl?.trim();
-                if (!url) {
+                const rawUrl = project.mapsUrl?.trim();
+                const locationName = project.location?.trim();
+
+                if (!rawUrl && !locationName) {
                   return (
                     <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-100 gap-3">
                       <svg className="w-6 h-6 md:w-8 md:h-8 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -234,42 +236,65 @@ export default function DetailProyekPage({ params }) {
                     </div>
                   );
                 }
-                // Cek apakah URL adalah Google Maps Embed link
-                const isEmbed =
-                  url.includes('/embed/') ||
-                  url.includes('google.com/maps/embed');
-                if (isEmbed) {
+
+                // Cek apakah URL sudah berbentuk embed resmi (HTML iframe embed dari Google Maps)
+                const isEmbed = rawUrl && (rawUrl.includes('/embed/') || rawUrl.includes('google.com/maps/embed'));
+
+                // Jika bukan embed resmi, gunakan nama lokasi (misal: "Semarang") agar peta menampilkan kota/lokasi dengan bersih tanpa error bar
+                const queryLocation = isEmbed
+                  ? null
+                  : locationName || (rawUrl && !rawUrl.startsWith('http') ? rawUrl : null);
+
+                const embedSrc = isEmbed
+                  ? rawUrl
+                  : queryLocation
+                    ? `https://maps.google.com/maps?q=${encodeURIComponent(queryLocation)}&output=embed`
+                    : null;
+
+                const targetMapsUrl = rawUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locationName)}`;
+
+                if (!embedSrc) {
                   return (
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-100 gap-3 p-6 text-center">
+                      <svg className="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                      </svg>
+                      <a
+                        href={targetMapsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 bg-blue-600 text-white text-xs font-semibold px-4 py-2 rounded-full hover:bg-blue-700 transition-colors shadow-sm"
+                      >
+                        Buka di Google Maps
+                      </a>
+                    </div>
+                  );
+                }
+
+                return (
+                  <>
+                    {/* Tombol Overlay Buka di Maps (Pojok Kiri Atas) */}
+                    <a
+                      href={targetMapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="absolute top-3 left-3 z-10 bg-white/95 backdrop-blur-sm text-[#1a73e8] hover:text-[#174ea6] text-xs font-semibold px-3 py-1.5 rounded-md shadow-md border border-neutral-200/80 hover:bg-white transition-all flex items-center gap-1.5 group/btn"
+                    >
+                      <span>Buka di Maps</span>
+                      <svg className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
+
+                    {/* Iframe Peta Google Maps */}
                     <iframe
-                      src={url}
+                      src={embedSrc}
                       className="w-full h-full border-0 absolute inset-0"
                       allowFullScreen=""
                       loading="lazy"
                       referrerPolicy="no-referrer-when-downgrade"
                     ></iframe>
-                  );
-                }
-                // Bukan embed — tampilkan tombol buka di Google Maps
-                return (
-                  <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-100 gap-3 p-6">
-                    <svg className="w-8 h-8 md:w-10 md:h-10 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                    </svg>
-                    <span className="text-[12px] md:text-[13px] text-neutral-600 font-medium font-['Montserrat'] text-center">
-                      Lihat lokasi proyek di Google Maps
-                    </span>
-                    <a
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 bg-blue-600 text-white text-[12px] md:text-[13px] font-semibold px-5 py-2.5 rounded-full hover:bg-blue-700 transition-colors shadow-sm"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                      </svg>
-                      Buka Google Maps
-                    </a>
-                  </div>
+                  </>
                 );
               })()}
             </div>
