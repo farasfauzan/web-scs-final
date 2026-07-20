@@ -1,104 +1,89 @@
-"use client";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import { prisma } from "@/lib/prisma";
 import FadeUp from "@/components/ui/FadeUp";
 import CldImg from "@/components/shared/CldImg";
 import InteractiveGallery from "@/components/ui/InteractiveGallery";
 import Breadcrumbs from "@/components/shared/Breadcrumbs";
 import ShareButtons from "@/components/shared/ShareButtons";
 
-export default function DetailBeritaPage({ params }) {
-  const { slug } = React.use(params);
-  const [news, setNews] = useState(null);
-  const [relatedNews, setRelatedNews] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+// 1. GENERATE METADATA (SEO)
+export async function generateMetadata({ params }) {
+  const { slug } = await params; // Wajib di-await pada Next.js 15+
+  const news = await prisma.news.findUnique({ where: { slug } });
 
-  useEffect(() => {
-    fetch(`/api/news/slug/${slug}`)
-      .then((res) => res.json())
-      .then(async (data) => {
-        if (data.news) {
-          setNews(data.news);
-        }
-        try {
-          const newsRes = await fetch("/api/news?status=PUBLISHED");
-          const newsData = await newsRes.json();
-          const filtered = (newsData.news || []).filter(
-            (n) => n.slug !== data.news.slug && n.id !== data.news.id,
-          );
-          setRelatedNews(filtered.slice(0, 3));
-        } catch (err) {
-          console.warn("Failed to fetch related news:", err);
-        }
-      })
-      .catch((err) => {
-        console.warn("Failed to fetch news:", err);
-      })
-      .finally(() => setIsLoading(false));
-  }, [slug]);
+  if (!news) return { title: "Berita Tidak Ditemukan" };
 
-  if (isLoading) return <div className="min-h-screen bg-zinc-100" />;
-  if (!news) {
-    return (
-      <div className="min-h-screen bg-zinc-100 flex items-center justify-center font-['Plus_Jakarta_Sans'] text-neutral-500">
-        Artikel berita tidak ditemukan.
-      </div>
-    );
-  }
+  return {
+    title: `${news.title} | PT Sinar Cerah Sempurna`,
+    description: news.excerpt || news.content.slice(0, 150),
+    openGraph: {
+      images: [news.imageUrl || "/carousel1.svg"],
+    },
+  };
+}
 
-  const rawGallery = news.galleryImages || news.gallery || news.images || [];
-  const formattedGallery = rawGallery.map((item) => {
-    if (typeof item === "string") {
-      if (item.startsWith("{") || item.startsWith("[")) {
-        try {
-          const parsed = JSON.parse(item);
-          if (parsed && typeof parsed === "object" && parsed.url) {
-            return { url: parsed.url, caption: parsed.caption || "" };
-          }
-        } catch {}
-      }
-      return { url: item, caption: "" };
-    }
-    return { url: item.url || "", caption: item.caption || "" };
-  });
+// 2. SERVER COMPONENT UTAMA
+export default async function DetailBeritaPage({ params }) {
+  const { slug } = await params; // Wajib di-await
 
+  // Fetch Paralel
+  const [news, relatedNews] = await Promise.all([
+    prisma.news.findUnique({ where: { slug } }),
+    prisma.news.findMany({
+      where: { status: "PUBLISHED", NOT: { slug } },
+      orderBy: { publishedAt: "desc" },
+      take: 3,
+    }),
+  ]);
+
+  if (!news) notFound();
+
+  // Helper Functions
   const formatYellowText = (text) => {
     if (!text) return null;
-    const parts = text.split(/(\*\*.*?\*\*)/g);
-    return parts.map((part, index) => {
+    return text.split(/(\*\*.*?\*\*)/g).map((part, index) => {
       if (part.startsWith("**") && part.endsWith("**")) {
         return (
-          <span key={index} className="text-[#FFD700]">
+          <strong key={index} className="text-[#FFD700] font-inherit">
             {part.replace(/\*\*/g, "")}
-          </span>
+          </strong>
         );
       }
       return <span key={index}>{part}</span>;
     });
   };
 
-  const publishDate = news.createdAt
-    ? new Date(news.createdAt).toLocaleDateString("id-ID", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      })
-    : "9 Juli 2026";
+  const publishDate =
+    news.publishedAt || news.createdAt
+      ? new Date(news.publishedAt || news.createdAt).toLocaleDateString(
+          "id-ID",
+          {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          },
+        )
+      : "9 Juli 2026";
+
+  const appUrl =
+    process.env.NEXT_PUBLIC_APP_URL || "https://sinarcerahsempurna.com";
 
   return (
     <main className="w-full bg-zinc-100 min-h-screen pt-[76px] lg:pt-[88px] pb-20 md:pb-24 px-4 lg:px-8 flex flex-col items-center">
-      <div className="w-full max-w-[1144px] flex flex-col gap-3">
-        {/* Header Group */}
-        <div className="w-full flex flex-col gap-1.5 md:gap-2 px-1 md:px-2">
-          {news && (
-            <Breadcrumbs
-              items={[
-                { label: "Beranda", href: "/" },
-                { label: "Berita", href: "/berita" },
-                { label: news?.title || "Detail Berita" },
-              ]}
-            />
-          )}
+      <article className="w-full max-w-[1144px] flex flex-col gap-3">
+        <nav
+          aria-label="Breadcrumb"
+          className="w-full flex flex-col gap-1.5 md:gap-2 px-1 md:px-2"
+        >
+          <Breadcrumbs
+            items={[
+              { label: "Beranda", href: "/" },
+              { label: "Berita", href: "/berita" },
+              { label: news.title },
+            ]}
+          />
           <FadeUp delay={0.1}>
             <Link
               href="/berita"
@@ -110,6 +95,7 @@ export default function DetailBeritaPage({ params }) {
                 viewBox="0 0 24 24"
                 stroke="currentColor"
                 strokeWidth="2.5"
+                aria-hidden="true"
               >
                 <path
                   strokeLinecap="round"
@@ -120,72 +106,67 @@ export default function DetailBeritaPage({ params }) {
               Kembali ke Berita
             </Link>
           </FadeUp>
-        </div>
+        </nav>
 
         <FadeUp
           delay={0.2}
           className="w-full bg-white rounded-[24px] md:rounded-[48px] px-5 md:px-8 pt-4 pb-6 lg:pt-5 lg:pb-8 flex flex-col gap-4 md:gap-6 shadow-sm border border-neutral-100"
         >
-          <div className="w-full flex flex-col gap-2.5 md:gap-3">
-            <div className="w-full text-left">
-              <p className="text-neutral-500 text-[11px] md:text-[13px] font-bold font-['Plus_Jakarta_Sans'] tracking-widest uppercase">
-                Berita Terkini • {publishDate}
-              </p>
-            </div>
-
-            <div className="w-full h-[220px] sm:h-[300px] md:h-[350px] lg:h-[400px] rounded-xl md:rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] overflow-hidden relative">
+          <header className="w-full flex flex-col gap-2.5 md:gap-3">
+            <p className="text-neutral-500 text-[11px] md:text-[13px] font-bold font-['Plus_Jakarta_Sans'] tracking-widest uppercase">
+              Berita Terkini •{" "}
+              <time dateTime={new Date(news.createdAt).toISOString()}>
+                {publishDate}
+              </time>
+            </p>
+            <figure className="w-full h-[220px] sm:h-[300px] md:h-[350px] lg:h-[400px] rounded-xl md:rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] overflow-hidden relative m-0">
               <CldImg
-                src={news.imageUrl || news.image || "/carousel1.svg"}
+                src={news.imageUrl || "/carousel1.svg"}
                 alt={news.title}
                 className="w-full h-full object-cover"
               />
-            </div>
-          </div>
+            </figure>
+          </header>
 
-          <h1 className="w-full text-left text-black text-2xl md:text-3xl lg:text-4xl font-bold font-['Montserrat'] leading-snug">
+          <h1 className="w-full text-left text-black text-2xl md:text-3xl lg:text-4xl font-bold font-['Plus_Jakarta_Sans'] leading-snug">
             {formatYellowText(news.title)}
           </h1>
 
           <hr className="border-neutral-100 w-full" />
 
-          <div className="w-full text-neutral-800 text-[14px] md:text-[15px] font-normal font-['Montserrat'] leading-[1.8] whitespace-pre-line text-justify">
-            {formatYellowText(news.content || news.description || news.desc)}
-          </div>
+          <section className="w-full text-neutral-800 text-[14px] md:text-[15px] font-normal font-['Plus_Jakarta_Sans'] leading-[1.8] whitespace-pre-line text-left">
+            {formatYellowText(news.content)}
+          </section>
 
-          <hr className="border-neutral-100 w-full mt-4" />
-          <div className="w-full flex flex-col items-start gap-2">
-            <span className="text-black text-[11px] md:text-xs font-semibold tracking-wide uppercase">
+          <footer className="w-full flex flex-col items-start gap-2 mt-4 pt-4 border-t border-neutral-100">
+            <span className="text-black text-[11px] md:text-xs font-semibold font-['Plus_Jakarta_Sans'] tracking-wide uppercase">
               Bagikan Artikel ini:
             </span>
             <ShareButtons
               title={news.title}
-              url={`${process.env.NEXT_PUBLIC_APP_URL || "https://sinarcerahsempurna.com"}/berita/${news.slug}`}
-              description={
-                news.excerpt?.slice(0, 100) || news.content?.slice(0, 100) || ""
-              }
+              url={`${appUrl}/berita/${news.slug}`}
+              description={news.excerpt || ""}
             />
-          </div>
+          </footer>
         </FadeUp>
 
         <FadeUp
           delay={0.3}
           className="w-full bg-white rounded-[24px] md:rounded-[48px] px-5 md:px-8 py-6 lg:py-8 flex flex-col gap-5 md:gap-8 shadow-sm border border-neutral-100"
         >
-          <div className="w-full text-left">
-            <h2 className="text-black text-xl md:text-3xl font-extrabold font-['Plus_Jakarta_Sans']">
-              Galeri
-            </h2>
-          </div>
-          {formattedGallery.length > 0 ? (
-            <InteractiveGallery images={formattedGallery} />
+          <h2 className="text-black text-xl md:text-3xl font-extrabold font-['Plus_Jakarta_Sans']">
+            Galeri
+          </h2>
+          {news.galleryImages && news.galleryImages.length > 0 ? (
+            <InteractiveGallery images={news.galleryImages} />
           ) : (
             <div className="w-full py-12 md:py-16 flex flex-col items-center justify-center bg-zinc-50 rounded-2xl border-2 border-dashed border-neutral-200">
               <img
                 src="/no-picture.svg"
-                alt="Tidak ada gambar"
-                className="w-12 h-12 md:w-16 md:h-16 mb-3 md:mb-4 opacity-40 object-contain"
+                alt="Ilustrasi kosong"
+                className="w-12 h-12 mb-3 opacity-40 object-contain"
               />
-              <p className="text-neutral-500 text-[13px] md:text-[15px] font-medium font-['Plus_Jakarta_Sans'] text-center px-4">
+              <p className="text-neutral-500 text-sm font-medium font-['Plus_Jakarta_Sans']">
                 Belum ada foto dokumentasi untuk berita ini.
               </p>
             </div>
@@ -193,15 +174,10 @@ export default function DetailBeritaPage({ params }) {
         </FadeUp>
 
         {relatedNews.length > 0 && (
-          <FadeUp
-            delay={0.4}
-            className="mt-6 md:mt-8 w-full bg-white rounded-[24px] md:rounded-[48px] px-5 md:px-8 py-6 lg:py-8 flex flex-col gap-5 md:gap-8 shadow-sm border border-neutral-100"
-          >
-            <div className="w-full text-left">
-              <h2 className="text-black text-xl md:text-3xl font-extrabold font-['Plus_Jakarta_Sans']">
-                Berita Lainnya
-              </h2>
-            </div>
+          <aside className="mt-6 md:mt-8 w-full bg-white rounded-[24px] md:rounded-[48px] px-5 md:px-8 py-6 lg:py-8 flex flex-col gap-5 md:gap-8 shadow-sm border border-neutral-100">
+            <h2 className="text-black text-xl md:text-3xl font-extrabold font-['Plus_Jakarta_Sans']">
+              Berita Lainnya
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {relatedNews.map((item) => (
                 <Link
@@ -217,24 +193,16 @@ export default function DetailBeritaPage({ params }) {
                     />
                   </div>
                   <div className="p-4">
-                    <h3 className="text-sm font-semibold text-neutral-800 line-clamp-2">
+                    <h3 className="text-sm font-semibold text-neutral-800 font-['Plus_Jakarta_Sans'] line-clamp-2">
                       {item.title}
                     </h3>
-                    <p className="text-xs text-neutral-500 mt-1">
-                      {item.publishedAt
-                        ? new Date(item.publishedAt).toLocaleDateString(
-                            "id-ID",
-                            { day: "numeric", month: "short", year: "numeric" },
-                          )
-                        : ""}
-                    </p>
                   </div>
                 </Link>
               ))}
             </div>
-          </FadeUp>
+          </aside>
         )}
-      </div>
+      </article>
     </main>
   );
 }

@@ -1,6 +1,7 @@
-"use client";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import { prisma } from "@/lib/prisma";
 import FadeUp from "@/components/ui/FadeUp";
 import CldImg from "@/components/shared/CldImg";
 import InteractiveGallery from "@/components/ui/InteractiveGallery";
@@ -8,84 +9,58 @@ import ShareButtons from "@/components/shared/ShareButtons";
 import Breadcrumbs from "@/components/shared/Breadcrumbs";
 import BeforeAfterSlider from "@/components/shared/BeforeAfterSlider";
 
-export default function DetailProyekPage({ params }) {
-  const { slug } = React.use(params);
-  const [project, setProject] = useState(null);
-  const [relatedProjects, setRelatedProjects] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+// 1. GENERATE METADATA (SEO)
+export async function generateMetadata({ params }) {
+  const { slug } = await params;
+  let project = await prisma.project.findUnique({ where: { slug } });
 
-  useEffect(() => {
-    (async () => {
-      let fetchedProject = null;
-      try {
-        const slugRes = await fetch(`/api/projects/slug/${slug}`);
-        const slugData = await slugRes.json();
-        if (slugData.project) {
-          fetchedProject = slugData.project;
-          setProject(fetchedProject);
-        } else {
-          const idRes = await fetch(`/api/projects/${slug}`);
-          const idData = await idRes.json();
-          if (idData.project) {
-            fetchedProject = idData.project;
-            setProject(fetchedProject);
-          }
-        }
-      } catch {}
-
-      if (fetchedProject) {
-        try {
-          const relatedRes = await fetch(
-            `/api/projects?category=${encodeURIComponent(fetchedProject.category || "")}`,
-          );
-          const relatedData = await relatedRes.json();
-          const filtered = (relatedData.projects || []).filter(
-            (p) => p.id !== fetchedProject.id && p.slug !== fetchedProject.slug,
-          );
-          setRelatedProjects(filtered.slice(0, 3));
-        } catch (err) {
-          console.warn("Failed to fetch related projects:", err);
-        }
-      }
-      setIsLoading(false);
-    })();
-  }, [slug]);
-
-  if (isLoading) return <div className="min-h-screen bg-zinc-100" />;
-  if (!project) {
-    return (
-      <div className="min-h-screen bg-zinc-100 flex items-center justify-center font-['Plus_Jakarta_Sans'] text-neutral-500">
-        Proyek tidak ditemukan.
-      </div>
-    );
+  if (!project && !isNaN(Number(slug))) {
+    project = await prisma.project.findUnique({ where: { id: Number(slug) } });
   }
 
-  const rawGallery =
-    project.gallery || project.images || project.galleryImages || [];
-  const formattedGallery = rawGallery.map((item) => {
-    if (typeof item === "string") {
-      if (item.startsWith("{") || item.startsWith("[")) {
-        try {
-          const parsed = JSON.parse(item);
-          if (parsed && typeof parsed === "object" && parsed.url) {
-            return { url: parsed.url, caption: parsed.caption || "" };
-          }
-        } catch {}
-      }
-      return { url: item, caption: "" };
-    }
-    return { url: item.url || "", caption: item.caption || "" };
+  if (!project) return { title: "Proyek Tidak Ditemukan" };
+
+  return {
+    title: `${project.title} | Portofolio PT Sinar Cerah Sempurna`,
+    description:
+      project.description?.slice(0, 150) ||
+      `Detail proyek ${project.title} oleh PT Sinar Cerah Sempurna.`,
+    openGraph: {
+      images: [project.imageUrl || "/carousel3.svg"],
+    },
+  };
+}
+
+// 2. SERVER COMPONENT UTAMA
+export default async function DetailProyekPage({ params }) {
+  const { slug } = await params;
+
+  let project = await prisma.project.findUnique({ where: { slug } });
+  if (!project && !isNaN(Number(slug))) {
+    project = await prisma.project.findUnique({ where: { id: Number(slug) } });
+  }
+
+  if (!project) notFound();
+
+  const relatedProjects = await prisma.project.findMany({
+    where: {
+      category: project.category,
+      isActive: true,
+      NOT: { id: project.id },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 3,
   });
 
+  // Helper Functions
   const formatYellowText = (text) => {
     if (!text) return null;
-    const parts = text.split(/(\*\*.*?\*\*)/g);
-    return parts.map((part, index) => {
+    return text.split(/(\*\*.*?\*\*)/g).map((part, index) => {
       if (part.startsWith("**") && part.endsWith("**")) {
         return (
-          <span key={index} className="text-[#FFD700]">
+          <strong key={index} className="text-[#FFD700] font-inherit">
             {part.replace(/\*\*/g, "")}
-          </span>
+          </strong>
         );
       }
       return <span key={index}>{part}</span>;
@@ -100,20 +75,41 @@ export default function DetailProyekPage({ params }) {
       })
     : "9 Juli 2026";
 
+  const appUrl =
+    process.env.NEXT_PUBLIC_APP_URL || "https://sinarcerahsempurna.com";
+  const formattedGallery = project.galleryImages || [];
+
+  const rawUrl = project.mapsUrl?.trim();
+  const locationName = project.location?.trim();
+  const isEmbed =
+    rawUrl &&
+    (rawUrl.includes("/embed/") || rawUrl.includes("google.com/maps/embed"));
+  const queryLocation = isEmbed
+    ? null
+    : locationName || (rawUrl && !rawUrl.startsWith("http") ? rawUrl : null);
+  const embedSrc = isEmbed
+    ? rawUrl
+    : queryLocation
+      ? `https://maps.google.com/maps?q=${encodeURIComponent(queryLocation)}&output=embed`
+      : null;
+  const targetMapsUrl =
+    rawUrl ||
+    `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locationName || "Indonesia")}`;
+
   return (
     <main className="w-full bg-zinc-100 min-h-screen pt-[76px] lg:pt-[88px] pb-20 md:pb-24 px-4 lg:px-8 flex flex-col items-center">
-      <div className="w-full max-w-[1144px] flex flex-col gap-3">
-        {/* Header Group */}
-        <div className="w-full flex flex-col gap-1.5 md:gap-2 px-1 md:px-2">
-          {project && (
-            <Breadcrumbs
-              items={[
-                { label: "Beranda", href: "/" },
-                { label: "Proyek", href: "/proyek" },
-                { label: project?.title || "Detail Proyek" },
-              ]}
-            />
-          )}
+      <article className="w-full max-w-[1144px] flex flex-col gap-3">
+        <nav
+          aria-label="Breadcrumb"
+          className="w-full flex flex-col gap-1.5 md:gap-2 px-1 md:px-2"
+        >
+          <Breadcrumbs
+            items={[
+              { label: "Beranda", href: "/" },
+              { label: "Proyek", href: "/proyek" },
+              { label: project.title },
+            ]}
+          />
           <FadeUp delay={0.1}>
             <Link
               href="/proyek"
@@ -125,6 +121,7 @@ export default function DetailProyekPage({ params }) {
                 viewBox="0 0 24 24"
                 stroke="currentColor"
                 strokeWidth="2.5"
+                aria-hidden="true"
               >
                 <path
                   strokeLinecap="round"
@@ -135,223 +132,155 @@ export default function DetailProyekPage({ params }) {
               Kembali ke Proyek
             </Link>
           </FadeUp>
-        </div>
+        </nav>
 
         <FadeUp
           delay={0.2}
           className="w-full bg-white rounded-[24px] md:rounded-[48px] px-5 md:px-8 pt-4 pb-6 lg:pt-5 lg:pb-8 flex flex-col gap-4 md:gap-6 shadow-sm border border-neutral-100"
         >
-          <div className="w-full flex flex-col gap-2.5 md:gap-3">
-            <div className="w-full text-left">
-              <p className="text-neutral-500 text-[11px] md:text-[13px] font-bold font-['Plus_Jakarta_Sans'] tracking-widest uppercase">
-                Diterbitkan pada • {publishDate}
-              </p>
-            </div>
-
-            <div className="w-full h-[220px] sm:h-[300px] md:h-[350px] lg:h-[400px] rounded-xl md:rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] overflow-hidden relative">
+          <header className="w-full flex flex-col gap-2.5 md:gap-3">
+            <p className="text-neutral-500 text-[11px] md:text-[13px] font-bold font-['Plus_Jakarta_Sans'] tracking-widest uppercase">
+              Diterbitkan pada •{" "}
+              <time dateTime={new Date(project.createdAt).toISOString()}>
+                {publishDate}
+              </time>
+            </p>
+            <figure className="w-full h-[220px] sm:h-[300px] md:h-[350px] lg:h-[400px] rounded-xl md:rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] overflow-hidden relative m-0">
               <CldImg
-                src={
-                  project.imageUrl ||
-                  project.coverImage ||
-                  project.image ||
-                  "/carousel3.svg"
-                }
+                src={project.imageUrl || "/carousel3.svg"}
                 alt={project.title}
                 className="w-full h-full object-cover"
               />
-            </div>
-          </div>
+            </figure>
+          </header>
 
-          <h1 className="w-full text-left text-black text-2xl md:text-3xl lg:text-4xl font-bold font-['Montserrat'] leading-snug">
+          <h1 className="w-full text-left text-black text-2xl md:text-3xl lg:text-4xl font-bold font-['Plus_Jakarta_Sans'] leading-snug">
             {formatYellowText(project.title)}
           </h1>
 
           <hr className="border-neutral-100 w-full" />
 
-          <div className="w-full grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-6 md:gap-10 items-start">
+          <section className="w-full grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-6 md:gap-10 items-start">
             <div className="flex flex-col gap-4 md:gap-5">
-              <h2 className="text-black text-base md:text-xl font-bold font-['Montserrat'] mb-1">
+              <h2 className="text-black text-base md:text-xl font-bold font-['Plus_Jakarta_Sans'] mb-1">
                 Detail Proyek
               </h2>
-              <div className="flex flex-col gap-3 md:gap-4">
+              <dl className="flex flex-col gap-3 md:gap-4 m-0">
                 <div>
-                  <h3 className="text-black text-[14px] md:text-[15px] font-bold font-['Montserrat']">
+                  <dt className="text-black text-[14px] md:text-[15px] font-bold font-['Plus_Jakarta_Sans']">
                     Kategori
-                  </h3>
-                  <p className="text-neutral-700 text-[13px] md:text-[15px] font-normal font-['Montserrat'] mt-0.5">
+                  </dt>
+                  <dd className="text-neutral-700 text-[13px] md:text-[15px] font-normal font-['Plus_Jakarta_Sans'] mt-0.5 m-0">
                     {project.category || "-"}
-                  </p>
+                  </dd>
                 </div>
                 <div>
-                  <h3 className="text-black text-[14px] md:text-[15px] font-bold font-['Montserrat']">
+                  <dt className="text-black text-[14px] md:text-[15px] font-bold font-['Plus_Jakarta_Sans']">
                     Lokasi
-                  </h3>
-                  <p className="text-neutral-700 text-[13px] md:text-[15px] font-normal font-['Montserrat'] mt-0.5">
+                  </dt>
+                  <dd className="text-neutral-700 text-[13px] md:text-[15px] font-normal font-['Plus_Jakarta_Sans'] mt-0.5 m-0">
                     {project.location || "-"}
-                  </p>
+                  </dd>
                 </div>
                 <div>
-                  <h3 className="text-black text-[14px] md:text-[15px] font-bold font-['Montserrat']">
-                    Status
-                  </h3>
-                  <p className="text-neutral-700 text-[13px] md:text-[15px] font-normal font-['Montserrat'] mt-0.5">
-                    {project.status || "Completed"}
-                  </p>
+                  <dt className="text-black text-[14px] md:text-[15px] font-bold font-['Plus_Jakarta_Sans']">
+                    Klien
+                  </dt>
+                  <dd className="text-neutral-700 text-[13px] md:text-[15px] font-normal font-['Plus_Jakarta_Sans'] mt-0.5 m-0">
+                    {project.client || "-"}
+                  </dd>
                 </div>
                 {project.description && (
                   <div className="mt-1 md:mt-2">
-                    <h3 className="text-black text-[14px] md:text-[15px] font-bold font-['Montserrat']">
+                    <dt className="text-black text-[14px] md:text-[15px] font-bold font-['Plus_Jakarta_Sans']">
                       Deskripsi
-                    </h3>
-                    <p className="text-neutral-700 text-[13px] md:text-[15px] font-normal font-['Montserrat'] leading-relaxed whitespace-pre-line mt-1.5">
+                    </dt>
+                    <dd className="text-neutral-700 text-[13px] md:text-[15px] font-normal font-['Plus_Jakarta_Sans'] text-left leading-relaxed whitespace-pre-line mt-1.5 m-0">
                       {project.description}
-                    </p>
+                    </dd>
                   </div>
                 )}
-              </div>
+              </dl>
             </div>
 
-            <div className="w-full aspect-video md:aspect-auto md:h-[260px] rounded-xl md:rounded-2xl overflow-hidden relative bg-zinc-200 shadow-inner border border-neutral-100 group">
-              {(() => {
-                const rawUrl = project.mapsUrl?.trim();
-                const locationName = project.location?.trim();
-
-                if (!rawUrl && !locationName) {
-                  return (
-                    <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-100 gap-3">
-                      <svg
-                        className="w-6 h-6 md:w-8 md:h-8 text-neutral-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                        />
-                      </svg>
-                      <span className="text-[12px] md:text-[13px] text-neutral-500 font-medium font-['Montserrat']">
-                        Peta tidak tersedia
-                      </span>
-                    </div>
-                  );
-                }
-
-                const isEmbed =
-                  rawUrl &&
-                  (rawUrl.includes("/embed/") ||
-                    rawUrl.includes("google.com/maps/embed"));
-                const queryLocation = isEmbed
-                  ? null
-                  : locationName ||
-                    (rawUrl && !rawUrl.startsWith("http") ? rawUrl : null);
-                const embedSrc = isEmbed
-                  ? rawUrl
-                  : queryLocation
-                    ? `https://maps.google.com/maps?q=${encodeURIComponent(queryLocation)}&output=embed`
-                    : null;
-                const targetMapsUrl =
-                  rawUrl ||
-                  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locationName)}`;
-
-                if (!embedSrc) {
-                  return (
-                    <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-100 gap-3 p-6 text-center">
-                      <svg
-                        className="w-8 h-8 text-blue-600"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-                      </svg>
-                      <a
-                        href={targetMapsUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 bg-blue-600 text-white text-xs font-semibold px-4 py-2 rounded-full hover:bg-blue-700 transition-colors shadow-sm"
-                      >
-                        Buka di Google Maps
-                      </a>
-                    </div>
-                  );
-                }
-
-                return (
-                  <>
-                    <a
-                      href={targetMapsUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="absolute top-3 left-3 z-10 bg-white/95 backdrop-blur-sm text-[#1a73e8] hover:text-[#174ea6] text-xs font-semibold px-3 py-1.5 rounded-md shadow-md border border-neutral-200/80 hover:bg-white transition-all flex items-center gap-1.5 group/btn"
+            <div className="w-full aspect-video md:aspect-auto md:h-[260px] rounded-xl md:rounded-2xl overflow-hidden relative bg-zinc-200 shadow-inner border border-neutral-100">
+              {!embedSrc ? (
+                <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-100 gap-3 p-6 text-center">
+                  <span className="text-[12px] md:text-[13px] text-neutral-500 font-medium font-['Plus_Jakarta_Sans']">
+                    Data peta tidak akurat/tidak tersedia
+                  </span>
+                </div>
+              ) : (
+                <>
+                  <a
+                    href={targetMapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="absolute top-3 left-3 z-10 bg-white/95 backdrop-blur-sm text-[#1a73e8] hover:text-[#174ea6] text-xs font-semibold font-['Plus_Jakarta_Sans'] px-3 py-1.5 rounded-md shadow-md border border-neutral-200/80 hover:bg-white transition-all flex items-center gap-1.5 group/btn"
+                    aria-label="Buka navigasi di Google Maps"
+                  >
+                    <span>Buka di Maps</span>
+                    <svg
+                      className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
                     >
-                      <span>Buka di Maps</span>
-                      <svg
-                        className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                        />
-                      </svg>
-                    </a>
-                    <iframe
-                      src={embedSrc}
-                      className="w-full h-full border-0 absolute inset-0"
-                      allowFullScreen=""
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                    ></iframe>
-                  </>
-                );
-              })()}
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                      />
+                    </svg>
+                  </a>
+                  <iframe
+                    src={embedSrc}
+                    title={`Peta Lokasi ${project.title}`}
+                    className="w-full h-full border-0 absolute inset-0"
+                    allowFullScreen=""
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                </>
+              )}
             </div>
-          </div>
+          </section>
 
           <hr className="border-neutral-100 w-full mt-4" />
-          <div className="w-full flex flex-col items-start gap-2">
-            <span className="text-black text-[11px] md:text-xs font-semibold tracking-wide uppercase">
+
+          <footer className="w-full flex flex-col items-start gap-2">
+            <span className="text-black text-[11px] md:text-xs font-semibold font-['Plus_Jakarta_Sans'] tracking-wide uppercase">
               Bagikan Proyek ini:
             </span>
             <ShareButtons
               title={project.title}
-              url={`${process.env.NEXT_PUBLIC_APP_URL || "https://sinarcerahsempurna.com"}/proyek/${project.slug || project.id}`}
+              url={`${appUrl}/proyek/${project.slug || project.id}`}
               description={project.description?.slice(0, 100) || ""}
             />
-          </div>
+          </footer>
         </FadeUp>
 
         <FadeUp
           delay={0.3}
           className="w-full bg-white rounded-[24px] md:rounded-[48px] px-5 md:px-8 py-6 lg:py-8 flex flex-col gap-5 md:gap-8 shadow-sm border border-neutral-100"
         >
-          <div className="w-full text-left">
-            <h2 className="text-black text-xl md:text-3xl font-extrabold font-['Plus_Jakarta_Sans']">
-              Galeri
-            </h2>
-          </div>
+          <h2 className="text-black text-xl md:text-3xl font-extrabold font-['Plus_Jakarta_Sans']">
+            Galeri
+          </h2>
           {formattedGallery.length > 0 ? (
-            <InteractiveGallery images={formattedGallery} />
+            <InteractiveGallery
+              images={formattedGallery.map((url) => ({ url, caption: "" }))}
+            />
           ) : (
             <div className="w-full py-12 md:py-16 flex flex-col items-center justify-center bg-zinc-50 rounded-2xl border-2 border-dashed border-neutral-200">
               <img
                 src="/no-picture.svg"
-                alt="Tidak ada gambar"
-                className="w-12 h-12 md:w-16 md:h-16 mb-3 md:mb-4 opacity-40 object-contain"
+                alt="Ilustrasi kosong"
+                className="w-12 h-12 mb-3 opacity-40 object-contain"
               />
-              <p className="text-neutral-500 text-[13px] md:text-[15px] font-medium font-['Plus_Jakarta_Sans'] text-center px-4">
+              <p className="text-neutral-500 text-sm font-medium font-['Plus_Jakarta_Sans']">
                 Belum ada foto galeri yang ditambahkan.
               </p>
             </div>
@@ -363,33 +292,28 @@ export default function DetailProyekPage({ params }) {
             delay={0.35}
             className="w-full bg-white rounded-[24px] md:rounded-[48px] px-5 md:px-8 py-6 lg:py-8 flex flex-col gap-4 md:gap-8 shadow-sm border border-neutral-100"
           >
-            <div className="w-full text-left">
+            <header className="w-full text-left">
               <h2 className="text-black text-xl md:text-3xl font-extrabold font-['Plus_Jakarta_Sans']">
                 Sebelum & Sesudah
               </h2>
-              <p className="text-neutral-500 text-sm mt-1">
+              <p className="text-neutral-500 text-sm font-['Plus_Jakarta_Sans'] mt-1">
                 Geser untuk melihat perbandingan
               </p>
-            </div>
+            </header>
             <BeforeAfterSlider
-              beforeSrc={formattedGallery[0].url}
-              afterSrc={formattedGallery[1].url}
-              beforeAlt="Sebelum"
-              afterAlt="Sesudah"
+              beforeSrc={formattedGallery[0]}
+              afterSrc={formattedGallery[1]}
+              beforeAlt="Kondisi Awal"
+              afterAlt="Kondisi Selesai"
             />
           </FadeUp>
         )}
 
         {relatedProjects.length > 0 && (
-          <FadeUp
-            delay={0.4}
-            className="mt-6 md:mt-8 w-full bg-white rounded-[24px] md:rounded-[48px] px-5 md:px-8 py-6 lg:py-8 flex flex-col gap-5 md:gap-8 shadow-sm border border-neutral-100"
-          >
-            <div className="w-full text-left">
-              <h2 className="text-black text-xl md:text-3xl font-extrabold font-['Plus_Jakarta_Sans']">
-                Proyek Lainnya
-              </h2>
-            </div>
+          <aside className="mt-6 md:mt-8 w-full bg-white rounded-[24px] md:rounded-[48px] px-5 md:px-8 py-6 lg:py-8 flex flex-col gap-5 md:gap-8 shadow-sm border border-neutral-100">
+            <h2 className="text-black text-xl md:text-3xl font-extrabold font-['Plus_Jakarta_Sans']">
+              Proyek Serupa
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {relatedProjects.map((proj) => (
                 <Link
@@ -405,19 +329,19 @@ export default function DetailProyekPage({ params }) {
                     />
                   </div>
                   <div className="p-4">
-                    <h3 className="text-sm font-semibold text-neutral-800 line-clamp-2">
+                    <h3 className="text-sm font-semibold text-neutral-800 font-['Plus_Jakarta_Sans'] line-clamp-2">
                       {proj.title}
                     </h3>
-                    <p className="text-xs text-neutral-500 mt-1">
-                      {proj.category || "Proyek"}
+                    <p className="text-xs text-neutral-500 font-['Plus_Jakarta_Sans'] mt-1">
+                      {proj.category || "Infrastruktur"}
                     </p>
                   </div>
                 </Link>
               ))}
             </div>
-          </FadeUp>
+          </aside>
         )}
-      </div>
+      </article>
     </main>
   );
 }

@@ -18,8 +18,9 @@ const FALLBACK = {
 export default function HeroSection({ data }) {
   const hero = data || FALLBACK;
   const [showArrow, setShowArrow] = useState(true);
+  const [activeImage, setActiveImage] = useState(null); // 'left' | 'right' | null
 
-  // Memantau scroll untuk menghilangkan panah
+  // Memantau scroll hanya untuk menghilangkan panah (Parallax dihapus)
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 100) {
@@ -33,7 +34,6 @@ export default function HeroSection({ data }) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Fungsi untuk meluncur ke section berikutnya
   const scrollToNext = () => {
     window.scrollBy({
       top: window.innerHeight,
@@ -43,6 +43,29 @@ export default function HeroSection({ data }) {
 
   return (
     <section className="relative w-full min-h-[100svh] py-[clamp(4rem,10vh,8rem)] bg-[#004282] overflow-hidden flex items-center rounded-b-[64px]">
+      {/* Animasi Kustom CSS untuk efek melayang */}
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+        @keyframes floatUpDown {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-20px); }
+        }
+        .anim-float-1 { animation: floatUpDown 6s ease-in-out infinite; }
+        .anim-float-2 { animation: floatUpDown 7s ease-in-out infinite 1s; }
+      `,
+        }}
+      />
+
+      {/* Layer Transparan Penjaga Klik Luar untuk mengecilkan foto */}
+      {activeImage && (
+        <div
+          className="fixed inset-0 z-40 cursor-pointer"
+          onClick={() => setActiveImage(null)}
+          aria-hidden="true"
+        />
+      )}
+
       <div className="absolute inset-0 z-0">
         <CldImg
           src={hero.imageUrl}
@@ -65,41 +88,92 @@ export default function HeroSection({ data }) {
           <FadeUp delay={0.2}>
             <HeroTitle
               text={hero.title || FALLBACK.title}
-              className="text-white text-[2.25rem] leading-[1.35] md:text-[clamp(2.5rem,5vw,4rem)] md:leading-[1.05] font-serif tracking-tight"
+              className="text-white text-[2rem] leading-[1.3] md:text-[clamp(2.25rem,4vw,3.5rem)] md:leading-[1.15] font-serif tracking-tight"
             />
           </FadeUp>
 
           <FadeUp delay={0.3}>
             <BoldText
               text={hero.description || FALLBACK.description}
-              className="text-white text-[13px] md:text-[15px] font-normal font-['Plus_Jakarta_Sans'] leading-relaxed opacity-90 max-w-lg mt-2"
+              className="text-white text-[13px] md:text-[15px] font-normal font-['Plus_Jakarta_Sans'] leading-relaxed opacity-90 max-w-lg mt-6 md:mt-8"
               as="p"
             />
           </FadeUp>
         </div>
 
-        <FadeUp delay={0.4} className="hidden md:flex gap-5 h-[420px] relative">
-          <div className="w-1/2 h-[85%] mt-8 rounded-xl overflow-hidden shadow-2xl border-[3px] border-white/20">
-            <CldImg
-              src={hero.heroImage2 || "/foto-hero1.svg"}
-              alt="Konstruksi 1"
-              className="w-full h-full object-cover"
-            />
+        {/* Area Foto Kanan */}
+        <FadeUp
+          delay={0.4}
+          className="hidden md:block w-full h-[450px] relative"
+        >
+          {/* FOTO KIRI (85 Derajat -> Dimiringkan -5deg) */}
+          <div
+            className={`absolute transition-all duration-700 ease-out origin-center cursor-pointer ${
+              activeImage === "left"
+                ? "left-[50%] top-[50%] -translate-x-1/2 -translate-y-1/2 z-50" // Membesar di tengah kontainer kanan
+                : activeImage === "right"
+                  ? "opacity-0 scale-90 pointer-events-none left-0 top-[10%] translate-x-0 translate-y-0" // Menghilang saat sebelahnya aktif
+                  : "left-0 top-[10%] translate-x-0 translate-y-0 hover:scale-105 hover:z-30" // Normal (Idle)
+            }`}
+            onClick={() =>
+              setActiveImage(activeImage === "left" ? null : "left")
+            }
+          >
+            {/* Animasi melayang di-nonaktifkan saat di-klik agar diam sempurna */}
+            <div className={activeImage === "left" ? "" : "anim-float-1"}>
+              {/* Ukuran diset secara spesifik agar selalu Portrait */}
+              <div
+                className={`rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.3)] border-[3px] border-white/20 transition-all duration-700 ease-out ${
+                  activeImage === "left"
+                    ? "w-[320px] h-[460px] rotate-0"
+                    : "w-[230px] h-[340px] -rotate-[5deg]"
+                }`}
+              >
+                <CldImg
+                  src={hero.heroImage2 || "/foto-hero1.svg"}
+                  alt="Konstruksi 1"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
           </div>
-          <div className="w-1/2 h-[85%] mb-8 rounded-xl overflow-hidden shadow-2xl border-[3px] border-white/20">
-            <CldImg
-              src={hero.heroImage3 || "/foto-hero2.svg"}
-              alt="Konstruksi 2"
-              className="w-full h-full object-cover"
-            />
+
+          {/* FOTO KANAN (100 Derajat -> Dimiringkan +10deg) */}
+          <div
+            className={`absolute transition-all duration-700 ease-out origin-center cursor-pointer ${
+              activeImage === "right"
+                ? "right-[50%] top-[50%] translate-x-1/2 -translate-y-1/2 z-50" // Membesar di tengah
+                : activeImage === "left"
+                  ? "opacity-0 scale-90 pointer-events-none right-0 top-[15%] translate-x-0 translate-y-0"
+                  : "right-0 top-[15%] translate-x-0 translate-y-0 hover:scale-105 hover:z-30"
+            }`}
+            onClick={() =>
+              setActiveImage(activeImage === "right" ? null : "right")
+            }
+          >
+            <div className={activeImage === "right" ? "" : "anim-float-2"}>
+              <div
+                className={`rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.3)] border-[3px] border-white/20 transition-all duration-700 ease-out ${
+                  activeImage === "right"
+                    ? "w-[320px] h-[460px] rotate-0"
+                    : "w-[230px] h-[340px] rotate-[10deg]"
+                }`}
+              >
+                <CldImg
+                  src={hero.heroImage3 || "/foto-hero2.svg"}
+                  alt="Konstruksi 2"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
           </div>
         </FadeUp>
       </div>
 
-      {/* Tanda Panah Interaktif */}
       <div
-        className={`absolute bottom-8 left-1/2 -translate-x-1/2 z-20 transition-opacity duration-500 ${showArrow ? "opacity-100" : "opacity-0 pointer-events-none"
-          }`}
+        className={`absolute bottom-8 left-1/2 -translate-x-1/2 z-20 transition-opacity duration-500 ${
+          showArrow ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
       >
         <button
           onClick={scrollToNext}
@@ -117,7 +191,7 @@ export default function HeroSection({ data }) {
               strokeLinejoin="round"
               strokeWidth="2.5"
               d="M19 14l-7 7m0 0l-7-7m7 7V3"
-            ></path>
+            />
           </svg>
         </button>
       </div>

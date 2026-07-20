@@ -7,6 +7,13 @@ import { getAllSettings } from "@/lib/data";
 
 export const revalidate = 3600;
 
+// INJEKSI METADATA
+export const metadata = {
+  title: "Tentang Kami",
+  description:
+    "Pelajari visi, misi, dan nilai-nilai inti dari PT Sinar Cerah Sempurna dalam membangun infrastruktur berkualitas di Indonesia.",
+};
+
 export default async function TentangKamiPage() {
   const [heroes, abouts, settings] = await Promise.all([
     prisma.hero.findMany({ where: { page: "about", isActive: true } }),

@@ -3,6 +3,13 @@ import BeritaClientView from "@/components/views/berita/BeritaClientView";
 
 export const revalidate = 1800;
 
+// INJEKSI METADATA
+export const metadata = {
+  title: "Berita & Inovasi",
+  description:
+    "Kabar terbaru, perkembangan proyek, dan inovasi terkini dari PT Sinar Cerah Sempurna.",
+};
+
 export default async function BeritaPage() {
   const [heroes, news] = await Promise.all([
     prisma.hero.findMany({ where: { page: "news", isActive: true } }),

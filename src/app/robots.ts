@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://sinarcerahsempurna.com";
+// KOREKSI: Samakan dengan ENV di layout.jsx
+const BASE_URL =
+  process.env.NEXT_PUBLIC_APP_URL || "https://sinarcerahsempurna.com";
 
 export default function robots(): MetadataRoute.Robots {
   return {

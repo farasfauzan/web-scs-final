@@ -7,11 +7,25 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
-function generateSlug(title: string): string {
+function generateSeoSlug(title: string): string {
   return title
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "") // Hapus karakter selain huruf, angka, spasi, dan dash
+    .replace(/[\s_-]+/g, "-") // Ganti spasi/underscore dengan single dash
+    .replace(/^-+|-+$/g, ""); // Hapus dash di awal atau akhir string
+}
+
+async function getUniqueSlug(baseSlug: string): Promise<string> {
+  let slug = baseSlug;
+  let counter = 1;
+
+  while (await prisma.project.findUnique({ where: { slug } })) {
+    slug = `${baseSlug}-${counter}`;
+    counter++;
+  }
+
+  return slug;
 }
 
 async function main() {
@@ -19,33 +33,35 @@ async function main() {
     where: { slug: null },
   });
 
-  console.log(`Found ${projects.length} projects without slugs`);
+  if (projects.length === 0) {
+    console.log("✅ Tidak ada proyek yang membutuhkan backfill slug.");
+    return;
+  }
+
+  console.log(
+    `Menemukan ${projects.length} proyek tanpa slug. Memulai sinkronisasi...`,
+  );
 
   for (const project of projects) {
-    let slug = generateSlug(project.title);
-
-    // Ensure uniqueness by appending a number if needed
-    let counter = 1;
-    let baseSlug = slug;
-    while (await prisma.project.findUnique({ where: { slug } })) {
-      slug = `${baseSlug}-${counter}`;
-      counter++;
-    }
+    const baseSlug = generateSeoSlug(project.title);
+    const uniqueSlug = await getUniqueSlug(baseSlug);
 
     await prisma.project.update({
       where: { id: project.id },
-      data: { slug },
+      data: { slug: uniqueSlug },
     });
 
-    console.log(`✅ ID:${project.id} "${project.title}" → slug: "${slug}"`);
+    console.log(
+      `[UPDATED] ID: ${project.id} | "${project.title}" → "${uniqueSlug}"`,
+    );
   }
 
-  console.log("✅ All slugs backfilled successfully!");
+  console.log("✅ Seluruh slug berhasil dibuat!");
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error("❌ Terjadi kesalahan saat migrasi:", e);
     process.exit(1);
   })
   .finally(async () => {

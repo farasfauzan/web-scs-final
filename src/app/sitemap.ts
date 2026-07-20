@@ -1,7 +1,9 @@
 import { getProjects, getNews } from "@/lib/data";
 import { encodeId } from "@/lib/encode-id";
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://sinarcerahsempurna.com";
+// KOREKSI: Samakan dengan ENV di layout.jsx
+const BASE_URL =
+  process.env.NEXT_PUBLIC_APP_URL || "https://sinarcerahsempurna.com";
 
 export default async function sitemap() {
   // Static pages

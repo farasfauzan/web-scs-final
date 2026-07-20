@@ -1,8 +1,6 @@
 "use client";
 
 import Link from "next/link";
-// CldImg dicabut dari sini karena kita akan menggunakan tag <img> bawaan Next/React untuk SVG statis dari folder public agar lebih cepat.
-import Image from "next/image";
 
 export default function Footer({ settings = {} }) {
   const youtubeUrl =
@@ -35,7 +33,6 @@ export default function Footer({ settings = {} }) {
       <div className="page-container-wide flex flex-col md:flex-row justify-between gap-10 md:gap-6 mb-4">
         <div className="flex flex-col gap-3 max-w-xs">
           <div className="flex items-center gap-3">
-            {/* Logo SCS dibiarkan menggunakan img/Image bawaan karena statis */}
             <img
               src="/logo-scs.svg"
               alt="Logo SCS"
@@ -52,7 +49,6 @@ export default function Footer({ settings = {} }) {
             {footerDescription}
           </p>
 
-          {/* KOREKSI: Ikon hitam lama diganti dengan aset SVG baru bermotif "*-footer.svg" */}
           <div className="flex gap-4 mt-3 items-center">
             <a
               href={youtubeUrl}
