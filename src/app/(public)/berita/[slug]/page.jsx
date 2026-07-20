@@ -16,7 +16,7 @@ export default function DetailBeritaPage({ params }) {
       .then((data) => {
         if (data.news) setNews(data.news);
       })
-      .catch(() => {})
+      .catch((err) => { console.warn("Failed to fetch news:", err); })
       .finally(() => setIsLoading(false));
   }, [slug]);
 
@@ -38,7 +38,7 @@ export default function DetailBeritaPage({ params }) {
         if (parsed && typeof parsed === "object" && parsed.url) {
           return { url: parsed.url, caption: parsed.caption || "" };
         }
-      } catch {}
+      } catch (err) { console.warn("Failed to parse gallery item:", err); }
       return { url: item, caption: "" };
     }
     return { url: item.url || "", caption: item.caption || "" };

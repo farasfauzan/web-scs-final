@@ -11,20 +11,20 @@ const COOKIE_NAME = "scs_admin_token";
 // In-memory rate limiter untuk login attempts
 const loginAttempts = new Map();
 
-// Bersihkan entry yang expired setiap 5 menit
-setInterval(() => {
+const MAX_LOGIN_ATTEMPTS = 3;
+const LOGIN_COOLDOWN_MS = 1 * 60 * 1000; // 1 menit
+
+function cleanExpired() {
   const now = Date.now();
   for (const [key, data] of loginAttempts.entries()) {
     if (now > data.expiresAt) {
       loginAttempts.delete(key);
     }
   }
-}, 5 * 60 * 1000);
-
-const MAX_LOGIN_ATTEMPTS = 3;
-const LOGIN_COOLDOWN_MS = 1 * 60 * 1000; // 1 menit
+}
 
 export function checkLoginRateLimit(username, ip) {
+  cleanExpired();
   const key = `${username}:${ip}`;
   const now = Date.now();
   const record = loginAttempts.get(key);
@@ -47,6 +47,7 @@ export function checkLoginRateLimit(username, ip) {
 }
 
 export function recordLoginAttempt(username, ip, success) {
+  cleanExpired();
   const key = `${username}:${ip}`;
   const now = Date.now();
   

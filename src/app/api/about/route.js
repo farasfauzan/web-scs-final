@@ -7,6 +7,7 @@ export async function GET() {
     const abouts = await prisma.about.findMany({ orderBy: { createdAt: "desc" } });
     return NextResponse.json({ abouts });
   } catch (error) {
+    console.error("API /api/about GET error:", error);
     return NextResponse.json({ error: "Failed to fetch abouts" }, { status: 500 });
   }
 }
@@ -21,6 +22,7 @@ export async function POST(request) {
     const about = await prisma.about.create({ data });
     return NextResponse.json({ about }, { status: 201 });
   } catch (error) {
+    console.error("API /api/about POST error:", error);
     return NextResponse.json({ error: "Failed to create about" }, { status: 500 });
   }
 }

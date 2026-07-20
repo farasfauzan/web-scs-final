@@ -154,8 +154,8 @@ export async function POST(request) {
       // Fallback ke nodemailer
       try {
         // Hapus fromEmail dari payload untuk Nodemailer — dia pakai SMTP_USER sendiri
-    const { fromEmail: _, ...nodemailerPayload } = emailPayload;
-    await sendViaNodemailer(nodemailerPayload);
+        const { fromEmail: _, ...nodemailerPayload } = emailPayload;
+        await sendViaNodemailer(nodemailerPayload);
         console.log("✅ Contact email sent via nodemailer (fallback)");
       } catch (nodemailerErr) {
         console.error("❌ Nodemailer juga gagal:", nodemailerErr);

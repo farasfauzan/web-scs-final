@@ -7,6 +7,7 @@ export async function GET() {
     const partners = await prisma.partner.findMany({ orderBy: { createdAt: "desc" } });
     return NextResponse.json({ partners });
   } catch (error) {
+    console.error("API /api/partners GET error:", error);
     return NextResponse.json({ error: "Failed to fetch partners" }, { status: 500 });
   }
 }
@@ -21,6 +22,7 @@ export async function POST(request) {
     const partner = await prisma.partner.create({ data });
     return NextResponse.json({ partner }, { status: 201 });
   } catch (error) {
+    console.error("API /api/partners POST error:", error);
     return NextResponse.json({ error: "Failed to create partner" }, { status: 500 });
   }
 }

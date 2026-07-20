@@ -17,7 +17,7 @@ export default function VisitorTracker() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({}),
-        }).catch(() => {}); // Tangkap error secara diam-diam agar tidak mengotori console
+        }).catch((err) => { console.warn("Visitor tracking fallback failed:", err); }); // Tangkap error secara diam-diam agar tidak mengotori console
       }
     };
 

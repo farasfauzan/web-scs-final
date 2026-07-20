@@ -13,6 +13,7 @@ export async function GET(request, { params }) {
     if (!project) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json({ project });
   } catch (error) {
+    console.error("API /api/projects/[id] GET error:", error);
     return NextResponse.json({ error: "Failed to fetch project" }, { status: 500 });
   }
 }
@@ -52,6 +53,7 @@ export async function PUT(request, { params }) {
     });
     return NextResponse.json({ project });
   } catch (error) {
+    console.error("API /api/projects/[id] PUT error:", error);
     return NextResponse.json({ error: "Failed to update project" }, { status: 500 });
   }
 }
@@ -75,6 +77,7 @@ export async function DELETE(request, { params }) {
     await prisma.project.delete({ where: { id: Number(realId) } });
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error("API /api/projects/[id] DELETE error:", error);
     return NextResponse.json({ error: "Failed to delete project" }, { status: 500 });
   }
 }

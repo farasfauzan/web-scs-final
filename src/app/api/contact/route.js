@@ -7,6 +7,7 @@ export async function GET() {
     const contacts = await prisma.contact.findMany({ orderBy: { createdAt: "asc" } });
     return NextResponse.json({ contacts });
   } catch (error) {
+    console.error("API /api/contact GET error:", error);
     return NextResponse.json({ error: "Failed to fetch contacts" }, { status: 500 });
   }
 }
@@ -21,6 +22,7 @@ export async function POST(request) {
     const contact = await prisma.contact.create({ data });
     return NextResponse.json({ contact }, { status: 201 });
   } catch (error) {
+    console.error("API /api/contact POST error:", error);
     return NextResponse.json({ error: "Failed to create contact" }, { status: 500 });
   }
 }

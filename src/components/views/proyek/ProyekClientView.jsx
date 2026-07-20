@@ -1,5 +1,5 @@
 "use client";
-import { useState, Suspense } from "react";
+import { useState, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import FadeUp from "@/components/ui/FadeUp";
 import ProjectCard from "@/components/shared/ProjectCard";
@@ -45,6 +45,7 @@ function ProyekInteractive({ initialProjects }) {
   const [activeFilter, setActiveFilter] = useState("Semua");
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const timeoutRef = useRef(null);
 
   const categories = [
     "Semua",
@@ -85,9 +86,10 @@ function ProyekInteractive({ initialProjects }) {
 
   const handleFilterChange = (cat) => {
     if (cat === activeFilter) return;
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
     setIsLoading(true);
     setActiveFilter(cat);
-    setTimeout(() => setIsLoading(false), 300);
+    timeoutRef.current = setTimeout(() => setIsLoading(false), 300);
   };
 
   return (

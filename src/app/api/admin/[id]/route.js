@@ -19,6 +19,7 @@ export async function GET(request, { params }) {
 
     return NextResponse.json({ admin });
   } catch (error) {
+    console.error("API /api/admin/[id] GET error:", error);
     return NextResponse.json({ error: "Failed to fetch admin" }, { status: 500 });
   }
 }
@@ -60,6 +61,7 @@ export async function PUT(request, { params }) {
 
     return NextResponse.json({ admin });
   } catch (error) {
+    console.error("API /api/admin/[id] PUT error:", error);
     return NextResponse.json({ error: "Failed to update admin" }, { status: 500 });
   }
 }
@@ -87,6 +89,7 @@ export async function DELETE(request, { params }) {
     await prisma.admin.delete({ where: { id: Number(id) } });
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error("API /api/admin/[id] DELETE error:", error);
     return NextResponse.json({ error: "Failed to delete admin" }, { status: 500 });
   }
 }

@@ -118,7 +118,7 @@ export default function GalleryUpload({
     const currentItem = newImages[index];
 
     // Pastikan data lama (string) dikonversi ke object sebelum diubah
-    if (typeof currentItem === "string") {
+    if (currentItem && typeof currentItem === "string") {
       newImages[index] = { url: currentItem, caption: newCaption };
     } else {
       newImages[index] = { ...currentItem, caption: newCaption };

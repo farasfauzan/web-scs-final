@@ -8,7 +8,7 @@
 const KEY = 7351; // bilangan prima acak
 
 export function encodeId(id) {
-  if (id == null || id === 0) return "0";
+  if (id === null || id === undefined || id === 0) return "0";
   return (Number(id) * KEY).toString(36);
 }
 

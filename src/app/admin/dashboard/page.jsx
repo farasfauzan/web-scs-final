@@ -35,7 +35,10 @@ export default function AdminDashboard() {
         const safeFetch = (url) =>
           fetch(url)
             .then((res) => res.json())
-            .catch(() => ({}));
+            .catch((err) => {
+              console.warn(`Dashboard fetch error [${url}]:`, err);
+              return {};
+            });
 
         const [
           heroes,

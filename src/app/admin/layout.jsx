@@ -107,7 +107,7 @@ export default function AdminLayout({ children }) {
           router.push("/admin/login");
         }
       })
-      .catch(() => router.push("/admin/login"))
+      .catch((err) => { console.warn("Auth check failed:", err); router.push("/admin/login"); })
       .finally(() => setLoading(false));
   }, [isLoginPage, router]);
 

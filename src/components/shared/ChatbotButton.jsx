@@ -799,6 +799,7 @@ export default function ChatbotButton({ settings = {} }) {
 
   const messagesEndRef = useRef(null);
   const inactivityTimerRef = useRef(null);
+  const chatTimeoutsRef = useRef([]);
 
   const langRef = useRef(lang);
   useEffect(() => {
@@ -811,6 +812,13 @@ export default function ChatbotButton({ settings = {} }) {
   }, [isOpen]);
 
   useEffect(() => {
+    return () => {
+      chatTimeoutsRef.current.forEach(clearTimeout);
+      chatTimeoutsRef.current = [];
+    };
+  }, []);
+
+  useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping, feedbackState, activeTopic]);
 
@@ -821,7 +829,7 @@ export default function ChatbotButton({ settings = {} }) {
     setFeedbackState((prev) => {
       if (prev !== "none") return prev;
 
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         setMessages((msgs) => {
           if (msgs.some((m) => m.type === "feedback_prompt")) return msgs;
 
@@ -842,6 +850,7 @@ export default function ChatbotButton({ settings = {} }) {
           setHasUnread(true);
         }
       }, delay);
+      chatTimeoutsRef.current.push(timeoutId);
 
       return "prompted";
     });
@@ -853,9 +862,11 @@ export default function ChatbotButton({ settings = {} }) {
     const userHasInteracted = messages.some((m) => m.type === "user");
 
     if (userHasInteracted && feedbackState === "none") {
-      inactivityTimerRef.current = setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         triggerFeedback(0);
       }, 180000);
+      inactivityTimerRef.current = timeoutId;
+      chatTimeoutsRef.current.push(timeoutId);
     }
 
     return () => clearTimeout(inactivityTimerRef.current);
@@ -882,7 +893,7 @@ export default function ChatbotButton({ settings = {} }) {
     const textLength = responseObj.text.length;
     const delay = Math.min(400 + textLength * 2, 1500);
 
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       setIsTyping(false);
       setMessages((prev) => [
         ...prev,
@@ -895,6 +906,7 @@ export default function ChatbotButton({ settings = {} }) {
         },
       ]);
     }, delay);
+    chatTimeoutsRef.current.push(timeoutId);
   };
 
   const processUserInput = (text) => {
@@ -915,7 +927,8 @@ export default function ChatbotButton({ settings = {} }) {
       });
       setFeedbackState("done");
       sendFeedbackToAdmin("negative_suggestion", text);
-      setTimeout(() => setShowFaq(true), 1800);
+      const timeoutId1 = setTimeout(() => setShowFaq(true), 1800);
+      chatTimeoutsRef.current.push(timeoutId1);
       return;
     }
 
@@ -923,7 +936,8 @@ export default function ChatbotButton({ settings = {} }) {
     addBotMessage(responseData);
 
     setActiveTopic(responseData.topic);
-    setTimeout(() => setShowFaq(true), 1800);
+    const timeoutId2 = setTimeout(() => setShowFaq(true), 1800);
+    chatTimeoutsRef.current.push(timeoutId2);
 
     const isEndOfBranch =
       responseData.topic !== "default" && !FAQ_TREE[responseData.topic];

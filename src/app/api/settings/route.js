@@ -13,6 +13,7 @@ export async function GET() {
     }
     return NextResponse.json({ settings, settingsMap });
   } catch (error) {
+    console.error("API /api/settings GET error:", error);
     return NextResponse.json({ error: "Failed to fetch settings" }, { status: 500 });
   }
 }
@@ -34,6 +35,7 @@ export async function POST(request) {
 
     return NextResponse.json({ setting }, { status: 201 });
   } catch (error) {
+    console.error("API /api/settings POST error:", error);
     return NextResponse.json({ error: "Failed to save setting" }, { status: 500 });
   }
 }

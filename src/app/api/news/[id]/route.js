@@ -13,6 +13,7 @@ export async function GET(request, { params }) {
     if (!news) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json({ news });
   } catch (error) {
+    console.error("API /api/news/[id] GET error:", error);
     return NextResponse.json({ error: "Failed to fetch news" }, { status: 500 });
   }
 }
@@ -52,6 +53,7 @@ export async function PUT(request, { params }) {
     });
     return NextResponse.json({ news });
   } catch (error) {
+    console.error("API /api/news/[id] PUT error:", error);
     return NextResponse.json({ error: "Failed to update news" }, { status: 500 });
   }
 }
@@ -75,6 +77,7 @@ export async function DELETE(request, { params }) {
     await prisma.news.delete({ where: { id: Number(realId) } });
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error("API /api/news/[id] DELETE error:", error);
     return NextResponse.json({ error: "Failed to delete news" }, { status: 500 });
   }
 }

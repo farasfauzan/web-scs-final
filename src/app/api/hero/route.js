@@ -10,6 +10,7 @@ export async function GET(request) {
     const heroes = await prisma.hero.findMany({ where, orderBy: { createdAt: "desc" } });
     return NextResponse.json({ heroes });
   } catch (error) {
+    console.error("API /api/hero GET error:", error);
     return NextResponse.json({ error: "Failed to fetch heroes" }, { status: 500 });
   }
 }
@@ -24,6 +25,7 @@ export async function POST(request) {
     const hero = await prisma.hero.create({ data });
     return NextResponse.json({ hero }, { status: 201 });
   } catch (error) {
+    console.error("API /api/hero POST error:", error);
     return NextResponse.json({ error: "Failed to create hero" }, { status: 500 });
   }
 }
