@@ -59,12 +59,15 @@ export default function DetailProyekPage({ params }) {
     project.gallery || project.images || project.galleryImages || [];
   const formattedGallery = rawGallery.map((item) => {
     if (typeof item === "string") {
-      try {
-        const parsed = JSON.parse(item);
-        if (parsed && typeof parsed === "object" && parsed.url) {
-          return { url: parsed.url, caption: parsed.caption || "" };
-        }
-      } catch {}
+      // Hanya coba parse JSON jika string diawali '{' atau '['
+      if (item.startsWith('{') || item.startsWith('[')) {
+        try {
+          const parsed = JSON.parse(item);
+          if (parsed && typeof parsed === "object" && parsed.url) {
+            return { url: parsed.url, caption: parsed.caption || "" };
+          }
+        } catch {}
+      }
       return { url: item, caption: "" };
     }
     return { url: item.url || "", caption: item.caption || "" };
@@ -211,40 +214,57 @@ export default function DetailProyekPage({ params }) {
             </div>
 
             <div className="w-full aspect-video md:aspect-auto md:h-[260px] rounded-xl md:rounded-2xl overflow-hidden relative bg-zinc-200 shadow-inner border border-neutral-100">
-              {project.mapsUrl ? (
-                <iframe
-                  src={project.mapsUrl}
-                  className="w-full h-full border-0 absolute inset-0"
-                  allowFullScreen=""
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                ></iframe>
-              ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-100 gap-3">
-                  <svg
-                    className="w-6 h-6 md:w-8 md:h-8 text-neutral-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                  </svg>
-                  <span className="text-[12px] md:text-[13px] text-neutral-500 font-medium font-['Montserrat']">
-                    Peta tidak tersedia
-                  </span>
-                </div>
-              )}
+              {(() => {
+                const url = project.mapsUrl?.trim();
+                if (!url) {
+                  return (
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-100 gap-3">
+                      <svg className="w-6 h-6 md:w-8 md:h-8 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      <span className="text-[12px] md:text-[13px] text-neutral-500 font-medium font-['Montserrat']">Peta tidak tersedia</span>
+                    </div>
+                  );
+                }
+                // Cek apakah URL adalah Google Maps Embed link
+                const isEmbed =
+                  url.includes('/embed/') ||
+                  url.includes('google.com/maps/embed');
+                if (isEmbed) {
+                  return (
+                    <iframe
+                      src={url}
+                      className="w-full h-full border-0 absolute inset-0"
+                      allowFullScreen=""
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                    ></iframe>
+                  );
+                }
+                // Bukan embed — tampilkan tombol buka di Google Maps
+                return (
+                  <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-100 gap-3 p-6">
+                    <svg className="w-8 h-8 md:w-10 md:h-10 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                    </svg>
+                    <span className="text-[12px] md:text-[13px] text-neutral-600 font-medium font-['Montserrat'] text-center">
+                      Lihat lokasi proyek di Google Maps
+                    </span>
+                    <a
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 bg-blue-600 text-white text-[12px] md:text-[13px] font-semibold px-5 py-2.5 rounded-full hover:bg-blue-700 transition-colors shadow-sm"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                      Buka Google Maps
+                    </a>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </FadeUp>

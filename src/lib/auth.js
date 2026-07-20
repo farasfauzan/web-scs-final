@@ -147,7 +147,7 @@ export async function requireAuth(request) {
 
 export async function requireAdminRole(request) {
   const payload = await requireAuth(request);
-  if (!payload) {
+  if (!payload || payload.role !== "ADMIN") {
     return null;
   }
   return payload;
