@@ -37,11 +37,14 @@ export default function EditProjectPage() {
           imageUrl: p.imageUrl || "",
           galleryImages: (p.galleryImages || []).map((item) => {
             if (typeof item === "string") {
-              try {
-                const parsed = JSON.parse(item);
-                if (parsed && typeof parsed === "object" && parsed.url)
-                  return parsed;
-              } catch {}
+              // Hanya coba parse JSON jika string diawali '{' atau '['
+              if (item.startsWith('{') || item.startsWith('[')) {
+                try {
+                  const parsed = JSON.parse(item);
+                  if (parsed && typeof parsed === "object" && parsed.url)
+                    return parsed;
+                } catch {}
+              }
               return { url: item, caption: "" };
             }
             return item;
@@ -141,9 +144,22 @@ export default function EditProjectPage() {
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004282] text-sm" />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Maps URL (Google Maps Embed Link)</label>
-            <input type="text" name="mapsUrl" value={form.mapsUrl} onChange={handleChange} placeholder="https://maps.google.com/..."
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Maps URL (Google Maps)</label>
+            <input type="text" name="mapsUrl" value={form.mapsUrl} onChange={handleChange} placeholder="https://maps.app.goo.gl/... atau https://www.google.com/maps/embed?..."
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004282] text-sm" />
+            {form.mapsUrl && (() => {
+              const isEmbed = form.mapsUrl.includes('/embed/') || form.mapsUrl.includes('google.com/maps/embed');
+              return (
+                <div className={`mt-2 flex items-center gap-2 text-xs font-medium px-3 py-2 rounded-lg ${
+                  isEmbed
+                    ? 'bg-green-50 text-green-700 border border-green-200'
+                    : 'bg-blue-50 text-blue-700 border border-blue-200'
+                }`}>
+                  <span className="text-base">{isEmbed ? '🗺️' : '🔗'}</span>
+                  <span>Akan ditampilkan sebagai <strong>{isEmbed ? 'peta interaktif (iframe)' : 'tombol buka Google Maps'}</strong></span>
+                </div>
+              );
+            })()}
           </div>
         </div>
 

@@ -97,6 +97,10 @@ export default function AdminLayout({ children }) {
       .then((res) => res.json())
       .then((data) => {
         if (data.admin) {
+          if (data.admin.role !== "ADMIN") {
+            router.push("/admin/login");
+            return;
+          }
           setAdmin(data.admin);
         } else {
           router.push("/admin/login");

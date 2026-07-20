@@ -32,11 +32,14 @@ export default function EditNewsPage() {
           imageUrl: n.imageUrl || "",
           galleryImages: (n.galleryImages || []).map((item) => {
             if (typeof item === "string") {
-              try {
-                const parsed = JSON.parse(item);
-                if (parsed && typeof parsed === "object" && parsed.url)
-                  return parsed;
-              } catch {}
+              // Hanya coba parse JSON jika string diawali '{' atau '['
+              if (item.startsWith('{') || item.startsWith('[')) {
+                try {
+                  const parsed = JSON.parse(item);
+                  if (parsed && typeof parsed === "object" && parsed.url)
+                    return parsed;
+                } catch {}
+              }
               return { url: item, caption: "" };
             }
             return item;

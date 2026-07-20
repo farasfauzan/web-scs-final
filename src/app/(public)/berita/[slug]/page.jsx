@@ -33,12 +33,15 @@ export default function DetailBeritaPage({ params }) {
   const rawGallery = news.galleryImages || news.gallery || news.images || [];
   const formattedGallery = rawGallery.map((item) => {
     if (typeof item === "string") {
-      try {
-        const parsed = JSON.parse(item);
-        if (parsed && typeof parsed === "object" && parsed.url) {
-          return { url: parsed.url, caption: parsed.caption || "" };
-        }
-      } catch (err) { console.warn("Failed to parse gallery item:", err); }
+      // Hanya coba parse JSON jika string diawali '{' atau '['
+      if (item.startsWith('{') || item.startsWith('[')) {
+        try {
+          const parsed = JSON.parse(item);
+          if (parsed && typeof parsed === "object" && parsed.url) {
+            return { url: parsed.url, caption: parsed.caption || "" };
+          }
+        } catch {}
+      }
       return { url: item, caption: "" };
     }
     return { url: item.url || "", caption: item.caption || "" };
