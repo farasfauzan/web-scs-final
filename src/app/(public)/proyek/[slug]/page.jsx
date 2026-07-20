@@ -16,32 +16,39 @@ export default function DetailProyekPage({ params }) {
 
   useEffect(() => {
     (async () => {
+      let fetchedProject = null;
+
       try {
         // First, try fetching by slug
         const slugRes = await fetch(`/api/projects/slug/${slug}`);
         const slugData = await slugRes.json();
         if (slugData.project) {
-          setProject(slugData.project);
-          return;
+          fetchedProject = slugData.project;
+          setProject(fetchedProject);
+        } else {
+          // Fallback: try fetching by encoded ID (backward compat)
+          const idRes = await fetch(`/api/projects/${slug}`);
+          const idData = await idRes.json();
+          if (idData.project) {
+            fetchedProject = idData.project;
+            setProject(fetchedProject);
+          }
         }
-        // Fallback: try fetching by encoded ID (backward compat)
-        const idRes = await fetch(`/api/projects/${slug}`);
-        const idData = await idRes.json();
-        if (idData.project) setProject(idData.project);
       } catch {}
 
-      try {
-        const relatedRes = await fetch(`/api/projects?category=${encodeURIComponent(project.category || "")}`);
-        const relatedData = await relatedRes.json();
-        const filtered = (relatedData.projects || []).filter(p => p.id !== project.id && p.slug !== project.slug);
-        setRelatedProjects(filtered.slice(0, 3));
-      } catch (err) {
-        console.warn("Failed to fetch related projects:", err);
+      // Fetch related projects only if we got a project
+      if (fetchedProject) {
+        try {
+          const relatedRes = await fetch(`/api/projects?category=${encodeURIComponent(fetchedProject.category || "")}`);
+          const relatedData = await relatedRes.json();
+          const filtered = (relatedData.projects || []).filter(p => p.id !== fetchedProject.id && p.slug !== fetchedProject.slug);
+          setRelatedProjects(filtered.slice(0, 3));
+        } catch (err) {
+          console.warn("Failed to fetch related projects:", err);
+        }
       }
 
-      finally {
-        setIsLoading(false);
-      }
+      setIsLoading(false);
     })();
   }, [slug]);
 

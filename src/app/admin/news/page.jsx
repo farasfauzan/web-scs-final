@@ -81,6 +81,7 @@ export default function NewsListPage() {
                 Manage news and announcements
               </p>
             </div>
+          </div>
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
