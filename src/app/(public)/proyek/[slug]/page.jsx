@@ -6,19 +6,30 @@ import CldImg from "@/components/shared/CldImg";
 import InteractiveGallery from "@/components/ui/InteractiveGallery";
 
 export default function DetailProyekPage({ params }) {
-  const { id } = React.use(params);
+  const { slug } = React.use(params);
   const [project, setProject] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`/api/projects/${id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.project) setProject(data.project);
-      })
-      .catch(() => {})
-      .finally(() => setIsLoading(false));
-  }, [id]);
+    (async () => {
+      try {
+        // First, try fetching by slug
+        const slugRes = await fetch(`/api/projects/slug/${slug}`);
+        const slugData = await slugRes.json();
+        if (slugData.project) {
+          setProject(slugData.project);
+          return;
+        }
+        // Fallback: try fetching by encoded ID (backward compat)
+        const idRes = await fetch(`/api/projects/${slug}`);
+        const idData = await idRes.json();
+        if (idData.project) setProject(idData.project);
+      } catch {}
+      finally {
+        setIsLoading(false);
+      }
+    })();
+  }, [slug]);
 
   if (isLoading) return <div className="min-h-screen bg-zinc-100" />;
   if (!project) {

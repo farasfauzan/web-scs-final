@@ -66,6 +66,7 @@ model About {
 
 model Project {
   id            Int      @id @default(autoincrement())
+  slug          String?  @unique
   title         String
   description   String
   category      String   @default("Lainnya")

@@ -38,10 +38,10 @@ export default async function sitemap() {
     },
   ];
 
-  // Dynamic project pages (using encoded ID)
+  // Dynamic project pages (using slug, fallback to encoded ID)
   const projects = await getProjects();
   const projectPages = projects.map((project) => ({
-    url: `${BASE_URL}/proyek/${encodeId(project.id)}`,
+    url: `${BASE_URL}/proyek/${project.slug || encodeId(project.id)}`,
     lastModified: project.updatedAt,
     changeFrequency: "monthly" as const,
     priority: 0.6,

@@ -10,9 +10,13 @@ const CATEGORIES = ["Rumah Sakit", "Gedung Pendidikan", "Pusat Perbelanjaan", "F
 
 export default function CreateProjectPage() {
   const router = useRouter();
-  const [form, setForm] = useState({ title: "", description: "", category: "Lainnya", location: "", mapsUrl: "", client: "", imageUrl: "", galleryImages: [], completedDate: "", isActive: true });
+  const [form, setForm] = useState({ slug: "", title: "", description: "", category: "Lainnya", location: "", mapsUrl: "", client: "", imageUrl: "", galleryImages: [], completedDate: "", isActive: true });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const generateSlug = (title) => {
+    return title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,7 +34,13 @@ export default function CreateProjectPage() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setForm((prev) => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
+    setForm((prev) => {
+      const updated = { ...prev, [name]: type === "checkbox" ? checked : value };
+      if (name === "title") {
+        updated.slug = generateSlug(value);
+      }
+      return updated;
+    });
   };
 
   return (
@@ -60,6 +70,14 @@ export default function CreateProjectPage() {
           <label className="block text-sm font-semibold text-gray-700 mb-1">Description *</label>
           <textarea name="description" value={form.description} onChange={handleChange} rows={3} required
             className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004282] text-sm resize-none" />
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Slug</label>
+          <input type="text" name="slug" value={form.slug} onChange={handleChange} required
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 text-sm cursor-not-allowed"
+            readOnly />
+          <p className="text-xs text-gray-500 mt-1">Otomatis terisi dari judul. Tidak perlu diisi manual.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
