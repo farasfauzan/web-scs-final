@@ -10,14 +10,9 @@ export default function SearchBar() {
   const [term, setTerm] = useState(searchParams.get("q")?.toString() || "");
 
   useEffect(() => {
-    // 1. Ambil nilai query 'q' dari URL saat ini
     const currentQuery = searchParams.get("q") || "";
-
-    // 2. GUARD CLAUSE (KUNCI PERBAIKAN):
-    // Hentikan eksekusi jika input state 'term' sudah sama dengan parameter URL.
     if (term === currentQuery) return;
 
-    // 3. Jalankan Debounce jika ada perbedaan
     const delayDebounceFn = setTimeout(() => {
       const params = new URLSearchParams(searchParams.toString());
       if (term) {
@@ -35,13 +30,17 @@ export default function SearchBar() {
   return (
     <div className="bg-white rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.08)] p-1.5 md:p-2 w-full max-w-7xl border border-neutral-100 flex">
       <input
-        type="text"
+        type="search"
+        aria-label="Cari Berita"
         placeholder="Cari Berita..."
         value={term}
         onChange={(e) => setTerm(e.target.value)}
         className="bg-transparent pl-4 md:pl-6 pr-3 py-2 md:py-2.5 w-full text-sm md:text-base font-['Plus_Jakarta_Sans'] text-neutral-600 focus:outline-none placeholder:text-neutral-400"
       />
-      <button className="cursor-pointer w-10 h-10 md:w-11 md:h-11 rounded-full bg-[#5a67d8] flex items-center justify-center hover:scale-105 transition-transform shrink-0 ml-auto">
+      <button
+        aria-label="Tombol Cari Berita"
+        className="cursor-pointer w-10 h-10 md:w-11 md:h-11 rounded-full bg-[#5a67d8] flex items-center justify-center hover:scale-105 transition-transform shrink-0 ml-auto"
+      >
         <svg
           className="w-4 h-4 md:w-5 md:h-5 text-white"
           fill="none"

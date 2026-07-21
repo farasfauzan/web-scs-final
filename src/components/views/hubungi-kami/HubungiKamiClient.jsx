@@ -61,7 +61,6 @@ export default function HubungiKamiClient({ initialContacts = [] }) {
     } catch (err) {
       setFormStatus({ type: "error", text: err.message });
     } finally {
-      // KOREKSI: Typo 'finaly' diperbaiki menjadi 'finally'
       setSending(false);
     }
   };
@@ -77,7 +76,7 @@ export default function HubungiKamiClient({ initialContacts = [] }) {
       <div className="absolute inset-0 z-0">
         <CldImg
           src="/hero-bg.svg"
-          alt=""
+          alt="Latar Belakang Form Hubungi Kami"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-[#004282]/85"></div>
@@ -99,7 +98,10 @@ export default function HubungiKamiClient({ initialContacts = [] }) {
               <h2 className="text-white text-lg md:text-xl font-bold mb-4 md:mb-5">
                 Kirimkan Pesan
               </h2>
-              <form onSubmit={handleSubmit} className="flex flex-col gap-3 md:gap-4">
+              <form
+                onSubmit={handleSubmit}
+                className="flex flex-col gap-3 md:gap-4"
+              >
                 {formStatus && (
                   <div
                     className={`px-4 py-3 rounded-lg text-sm font-medium ${formStatus.type === "success" ? "bg-green-500/20 text-green-300 border border-green-400/30" : "bg-red-500/20 text-red-300 border border-red-400/30"}`}
@@ -111,6 +113,7 @@ export default function HubungiKamiClient({ initialContacts = [] }) {
                   <input
                     type="text"
                     name="name"
+                    aria-label="Nama Lengkap"
                     value={form.name}
                     onChange={handleChange}
                     required
@@ -120,6 +123,7 @@ export default function HubungiKamiClient({ initialContacts = [] }) {
                   <input
                     type="email"
                     name="email"
+                    aria-label="Alamat Email"
                     value={form.email}
                     onChange={handleChange}
                     required
@@ -131,6 +135,7 @@ export default function HubungiKamiClient({ initialContacts = [] }) {
                   <input
                     type="tel"
                     name="phone"
+                    aria-label="Nomor Telepon"
                     value={form.phone}
                     onChange={handleChange}
                     className="bg-transparent border border-white/30 rounded-lg p-2.5 text-white text-sm focus:outline-none focus:border-white transition-colors"
@@ -139,6 +144,7 @@ export default function HubungiKamiClient({ initialContacts = [] }) {
                   <input
                     type="text"
                     name="subject"
+                    aria-label="Subjek Pesan"
                     value={form.subject}
                     onChange={handleChange}
                     className="bg-transparent border border-white/30 rounded-lg p-2.5 text-white text-sm focus:outline-none focus:border-white transition-colors"
@@ -148,6 +154,7 @@ export default function HubungiKamiClient({ initialContacts = [] }) {
                 <textarea
                   rows="3"
                   name="message"
+                  aria-label="Tulis pesan Anda"
                   value={form.message}
                   onChange={handleChange}
                   required
@@ -167,7 +174,9 @@ export default function HubungiKamiClient({ initialContacts = [] }) {
 
           <FadeUp delay={0.3} className="w-full">
             <div className="border border-white/20 rounded-xl md:rounded-2xl p-5 md:p-6 flex flex-col justify-center gap-5 md:gap-6 shadow-xl h-full bg-white/10 backdrop-blur-md will-change-transform">
-              <h2 className="text-white text-lg md:text-xl font-bold">Informasi Kontak</h2>
+              <h2 className="text-white text-lg md:text-xl font-bold">
+                Informasi Kontak
+              </h2>
               <ContactItem icon={getContactIcon(address?.type)} title="Alamat">
                 <a
                   href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address?.value || "Jl. Karangrejo Barat No 09, Tinjomoyo, Semarang")}`}

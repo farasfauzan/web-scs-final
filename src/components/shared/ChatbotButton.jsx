@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import CldImg from "@/components/shared/CldImg";
 
 // ═══════════════════════════════════════════════════════════
-// FILTER STOPWORDS (FITUR 1)
+// FILTER STOPWORDS
 // ═══════════════════════════════════════════════════════════
 const STOPWORDS = [
   "dan",
@@ -35,7 +35,7 @@ const STOPWORDS = [
 ];
 
 // ═══════════════════════════════════════════════════════════
-// ALGORITMA ANTI-TYPO (Proteksi Super Ketat)
+// ALGORITMA ANTI-TYPO
 // ═══════════════════════════════════════════════════════════
 function levenshtein(a, b) {
   if (a.length === 0) return b.length;
@@ -61,16 +61,10 @@ function levenshtein(a, b) {
 
 function isFuzzyMatch(word, keyword) {
   if (word === keyword) return true;
-
-  // Jika selisih panjang lebih dari 2 huruf, tolak mentah-mentah
   if (Math.abs(word.length - keyword.length) > 2) return false;
-
-  // MASALAH 1: Proteksi Khusus Kata Pendek (Wajib Sama Persis)
-  // Menghapus .includes() agar "wa" tidak dianggap cocok dengan "kecewa"
   if (word.length <= 3 || keyword.length <= 3) {
     return word === keyword;
   }
-
   const distance = levenshtein(word, keyword);
   const allowedTypos = keyword.length <= 5 ? 1 : 2;
   return distance <= allowedTypos;
@@ -91,16 +85,17 @@ function getDynamicKnowledgeBase(settings, lang = "id") {
     {
       topic: "arti_nama",
       keywords: [
-        "hikari", // EASTER EGG HIKARI DITEMPATKAN DI SINI
+        "hikari",
         "kenapa hikari",
         "arti nama",
         "namamu",
         "siapa hikari",
         "scs pintar",
+        "sinar",
       ],
       answer: {
-        id: "Halo! 'Hikari' adalah namaku yang dulu, diambil dari bahasa Jepang yang artinya 'Cahaya'. 🌟\n\nTapi sekarang, panggil aku **SCS Pintar**, asisten digital resmi PT Sinar Cerah Sempurna yang siap memberikan solusi untukmu! ✨",
-        en: "Hello! 'Hikari' was my old name, taken from Japanese meaning 'Light'. 🌟\n\nBut now, call me **SCS Pintar**, the official digital assistant of PT Sinar Cerah Sempurna ready to provide solutions for you! ✨",
+        id: "Halo! 'Hikari' adalah namaku yang dulu, diambil dari bahasa Jepang yang artinya 'Cahaya'. 🌟\n\nTapi sekarang, panggil aku **Sinar**, asisten digital resmi PT Sinar Cerah Sempurna yang siap memberikan solusi untukmu! ✨",
+        en: "Hello! 'Hikari' was my old name, taken from Japanese meaning 'Light'. 🌟\n\nBut now, call me **Sinar**, the official digital assistant of PT Sinar Cerah Sempurna ready to provide solutions for you! ✨",
       },
     },
     {
@@ -603,12 +598,10 @@ function getDynamicFaq(lang, currentTopic) {
 }
 
 // ═══════════════════════════════════════════════════════════
-// SMART MATCHING ENGINE (Logika Inti Diperbaiki)
+// SMART MATCHING ENGINE
 // ═══════════════════════════════════════════════════════════
 function findBestAnswer(input, knowledgeBase) {
   const lower = input.toLowerCase().replace(/[?!.,]/g, "");
-
-  // MASALAH 4 (Bagian 1): Filter stopwords agar tidak ikut diproses Levenshtein
   const words = lower
     .split(/\s+/)
     .filter((word) => !STOPWORDS.includes(word) && word.length > 0);
@@ -620,25 +613,23 @@ function findBestAnswer(input, knowledgeBase) {
     let score = 0;
 
     for (const keyword of entry.keywords) {
-      // MASALAH 2: Menggunakan Regex \b agar "visi" tidak me-match "televisi"
       const exactMatchRegex = new RegExp("\\b" + keyword + "\\b", "i");
 
       if (exactMatchRegex.test(lower)) {
-        score += 5; // Poin besar jika keyword-nya match sempurna 1 frasa utuh
-        continue; // MASALAH 3: Hentikan pengecekan kata-per-kata di bawahnya agar skor tidak ganda
+        score += 5;
+        continue;
       }
 
-      // Jika tidak match frasa utuh, pecah keyword dan lakukan Fuzzy per kata
       const kwWords = keyword.split(/\s+/);
       for (const kw of kwWords) {
-        if (kw.length < 3) continue; // FITUR 3: Skip keyword < 3 huruf dari proses fuzzy
+        if (kw.length < 3) continue;
 
         for (const word of words) {
-          if (word.length < 3) continue; // FITUR 3: Skip input user < 3 huruf dari proses fuzzy
+          if (word.length < 3) continue;
 
           if (isFuzzyMatch(word, kw)) {
             score += 2;
-            break; // MASALAH 4: Jika 1 kata user sudah match dgn kw ini, stop perulangan agar tidak dihitung dua kali
+            break;
           }
         }
       }
@@ -649,8 +640,6 @@ function findBestAnswer(input, knowledgeBase) {
       bestMatch = entry;
     }
   }
-
-  // FITUR 2: Naikkan threshold dinamis ke skor 4 (Setara dengan 1 frasa utuh ATAU 2 kata typo)
   return bestScore >= 4 ? bestMatch : null;
 }
 
@@ -682,12 +671,12 @@ const GREETINGS = {
   ],
   responses: {
     id: [
-      "Halo! 😊 Saya SCS Pintar. Ada yang bisa saya bantu tentang PT Sinar Cerah Sempurna?",
-      "Hai! 👋 Senang bisa membantu Anda. Mau tanya apa tentang SCS ke SCS Pintar?",
+      "Halo! 😊 Saya Sinar. Ada yang bisa saya bantu tentang PT Sinar Cerah Sempurna?",
+      "Hai! 👋 Senang bisa membantu Anda. Mau tanya apa tentang SCS ke Sinar?",
     ],
     en: [
-      "Hello! 😊 I am SCS Pintar. How can I help you regarding PT Sinar Cerah Sempurna?",
-      "Hi! 👋 Glad to help. What would you like to ask SCS Pintar about SCS?",
+      "Hello! 😊 I am Sinar. How can I help you regarding PT Sinar Cerah Sempurna?",
+      "Hi! 👋 Glad to help. What would you like to ask Sinar about SCS?",
     ],
   },
 };
@@ -763,10 +752,10 @@ function generateResponse(input, settings, lang) {
 
   const fallbacks = {
     id: [
-      "Hmm, SCS Pintar belum menangkap maksudnya. 🤔 Coba tanyakan tentang layanan, lokasi, atau profil PT Sinar Cerah Sempurna!",
+      "Hmm, Sinar belum menangkap maksudnya. 🤔 Coba tanyakan tentang layanan, lokasi, atau profil PT Sinar Cerah Sempurna!",
     ],
     en: [
-      "Hmm, SCS Pintar didn't quite get that. 🤔 Try asking about the services, location, or profile of PT Sinar Cerah Sempurna!",
+      "Hmm, Sinar didn't quite get that. 🤔 Try asking about the services, location, or profile of PT Sinar Cerah Sempurna!",
     ],
   };
   return { text: fallbacks[lang][0], type: "bot", topic: "default" };
@@ -785,7 +774,7 @@ export default function ChatbotButton({ settings = {} }) {
       id: "welcome-msg",
       type: "bot",
       isWelcome: true,
-      text: "Halo! 👋 Saya SCS Pintar, asisten virtual PT Sinar Cerah Sempurna.\n\nSilakan pilih pertanyaan di bawah atau ketik langsung apa yang ingin Anda tanyakan!",
+      text: "Halo! 👋 Saya Sinar, asisten virtual PT Sinar Cerah Sempurna.\n\nSilakan pilih pertanyaan di bawah atau ketik langsung apa yang ingin Anda tanyakan!\n\n*(Tips: Klik ganda pada pesan untuk memberi ❤️)*",
       reaction: null,
     },
   ]);
@@ -794,7 +783,6 @@ export default function ChatbotButton({ settings = {} }) {
   const [activeTopic, setActiveTopic] = useState("default");
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-
   const [feedbackState, setFeedbackState] = useState("none");
 
   const messagesEndRef = useRef(null);
@@ -832,7 +820,6 @@ export default function ChatbotButton({ settings = {} }) {
       const timeoutId = setTimeout(() => {
         setMessages((msgs) => {
           if (msgs.some((m) => m.type === "feedback_prompt")) return msgs;
-
           return [
             ...msgs,
             {
@@ -840,8 +827,8 @@ export default function ChatbotButton({ settings = {} }) {
               type: "feedback_prompt",
               text:
                 langRef.current === "id"
-                  ? "Apakah jawaban SCS Pintar membantu sejauh ini?"
-                  : "Has SCS Pintar been helpful so far?",
+                  ? "Apakah jawaban Sinar membantu sejauh ini?"
+                  : "Has Sinar been helpful so far?",
             },
           ];
         });
@@ -858,7 +845,6 @@ export default function ChatbotButton({ settings = {} }) {
 
   useEffect(() => {
     if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
-
     const userHasInteracted = messages.some((m) => m.type === "user");
 
     if (userHasInteracted && feedbackState === "none") {
@@ -921,8 +907,8 @@ export default function ChatbotButton({ settings = {} }) {
       addBotMessage({
         text:
           lang === "id"
-            ? "Terima kasih atas masukannya! SCS Pintar akan belajar menjadi lebih baik. 🙏"
-            : "Thank you for your feedback! SCS Pintar will learn to be better. 🙏",
+            ? "Terima kasih atas masukannya! Sinar akan belajar menjadi lebih baik. 🙏"
+            : "Thank you for your feedback! Sinar will learn to be better. 🙏",
         type: "bot",
       });
       setFeedbackState("done");
@@ -941,7 +927,6 @@ export default function ChatbotButton({ settings = {} }) {
 
     const isEndOfBranch =
       responseData.topic !== "default" && !FAQ_TREE[responseData.topic];
-
     if (isEndOfBranch) {
       triggerFeedback(3500);
     }
@@ -949,20 +934,17 @@ export default function ChatbotButton({ settings = {} }) {
 
   const handleFeedbackSelect = (emoji) => {
     const negativeEmojis = ["👎"];
-
     if (negativeEmojis.includes(emoji)) {
-      // Only save negative feedback to the log
       sendFeedbackToAdmin("emoji_rating", emoji);
       setFeedbackState("awaiting_text");
       addBotMessage({
         text:
           lang === "id"
-            ? "Maaf jika jawaban SCS Pintar belum memuaskan. 😔 Boleh beritahu apa yang bisa diperbaiki?"
-            : "Sorry if SCS Pintar's answer wasn't satisfactory. 😔 Could you tell me what can be improved?",
+            ? "Maaf jika jawaban Sinar belum memuaskan. 😔 Boleh beritahu apa yang bisa diperbaiki?"
+            : "Sorry if Sinar's answer wasn't satisfactory. 😔 Could you tell me what can be improved?",
         type: "bot",
       });
     } else {
-      // Positive feedback is NOT saved to the log
       setFeedbackState("done");
       addBotMessage({
         text:
@@ -993,8 +975,8 @@ export default function ChatbotButton({ settings = {} }) {
               reaction: null,
               text:
                 newLang === "id"
-                  ? "Halo! 👋 Saya SCS Pintar, asisten virtual PT Sinar Cerah Sempurna.\n\nSilakan pilih pertanyaan di bawah atau ketik langsung apa yang ingin Anda tanyakan!"
-                  : "Hello! 👋 I am SCS Pintar, PT Sinar Cerah Sempurna's virtual assistant.\n\nPlease select a question below or directly type what you want to ask!",
+                  ? "Halo! 👋 Saya Sinar, asisten virtual PT Sinar Cerah Sempurna.\n\nSilakan pilih pertanyaan di bawah atau ketik langsung apa yang ingin Anda tanyakan!\n\n*(Tips: Klik ganda pada pesan untuk memberi ❤️)*"
+                  : "Hello! 👋 I am Sinar, PT Sinar Cerah Sempurna's virtual assistant.\n\nPlease select a question below or directly type what you want to ask!\n\n*(Tip: Double-click a message to ❤️ it)*",
             },
           ];
         }
@@ -1047,7 +1029,7 @@ export default function ChatbotButton({ settings = {} }) {
               scale: 0.9,
             }}
             transition={{ type: "spring", damping: 24, stiffness: 220 }}
-            className="bg-white shadow-2xl border border-neutral-200 overflow-hidden flex flex-col absolute bottom-[70px] right-0 origin-bottom-right"
+            className="bg-white shadow-2xl border border-neutral-200 overflow-hidden flex flex-col absolute bottom-17.5 right-0 origin-bottom-right"
           >
             <div className="w-[min(340px,calc(100vw-2rem))] h-[min(480px,calc(100vh-120px))] flex flex-col justify-between shrink-0">
               {/* Header */}
@@ -1079,7 +1061,7 @@ export default function ChatbotButton({ settings = {} }) {
               </div>
 
               {/* Area Pesan */}
-              <div className="flex-grow p-4 overflow-y-auto overscroll-contain space-y-4 bg-[#f7f7f8] pb-6">
+              <div className="grow p-4 overflow-y-auto overscroll-contain space-y-4 bg-[#f7f7f8] pb-6">
                 {messages.map((msg) => (
                   <motion.div
                     key={msg.id}
@@ -1089,7 +1071,7 @@ export default function ChatbotButton({ settings = {} }) {
                   >
                     {msg.type === "feedback_prompt" ? (
                       <div className="flex flex-col gap-1.5 w-full items-start">
-                        <div className="bg-white text-[#1E1E1E] border border-neutral-200 px-3.5 py-2.5 rounded-2xl rounded-bl-md shadow-sm max-w-[85%] text-[13px]">
+                        <div className="bg-white text-[#1E1E1E] border border-neutral-200 px-3.5 py-2.5 rounded-2xl rounded-bl-sm shadow-sm max-w-[85%] text-[13px] break-words">
                           {msg.text}
                         </div>
                         {feedbackState === "prompted" && (
@@ -1100,7 +1082,7 @@ export default function ChatbotButton({ settings = {} }) {
                                 <button
                                   key={emoji}
                                   onClick={() => handleFeedbackSelect(emoji)}
-                                  className={`bg-white border shadow-sm px-3 py-1.5 rounded-full text-sm active:scale-95 transition-all flex items-center justify-center ${
+                                  className={`bg-white border shadow-sm px-3 py-1.5 rounded-full text-sm active:scale-95 transition-all flex items-center justify-center cursor-pointer ${
                                     isPositive
                                       ? "border-green-200 hover:bg-green-50"
                                       : "border-red-200 hover:bg-red-50"
@@ -1116,10 +1098,11 @@ export default function ChatbotButton({ settings = {} }) {
                     ) : (
                       <div className="relative group">
                         <div
-                          className={`px-3.5 py-2.5 rounded-2xl text-[13px] leading-relaxed max-w-[85%] whitespace-pre-line relative ${
+                          onDoubleClick={() => toggleReaction(msg.id)}
+                          className={`px-3.5 py-2.5 rounded-2xl text-[13px] leading-relaxed max-w-[85%] whitespace-pre-line break-words relative select-none cursor-pointer ${
                             msg.type === "user"
-                              ? "bg-[#004282] text-white rounded-br-md"
-                              : "bg-white text-[#1E1E1E] border border-neutral-200 rounded-bl-md shadow-sm"
+                              ? "bg-[#004282] text-white rounded-br-sm"
+                              : "bg-white text-[#1E1E1E] border border-neutral-200 shadow-sm rounded-bl-sm"
                           }`}
                         >
                           {msg.text}
@@ -1131,6 +1114,7 @@ export default function ChatbotButton({ settings = {} }) {
                             />
                           )}
 
+                          {/* REACTION BADGE FIX: Kembali ke posisi awal */}
                           {msg.reaction && (
                             <div
                               className={`absolute -bottom-2.5 ${
@@ -1141,16 +1125,6 @@ export default function ChatbotButton({ settings = {} }) {
                             </div>
                           )}
                         </div>
-
-                        <button
-                          onClick={() => toggleReaction(msg.id)}
-                          className={`absolute bottom-0 opacity-0 group-hover:opacity-100 transition-opacity bg-white shadow-md border border-neutral-100 rounded-full p-1 text-xs z-10 hover:scale-110 ${
-                            msg.type === "user" ? "-left-6" : "-right-6"
-                          }`}
-                          title="Love message"
-                        >
-                          ❤️
-                        </button>
                       </div>
                     )}
                   </motion.div>
@@ -1158,7 +1132,7 @@ export default function ChatbotButton({ settings = {} }) {
 
                 {isTyping && (
                   <div className="flex justify-start">
-                    <div className="bg-white border border-neutral-200 px-4 py-3 rounded-2xl rounded-bl-md shadow-sm flex gap-1.5">
+                    <div className="bg-white border border-neutral-200 px-4 py-3 rounded-2xl rounded-bl-sm shadow-sm flex gap-1.5">
                       <span
                         className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce"
                         style={{ animationDelay: "0ms" }}
@@ -1189,7 +1163,7 @@ export default function ChatbotButton({ settings = {} }) {
                           <button
                             key={idx}
                             onClick={() => processUserInput(q)}
-                            className="text-[11px] font-medium text-[#004282] bg-blue-50 hover:bg-blue-100 border border-blue-200 px-3 py-1.5 rounded-full transition-colors text-left"
+                            className="text-[11px] font-medium text-[#004282] bg-blue-50 hover:bg-blue-100 border border-blue-200 px-3 py-1.5 rounded-full transition-colors text-left cursor-pointer"
                           >
                             {q}
                           </button>
@@ -1201,7 +1175,7 @@ export default function ChatbotButton({ settings = {} }) {
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* Input */}
+              {/* Input Area */}
               <div className="p-3 border-t border-neutral-200 bg-white flex gap-2 shrink-0 z-10">
                 <input
                   type="text"
@@ -1217,7 +1191,7 @@ export default function ChatbotButton({ settings = {} }) {
                         ? "Ketik pertanyaan Anda..."
                         : "Type your question..."
                   }
-                  className="flex-grow border border-neutral-300 rounded-xl px-3.5 py-2.5 text-[13px] focus:outline-none focus:border-[#004282] focus:ring-1 focus:ring-[#004282]/20 transition-all"
+                  className="grow border border-neutral-300 rounded-xl px-3.5 py-2.5 text-[13px] focus:outline-none focus:border-[#004282] focus:ring-1 focus:ring-[#004282]/20 transition-all"
                   autoFocus
                 />
                 <button
@@ -1240,11 +1214,9 @@ export default function ChatbotButton({ settings = {} }) {
         onClick={handleToggleChat}
         className="relative w-14 h-14 bg-yellow-400 hover:bg-yellow-500 text-[#004282] rounded-full shadow-xl transition-all duration-200 focus:outline-none group active:scale-95 flex items-center justify-center z-10 cursor-pointer"
       >
-        {/* Titik Merah Notifikasi */}
         {hasUnread && !isOpen && (
           <span className="absolute top-0 right-0 w-3.5 h-3.5 bg-red-500 border-2 border-white rounded-full"></span>
         )}
-
         <motion.svg
           animate={{ rotate: isOpen ? 180 : 0, scale: isOpen ? 0.95 : 1 }}
           className="w-7 h-7 fill-current transform group-hover:rotate-12 transition-transform duration-200"

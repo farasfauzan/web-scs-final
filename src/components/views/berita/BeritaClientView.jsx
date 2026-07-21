@@ -16,7 +16,7 @@ function BeritaHero({ heroData }) {
       <div className="absolute inset-0 z-0">
         <CldImg
           src={heroData?.imageUrl || "/carousel1.svg"}
-          alt=""
+          alt="Latar Belakang Hero Berita Sinar Cerah Sempurna"
           className="w-full h-full object-cover object-top"
         />
         <div className="absolute inset-0 bg-[#004282]/85"></div>
@@ -112,16 +112,21 @@ export default function BeritaClientView({ heroData, initialNews }) {
 
       <Suspense
         fallback={
-          <section className="w-full flex justify-center pt-[clamp(3rem,5vh,4rem)] px-6 mt-10">
-            {/* PERBAIKAN SKELETON: Harus sinkron dengan NewsList, gap-4 md:gap-8 */}
-            <div className="max-w-7xl w-full grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
-              {Array(6)
-                .fill(0)
-                .map((_, idx) => (
-                  <NewsSkeleton key={`skel-news-${idx}`} />
-                ))}
-            </div>
-          </section>
+          <div className="w-full flex flex-col items-center">
+            {/* Skeleton Search Bar untuk Mencegah Layout Shift */}
+            <section className="relative z-20 -mt-[26px] px-6 flex justify-center w-full">
+              <div className="w-full max-w-7xl h-[52px] md:h-[60px] bg-neutral-200/80 rounded-full animate-pulse border border-neutral-100 shadow-sm"></div>
+            </section>
+            <section className="w-full flex justify-center pt-[clamp(3rem,5vh,4rem)] px-6 mt-10">
+              <div className="max-w-7xl w-full grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
+                {Array(6)
+                  .fill(0)
+                  .map((_, idx) => (
+                    <NewsSkeleton key={`skel-news-${idx}`} />
+                  ))}
+              </div>
+            </section>
+          </div>
         }
       >
         <BeritaInteractive initialNews={initialNews} />

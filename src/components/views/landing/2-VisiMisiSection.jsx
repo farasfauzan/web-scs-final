@@ -21,7 +21,10 @@ export default function VisiMisiSection() {
   ];
 
   return (
-    <section className="w-full bg-[#F1F1F1] py-[clamp(3rem,8vh,6rem)] px-6 flex flex-col items-center">
+    <section
+      id="visi-misi"
+      className="w-full bg-[#F1F1F1] py-[clamp(3rem,8vh,6rem)] px-6 flex flex-col items-center"
+    >
       <div className="max-w-7xl mx-auto w-full flex flex-col gap-[clamp(2.5rem,6vh,4rem)] items-center">
         <FadeUp
           delay={0.1}
@@ -44,10 +47,13 @@ export default function VisiMisiSection() {
             {values.map((item, idx) => (
               <div key={idx} className="flex flex-col gap-2 md:gap-3">
                 <div className="flex items-center gap-3 mb-1 md:mb-2">
-                  <div className="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center shrink-0">
+                  <div
+                    className="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center shrink-0"
+                    aria-hidden="true"
+                  >
                     <CldImg
                       src={item.icon}
-                      alt={item.title}
+                      alt="" // Dikosongkan agar tidak dibaca ulang oleh screen reader, karena judul sudah ada di h3
                       className="w-full h-full object-contain"
                     />
                   </div>

@@ -27,8 +27,7 @@ export default function SinergiSection({ data }) {
 
         <div className="flex flex-wrap justify-center gap-x-6 gap-y-10 md:gap-x-12 md:gap-y-14 w-full mt-4">
           {networks.map((item, idx) => {
-            const displayName =
-              item.name || item.title || "PT Maharani Globalindo";
+            const displayName = item.name || item.title || "Mitra Perusahaan";
             const logo = item.logoUrl || item.image || "/logo-scs.svg";
             const hasLink = !!item.linkUrl;
             const WrapperComponent = hasLink ? "a" : "div";
@@ -37,47 +36,53 @@ export default function SinergiSection({ data }) {
               <FadeUp
                 key={idx}
                 delay={0.2 + Math.min(idx * 0.1, 0.8)}
-                className="flex flex-col items-center gap-3 md:gap-4 text-center w-[140px] md:w-[180px]"
+                className="flex flex-col items-center text-center w-[140px] md:w-[180px]"
               >
+                {/* 
+                  KUNCI PERBAIKAN: Jika ada link, seluruh kartu (gambar dan teks) 
+                  dibungkus SATU tag anchor luar. Tidak boleh ada tag anchor bersarang.
+                */}
                 <WrapperComponent
                   href={item.linkUrl || undefined}
                   target={hasLink ? "_blank" : undefined}
                   rel={hasLink ? "noopener noreferrer" : undefined}
-                  className={`relative w-20 h-20 md:w-32 md:h-32 bg-white rounded-full flex items-center justify-center overflow-hidden shrink-0 border border-neutral-200 shadow-sm p-3 md:p-4 ${
-                    hasLink
-                      ? "hover:scale-105 hover:shadow-md transition-all duration-300 cursor-pointer"
-                      : ""
+                  className={`group flex flex-col items-center gap-3 md:gap-4 ${
+                    hasLink ? "cursor-pointer" : ""
                   }`}
+                  aria-label={
+                    hasLink ? `Kunjungi situs web ${displayName}` : undefined
+                  }
                 >
-                  <OptimizedImage
-                    src={logo}
-                    alt={displayName}
-                    fill
-                    cldOptions={IMAGE_SIZES.avatar}
-                    className="object-contain"
-                  />
-                </WrapperComponent>
+                  <div
+                    className={`relative w-20 h-20 md:w-32 md:h-32 bg-white rounded-full flex items-center justify-center overflow-hidden shrink-0 border border-neutral-200 shadow-sm p-3 md:p-4 ${
+                      hasLink
+                        ? "group-hover:scale-105 group-hover:shadow-md transition-all duration-300"
+                        : ""
+                    }`}
+                  >
+                    <OptimizedImage
+                      src={logo}
+                      alt={displayName}
+                      fill
+                      cldOptions={IMAGE_SIZES.avatar}
+                      className="object-contain"
+                    />
+                  </div>
 
-                <h3 className="text-black text-[15px] md:text-xl font-extrabold font-['Plus_Jakarta_Sans'] leading-tight">
-                  {hasLink ? (
-                    <a
-                      href={item.linkUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="hover:text-[#004282] transition-colors"
-                    >
-                      {displayName}
-                    </a>
-                  ) : (
-                    displayName
+                  <h3
+                    className={`text-black text-[15px] md:text-xl font-extrabold font-['Plus_Jakarta_Sans'] leading-tight transition-colors ${
+                      hasLink ? "group-hover:text-[#004282]" : ""
+                    }`}
+                  >
+                    {displayName}
+                  </h3>
+
+                  {item.desc && (
+                    <p className="text-black text-xs md:text-sm font-normal font-['Plus_Jakarta_Sans'] hidden md:block">
+                      {item.desc}
+                    </p>
                   )}
-                </h3>
-
-                {item.desc && (
-                  <p className="text-black text-xs md:text-sm font-normal font-['Plus_Jakarta_Sans'] hidden md:block">
-                    {item.desc}
-                  </p>
-                )}
+                </WrapperComponent>
               </FadeUp>
             );
           })}

@@ -15,7 +15,7 @@ function ProyekHero({ heroData }) {
       <div className="absolute inset-0 z-0">
         <CldImg
           src={heroData?.imageUrl || "/carousel3.svg"}
-          alt=""
+          alt="Latar Belakang Visi dan Proyek Konstruksi Sinar Cerah Sempurna"
           className="w-full h-full object-cover object-top"
         />
         <div className="absolute inset-0 bg-[#004282]/85"></div>
@@ -103,10 +103,7 @@ function ProyekInteractive({ initialProjects }) {
           delay={0.2}
           className="w-full max-w-7xl flex flex-col-reverse lg:flex-row justify-between items-center lg:items-start gap-4 md:gap-6"
         >
-          {/* ======================= */}
-          {/* DESKTOP VIEW (ISOLATED) */}
-          {/* ======================= */}
-          {/* lg:flex-wrap dan lg:overflow-visible dipertahankan seperti desain asli milikmu */}
+          {/* DESKTOP VIEW */}
           <div
             className="hidden lg:flex items-center lg:flex-wrap p-1.5 bg-white rounded-[24px] shadow-md overflow-x-auto lg:overflow-visible w-full lg:max-w-[800px] scrollbar-hide shrink-0 z-30"
             role="tablist"
@@ -129,9 +126,7 @@ function ProyekInteractive({ initialProjects }) {
             ))}
           </div>
 
-          {/* ======================= */}
-          {/* MOBILE VIEW (ISOLATED)  */}
-          {/* ======================= */}
+          {/* MOBILE VIEW */}
           <div className="lg:hidden w-full flex justify-start relative z-30 shrink-0">
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -155,14 +150,12 @@ function ProyekInteractive({ initialProjects }) {
               </svg>
             </button>
 
-            {/* Layer Transparan Penjaga Klik Luar */}
             <div
               className={`fixed inset-0 z-40 ${isDropdownOpen ? "block" : "hidden"}`}
               onClick={() => setIsDropdownOpen(false)}
               aria-hidden="true"
             />
 
-            {/* Dropdown Menu */}
             <div
               className={`absolute top-[calc(100%+8px)] left-0 w-[220px] bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] border border-neutral-100 overflow-hidden z-50 flex flex-col py-2 origin-top transition-all duration-300 ${
                 isDropdownOpen
@@ -189,12 +182,11 @@ function ProyekInteractive({ initialProjects }) {
             </div>
           </div>
 
-          {/* ======================= */}
-          {/* SEARCH BAR              */}
-          {/* ======================= */}
+          {/* SEARCH BAR */}
           <div className="flex items-center bg-white rounded-full pl-6 pr-1.5 py-1.5 shadow-md w-full lg:w-[440px] shrink-0 relative z-20">
             <input
-              type="text"
+              type="search"
+              aria-label="Cari proyek, lokasi, atau klien"
               placeholder="Cari proyek, lokasi, klien..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -259,15 +251,24 @@ export default function ProyekClientView({ heroData, initialProjects }) {
 
       <Suspense
         fallback={
-          <section className="w-full flex justify-center pt-[clamp(3rem,5vh,4rem)] px-6">
-            <div className="max-w-7xl w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
-              {Array(6)
-                .fill(0)
-                .map((_, idx) => (
-                  <ProjectSkeleton key={`skel-init-${idx}`} />
-                ))}
-            </div>
-          </section>
+          <div className="w-full flex flex-col items-center">
+            {/* Skeleton Filter & Search untuk Mencegah Layout Shift */}
+            <section className="relative z-20 -mt-[26px] flex justify-center px-6 w-full">
+              <div className="w-full max-w-7xl flex flex-col-reverse lg:flex-row justify-between items-center lg:items-start gap-4 md:gap-6">
+                <div className="w-full lg:max-w-[800px] h-[52px] bg-neutral-200/80 rounded-[24px] animate-pulse border border-neutral-100 shadow-sm"></div>
+                <div className="w-full lg:w-[440px] h-[52px] bg-neutral-200/80 rounded-full animate-pulse border border-neutral-100 shadow-sm"></div>
+              </div>
+            </section>
+            <section className="w-full flex justify-center pt-[clamp(3rem,5vh,4rem)] px-6">
+              <div className="max-w-7xl w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
+                {Array(6)
+                  .fill(0)
+                  .map((_, idx) => (
+                    <ProjectSkeleton key={`skel-init-${idx}`} />
+                  ))}
+              </div>
+            </section>
+          </div>
         }
       >
         <ProyekInteractive initialProjects={initialProjects} />

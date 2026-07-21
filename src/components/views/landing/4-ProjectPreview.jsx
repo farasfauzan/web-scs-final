@@ -74,17 +74,21 @@ export default function ProjectPreview({ data }) {
           delay={0.2}
           className="mb-5 md:mb-8 w-full flex justify-start md:justify-center relative z-20"
         >
-          {/* ======================= */}
-          {/* DESKTOP VIEW            */}
-          {/* ======================= */}
-          <div className="hidden md:inline-flex bg-white rounded-full p-1.5 shadow-sm items-center justify-center flex-wrap gap-1">
+          {/* DESKTOP VIEW */}
+          <div
+            className="hidden md:inline-flex bg-white rounded-full p-1.5 shadow-sm items-center justify-center flex-wrap gap-1"
+            role="tablist"
+            aria-label="Filter Kategori Proyek"
+          >
             {categories.map((cat) => (
               <button
                 key={cat}
+                role="tab"
+                aria-selected={activeCategory === cat}
                 onClick={() => setActiveCategory(cat)}
                 className={`cursor-pointer px-5 py-2 rounded-full font-semibold text-sm transition-all duration-300 ${
                   activeCategory === cat
-                    ? "bg-[#6B7AE5] text-white shadow-sm" // Disesuaikan menjadi ungu agar seragam
+                    ? "bg-[#6B7AE5] text-white shadow-sm"
                     : "text-neutral-400 hover:text-stone-600"
                 }`}
               >
@@ -93,12 +97,12 @@ export default function ProjectPreview({ data }) {
             ))}
           </div>
 
-          {/* ======================= */}
-          {/* MOBILE VIEW (Identik)   */}
-          {/* ======================= */}
+          {/* MOBILE VIEW */}
           <div className="md:hidden relative self-start z-30">
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              aria-label="Buka menu kategori"
+              aria-expanded={isDropdownOpen}
               className="flex items-center justify-between gap-3 px-5 py-2.5 bg-white rounded-full shadow-md border border-neutral-100 text-[#6B7AE5] text-[14px] font-bold z-20 relative"
             >
               {activeCategory}
@@ -119,14 +123,12 @@ export default function ProjectPreview({ data }) {
               </svg>
             </button>
 
-            {/* Layer Transparan Penjaga Klik Luar */}
             <div
               className={`fixed inset-0 z-40 ${isDropdownOpen ? "block" : "hidden"}`}
               onClick={() => setIsDropdownOpen(false)}
               aria-hidden="true"
             />
 
-            {/* Dropdown Menu (Animasi scale-y) */}
             <div
               className={`absolute top-[calc(100%+8px)] left-0 w-[220px] bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] border border-neutral-100 overflow-hidden z-50 flex flex-col py-2 origin-top transition-all duration-300 ${
                 isDropdownOpen
@@ -171,6 +173,7 @@ export default function ProjectPreview({ data }) {
         <FadeUp delay={0.6} className="w-full flex justify-end mt-2 md:mt-0">
           <Link
             href="/proyek"
+            aria-label="Lihat seluruh daftar proyek"
             className="inline-flex items-center gap-1 text-sky-700 hover:text-sky-900 font-bold text-xs md:text-sm font-['Plus_Jakarta_Sans'] transition-colors"
           >
             Lihat Semua
@@ -184,7 +187,7 @@ export default function ProjectPreview({ data }) {
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                d="M9 5l7 7-7 7"
+                d="M9 5l7 7-7-7"
               />
             </svg>
           </Link>
