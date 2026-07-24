@@ -34,7 +34,10 @@ SUSPICIOUS_PATTERNS=(
 )
 
 # Ekstensi file yang diizinkan untuk mengandung .env (hanya .env.example)
-ALLOWED_ENV_FILES=('.env.example')
+ALLOWED_ENV_FILES=('.env.example' './.env.example')
+
+# File yang di-skip dari content scanning (pattern regex false-positive)
+SKIP_CONTENT_SCAN=('.gitignore' 'scripts/pre-commit-check.sh' './scripts/pre-commit-check.sh')
 
 echo -e "${YELLOW}[SECURITY CHECK] Memindai file yang akan di-commit...${NC}"
 
@@ -64,6 +67,11 @@ for FILE in $STAGED_FILES; do
   if [[ "$BASENAME" == .env* ]] && [[ "$BASENAME" != ".env.example" ]]; then
     echo -e "${RED}  ❌ TERDETEKSI: File environment '$FILE' akan di-commit! ${NC}"
     VIOLATIONS=$((VIOLATIONS + 1))
+    continue
+  fi
+
+  # Skip file yang terdaftar di SKIP_CONTENT_SCAN
+  if [[ " ${SKIP_CONTENT_SCAN[@]} " =~ " ${FILE} " ]]; then
     continue
   fi
 
