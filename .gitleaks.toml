@@ -1,0 +1,52 @@
+# =============================================================================
+# Gitleaks Configuration — PT Sinar Cerah Sempurna
+# =============================================================================
+# Gitleaks digunakan di GitHub Actions untuk auto-scan credentials.
+# File ini mengatur:
+#   - Aturan deteksi kustom (tambahan dari bawaan Gitleaks)
+#   - Whitelist path/file yang aman (false-positif)
+#
+# Referensi: https://github.com/gitleaks/gitleaks#configuration
+# =============================================================================
+
+# ────────────────────────────────────────────────────────────────────────────
+# Whitelist — Path/file yang di-skip dari scanning
+# ────────────────────────────────────────────────────────────────────────────
+[allowlist]
+  description = "File dan path yang aman — bukan data sensitif"
+
+  # File yang sengaja mengandung pola mirip credentials (false-positif)
+  paths = [
+    '''^\.github/workflows/secret-scan\.yml$''',    # Workflow itu sendiri
+    '''^scripts/pre-commit-check\.sh$''',            # Pre-commit hook (regex patterns)
+    '''^\.gitleaks\.toml$''',                         # Config ini sendiri
+    '''^prisma/seed\.ts$''',                          # Seed script (password dari env)
+    '''^next\.config\.ts$''',                         # Next.js config
+    '''^\.env\.example$''',                           # Template env (placeholder values)
+  ]
+
+  # Komentar eksak yang mengandung kata kunci teknis (bukan credentials)
+  # CATATAN: Gunakan pattern yang sempit — jangan sampe mask credential asli!
+  regexes = [
+    '''# .*password.*adalah''',      # Komentar dokumentasi, bukan credential
+    '''JWT_SECRET.*env''',           # Referensi env var, bukan nilai
+    '''DATABASE_URL.*env''',         # Referensi env var, bukan nilai
+  ]
+
+# ────────────────────────────────────────────────────────────────────────────
+# Aturan Kustom — pola spesifik project + bypass bawaan yang terlalu ketat
+# ────────────────────────────────────────────────────────────────────────────
+
+# Aturan: Next.js public env vars (aman untuk di-commit)
+[[rules]]
+  id = "nextjs-public-env"
+  description = "Next.js public environment variable (NEXT_PUBLIC_)"
+  regex = '''NEXT_PUBLIC_'''
+  allowlist = { paths = ['''\.(js|jsx|ts|tsx|env\.example)$'''] }
+
+# Aturan: Cloudinary asset URL (bukan credential)
+[[rules]]
+  id = "cloudinary-asset-url"
+  description = "Cloudinary asset URL di source code"
+  regex = '''res\.cloudinary\.com/'''
+  allowlist = { paths = ['''\.(js|jsx|ts|tsx|json)$'''] }
