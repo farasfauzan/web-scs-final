@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 import CldImg from "@/components/shared/CldImg";
 
 // ═══════════════════════════════════════════════════════════
@@ -1157,17 +1158,41 @@ export default function ChatbotButton({ settings = {} }) {
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 4 }}
-                        className="flex flex-wrap gap-1.5 pt-1"
+                        className="flex flex-col gap-2 pt-1"
                       >
-                        {getDynamicFaq(lang, activeTopic).map((q, idx) => (
-                          <button
-                            key={idx}
-                            onClick={() => processUserInput(q)}
-                            className="text-[11px] font-medium text-[#004282] bg-blue-50 hover:bg-blue-100 border border-blue-200 px-3 py-1.5 rounded-full transition-colors text-left cursor-pointer"
+                        {/* Aksi Cepat: navigasi langsung */}
+                        <div className="flex flex-wrap gap-1.5">
+                          <Link
+                            href="/proyek"
+                            className="text-[11px] font-semibold text-white bg-[#004282] hover:bg-blue-900 px-3 py-1.5 rounded-full transition-colors cursor-pointer"
                           >
-                            {q}
-                          </button>
-                        ))}
+                            🏗️ Lihat Proyek
+                          </Link>
+                          <Link
+                            href="/berita"
+                            className="text-[11px] font-semibold text-white bg-[#004282] hover:bg-blue-900 px-3 py-1.5 rounded-full transition-colors cursor-pointer"
+                          >
+                            📰 Baca Berita
+                          </Link>
+                          <Link
+                            href="/hubungi-kami"
+                            className="text-[11px] font-semibold text-white bg-[#004282] hover:bg-blue-900 px-3 py-1.5 rounded-full transition-colors cursor-pointer"
+                          >
+                            ✉️ Hubungi Kami
+                          </Link>
+                        </div>
+
+                        <div className="flex flex-wrap gap-1.5">
+                          {getDynamicFaq(lang, activeTopic).map((q, idx) => (
+                            <button
+                              key={idx}
+                              onClick={() => processUserInput(q)}
+                              className="text-[11px] font-medium text-[#004282] bg-blue-50 hover:bg-blue-100 border border-blue-200 px-3 py-1.5 rounded-full transition-colors text-left cursor-pointer"
+                            >
+                              {q}
+                            </button>
+                          ))}
+                        </div>
                       </motion.div>
                     )}
                 </AnimatePresence>

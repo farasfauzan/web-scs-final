@@ -250,16 +250,19 @@ export default async function TentangKamiPage() {
               const desc = settings[n.descKey] || n.defaultDesc;
               const icon = settings[n.iconKey] || n.defaultIcon;
               return (
-                <div key={idx} className="flex gap-5">
-                  <div className="w-14 h-14 bg-white rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.05)] border border-neutral-100 flex items-center justify-center shrink-0">
+                <div
+                  key={idx}
+                  className="group flex gap-5 rounded-2xl p-4 -m-2 transition-all duration-300 hover:bg-white hover:shadow-[0_12px_30px_-15px_rgba(0,66,130,0.3)] hover:border border-neutral-100 border border-transparent"
+                >
+                  <div className="w-14 h-14 bg-white rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.05)] border border-neutral-100 flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3">
                     <img
                       src={icon}
                       alt={title}
-                      className="w-6 h-6 object-contain opacity-80"
+                      className="w-6 h-6 object-contain opacity-80 transition-opacity duration-300 group-hover:opacity-100"
                     />
                   </div>
                   <div className="flex flex-col gap-2">
-                    <h4 className="text-lg font-bold text-[#1E1E1E]">
+                    <h4 className="text-lg font-bold text-[#1E1E1E] transition-colors duration-300 group-hover:text-[#004282]">
                       {title}
                     </h4>
                     <p className="text-sm text-[#757575] leading-relaxed">

@@ -45,10 +45,13 @@ export default function VisiMisiSection() {
         <FadeUp delay={0.2} className="w-full">
           <div className="bg-[#FFFFFF] rounded-3xl p-[clamp(1.5rem,4vw,3rem)] border border-[#E6E6E6] shadow-sm grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
             {values.map((item, idx) => (
-              <div key={idx} className="flex flex-col gap-2 md:gap-3">
+              <div
+                key={idx}
+                className="group flex flex-col gap-2 md:gap-3 rounded-2xl p-3 md:p-4 -m-3 md:-m-4 transition-all duration-300 hover:bg-blue-50/70 hover:shadow-[0_10px_30px_-12px_rgba(0,66,130,0.25)]"
+              >
                 <div className="flex items-center gap-3 mb-1 md:mb-2">
                   <div
-                    className="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center shrink-0"
+                    className="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110"
                     aria-hidden="true"
                   >
                     <CldImg
@@ -57,7 +60,7 @@ export default function VisiMisiSection() {
                       className="w-full h-full object-contain"
                     />
                   </div>
-                  <h3 className="text-[#1E1E1E] text-lg md:text-xl font-bold font-['Plus_Jakarta_Sans'] leading-tight">
+                  <h3 className="text-[#1E1E1E] text-lg md:text-xl font-bold font-['Plus_Jakarta_Sans'] leading-tight transition-colors duration-300 group-hover:text-[#004282]">
                     {item.title}
                   </h3>
                 </div>

@@ -86,3 +86,4 @@ yarn.lock.bak
 
 AGENTS.md
 CLAUDE.md
+.env*

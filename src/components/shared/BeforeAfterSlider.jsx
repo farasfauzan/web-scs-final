@@ -63,12 +63,30 @@ export default function BeforeAfterSlider({
     };
   }, [isDragging]);
 
+  // Dukungan keyboard: panah kiri/kanan menggeser pembatas
+  const handleKeyDown = (e) => {
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      setPosition((prev) => Math.max(0, prev - 5));
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      setPosition((prev) => Math.min(100, prev + 5));
+    }
+  };
+
   return (
     <div
       ref={containerRef}
-      className="relative select-none overflow-hidden rounded-xl shadow-sm aspect-video bg-gray-100"
+      className="relative select-none overflow-hidden rounded-xl shadow-sm aspect-video bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#004282]"
       onMouseDown={(e) => handleStart(e.clientX)}
       onTouchStart={(e) => handleStart(e.touches[0].clientX)}
+      onKeyDown={handleKeyDown}
+      role="slider"
+      tabIndex={0}
+      aria-label={`Perbandingan ${beforeAlt} dan ${afterAlt}`}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={Math.round(position)}
     >
       <img
         src={afterSrc}

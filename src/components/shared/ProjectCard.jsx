@@ -9,7 +9,7 @@ export default function ProjectCard({ project }) {
   return (
     <Link
       href={`/proyek/${project?.slug || encodeId(project.id)}`}
-      className="bg-white rounded-[20px] overflow-hidden flex flex-col shadow-sm hover:shadow-md transition-all group w-full border border-neutral-100 h-full"
+      className="bg-white rounded-[20px] overflow-hidden flex flex-col shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group w-full border border-neutral-100 h-full"
     >
       {/* KOREKSI: Tinggi gambar dikecilkan di mobile */}
       <div className="w-full h-[140px] md:h-[160px] bg-neutral-200 relative overflow-hidden shrink-0">

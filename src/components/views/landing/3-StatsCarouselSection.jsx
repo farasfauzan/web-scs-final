@@ -1,6 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
 import FadeUp from "@/components/ui/FadeUp";
+import CountUp from "@/components/ui/CountUp";
 import CldImg from "@/components/shared/CldImg";
 
 export default function StatsCarouselSection({ data }) {
@@ -82,9 +82,10 @@ export default function StatsCarouselSection({ data }) {
                     className="w-5 h-5 md:w-6 md:h-6 brightness-0 invert"
                   />
                 </div>
-                <span className="text-white text-2xl md:text-4xl font-extrabold font-['Plus_Jakarta_Sans'] leading-none">
-                  {stat.value}
-                </span>
+                <CountUp
+                  value={stat.value}
+                  className="text-white text-2xl md:text-4xl font-extrabold font-['Plus_Jakarta_Sans'] leading-none"
+                />
                 <span className="text-white text-[13px] md:text-2xl font-semibold font-['Plus_Jakarta_Sans']">
                   {stat.label}
                 </span>
